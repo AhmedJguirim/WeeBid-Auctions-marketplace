@@ -9,8 +9,14 @@ import Box from "@mui/material/Box";
 import Typography from "@mui/material/Typography";
 import Container from "@mui/material/Container";
 import { FormControl, InputLabel, MenuItem, Select } from "@mui/material";
+import { ButtonStyles, formBox } from "../base/customComponents/general";
+import axios from "axios";
 
-const CreerEnchere = () => {
+
+ 
+  
+
+const CreerEnchere = ({article}) => {
   //#region form data state
   
   const [quantity, setQuantity] = React.useState("");
@@ -19,6 +25,7 @@ const CreerEnchere = () => {
   const [startDate, setStartDate] = React.useState(new Date());
   const [endDate, setEndDate] = React.useState(new Date());
   const [category, setCategory] = React.useState("");
+  
   //#endregion
 
   //#region state manipulation mathods
@@ -36,29 +43,43 @@ const CreerEnchere = () => {
   };
 
   //#endregion
-  
+  const [categories, setCategories] = React.useState({});
+   //categories GET request
+   async function getCategories() {
+    try {
+      const response = await axios.get('http://127.0.0.1:8000/api/categories');
+      
+      setCategories(response["data"]["hydra:member"])
+      
+    } catch (error) {
+      console.error(error);
+    }
+  }
+
   const handleSubmit = (event) => {
     event.preventDefault();
     const enchereData = {
         quantity: quantity,
         initPrice: initPrice,
+        currentPrice: initPrice,
         immediatePrice: immediatePrice,
         startDate: startDate,
         endDate: endDate,
-        category: category
+        category: `/api/categories/${category}`,
+        article: article
     }
-    console.log(enchereData)
+    console.log(JSON.stringify(enchereData))
 
   };
   //change this to categories from api!
-  const categories = {
-      1: {id: 1 , name:"informatique"},
-      2: {id: 2 , name:"informatique"},
-      3: {id: 3 , name:"informatique"},
-      4: {id: 4 , name:"informatique"},
-      5: {id: 5 , name:"informatique"},
-  }
-
+  
+  React.useEffect(()=>{
+    getCategories()
+    console.log("hi")
+  },[])
+  
+  
+  
   const styles = {
     form: {
       "& .MuiTextField-root": { m: 1, width: "25ch" },
@@ -71,12 +92,7 @@ const CreerEnchere = () => {
     <Container component="main" maxWidth="xs">
       <CssBaseline />
       <Box
-        sx={{
-          marginTop: 8,
-          display: "flex",
-          flexDirection: "column",
-          alignItems: "center",
-        }}
+        sx={formBox}
       >
         <Box component="form" noValidate onSubmit={handleSubmit} sx={{ mt: 3 }}>
           <Grid container spacing={2}>
@@ -158,7 +174,7 @@ const CreerEnchere = () => {
                 type="submit"
                 fullWidth
                 variant="contained"
-                sx={{ mt: 3, mb: 2 }}
+                sx={{...ButtonStyles ,mt: 3, mb: 2}}
               >
                 soumettre
               </Button>

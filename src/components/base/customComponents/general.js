@@ -32,3 +32,32 @@ export const DrawerHeader = styled('div')(({ theme }) => ({
     ...theme.mixins.toolbar,
     justifyContent: 'flex-end',
   }));
+
+export const ButtonStyles = {
+  color: "secondary.main",
+  border: "1px solid black",
+  "&:hover": {
+    backgroundColor: "info.main",
+    color: "primary.main",
+  },
+}
+export const darkContainer = {
+   padding: 4,borderRadius:10, backgroundColor: "secondary.main", color: "primary.main" 
+}
+
+export const formBox = {
+  marginTop: 8,
+  display: "flex",
+  flexDirection: "column",
+  alignItems: "center",
+}
+
+export const lightContainer = {
+  
+    backgroundColor: "primary.main",
+    color: "secondary.main",
+    borderRadius: 10,
+    padding: 4,
+    mt: 5,
+  
+}

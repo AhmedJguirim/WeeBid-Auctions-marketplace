@@ -2,6 +2,7 @@ import { Grid, Typography, Button, TextField } from "@mui/material";
 import { Box, minHeight } from "@mui/system";
 import React from "react";
 import PersonIcon from "@mui/icons-material/Person";
+import { ButtonStyles, lightContainer } from "../base/customComponents/general";
 // import img1 from "../../media/images/demosToBeReplaced/pc1.jpg"
 // import img2 from "../../media/images/demosToBeReplaced/pc2.jpg"
 // import img3 from "../../media/images/demosToBeReplaced/pc3.jpg"
@@ -102,12 +103,7 @@ const DetailedProduct = () => {
             <Grid
               item
               xs={12}
-              sx={{
-                backgroundColor: "primary.main",
-                borderRadius: 10,
-                padding: 4,
-                mt: 5,
-              }}
+              sx={lightContainer}
             >
               <Typography variant="h3">
                 <PersonIcon fontSize="large" sx={{ mr: 2 }} />
@@ -134,11 +130,7 @@ const DetailedProduct = () => {
         <Grid item xs={5.8} sx={{ color: "secondary.main" }}>
           {/* selling section */}
           <Box
-            sx={{
-              backgroundColor: "primary.main",
-              borderRadius: 10,
-              padding: 4,
-            }}
+            sx={lightContainer}
           >
             <Grid container spacing={2}>
               <Grid item xs={4}>
@@ -151,14 +143,7 @@ const DetailedProduct = () => {
               </Grid>
               <Grid item xs={4}>
                 <Button
-                  sx={{
-                    color: "secondary.main",
-                    border:"1px solid black",
-                    "&:hover": {
-                      backgroundColor: "info.main",
-                      color: "primary.main",
-                    },
-                  }}
+                  sx={ButtonStyles}
                 >
                   {" "}
                   acheter maintenant
@@ -178,7 +163,7 @@ const DetailedProduct = () => {
 
                   <Typography variant="h8">
                     prix apres l'augmentation:{" "}
-                    {enchereData.prixActuel + augmentation}
+                    {enchereData.prixActuel + augmentation} TND
                   </Typography>
                 </Grid>
                 <Grid xs={4}></Grid>
@@ -195,23 +180,48 @@ const DetailedProduct = () => {
 
                 <Grid item xs={4}>
                 <Button
-                  sx={{
-                    color: "secondary.main",
-                    border:"1px solid black",
-                    "&:hover": {
-                      backgroundColor: "info.main",
-                      color: "primary.main",
-                    },
-                  }}
+                  sx={ButtonStyles}
                 >
                   {" "}
-                  acheter maintenant
+                  encherir
                 </Button>
               </Grid>
             </Grid>
           </Box>
           {/* sale details section*/}
-          <Box></Box>
+          <Box>
+          <Grid container spacing={2} sx={{ mt: 2 }}>
+            {/* title */}
+            <Grid
+              item
+              xs={12}
+              sx={{
+                backgroundColor: "primary.main",
+                borderRadius: 10,
+                padding: 4,
+                mt: 5,
+              }}
+            >
+              <Typography variant="h3">
+                <PersonIcon fontSize="large" sx={{ mr: 2 }} />
+                details sur produit
+              </Typography>
+              {/* seller data details */}
+              <Grid item sx={{ mt: 2 }}>
+                {Object.keys(articleData).map((key, index) => (
+                  <Grid container key={index} sx={{ mb: 2 }}>
+                    <Grid item xs={6}>
+                      <Typography variant="h6">{key}: </Typography>
+                    </Grid>
+                    <Grid item xs={6}>
+                      <Typography variant="h6">{articleData[key]} </Typography>
+                    </Grid>
+                  </Grid>
+                ))}
+              </Grid>
+            </Grid>
+          </Grid>
+          </Box>
         </Grid>
       </Grid>
     </Grid>

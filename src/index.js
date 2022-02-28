@@ -29,6 +29,7 @@ const theme = createTheme({
       light: '#5927E5'
     }
   },
+  
 });
 ReactDOM.render(
   <ThemeProvider theme={theme}>

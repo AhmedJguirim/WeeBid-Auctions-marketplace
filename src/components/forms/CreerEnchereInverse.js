@@ -9,6 +9,7 @@ import Box from "@mui/material/Box";
 import Typography from "@mui/material/Typography";
 import Container from "@mui/material/Container";
 import { FormControl, InputLabel, MenuItem, Select } from "@mui/material";
+import { ButtonStyles, formBox } from "../base/customComponents/general";
 
 const CreerEnchereInverse = () => {
   //#region form data state
@@ -71,12 +72,7 @@ const CreerEnchereInverse = () => {
     <Container component="main" maxWidth="xs">
       <CssBaseline />
       <Box
-        sx={{
-          marginTop: 8,
-          display: "flex",
-          flexDirection: "column",
-          alignItems: "center",
-        }}
+        sx={formBox}
       >
         <Box component="form" noValidate onSubmit={handleSubmit} sx={{ mt: 3 }}>
           <Grid container spacing={2}>
@@ -159,7 +155,7 @@ const CreerEnchereInverse = () => {
                 type="submit"
                 fullWidth
                 variant="contained"
-                sx={{ mt: 3, mb: 2 }}
+                sx={{...ButtonStyles ,mt: 3, mb: 2 }}
               >
                 soumettre
               </Button>

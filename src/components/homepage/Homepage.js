@@ -65,6 +65,9 @@ const styles = {
     width: "70%",
     margin: "auto",
   },
+  sectionBox:{
+    mt: "10%", textAlign: "center" ,
+  }
 };
 
 const Homepage = () => {
@@ -93,7 +96,7 @@ const Homepage = () => {
       </Box>
 
       {/* section #2 */}
-      <Box sx={{ mt: "10%", textAlign: "center" }}>
+      <Box sx={styles.sectionBox}>
         <Container>
           <Typography variant="h2">NOS SERVICES</Typography>
           <hr style={styles.servicesHr} />
@@ -136,7 +139,7 @@ const Homepage = () => {
         </Grid>
       </Box>
       {/* section #3 */}
-      <Box sx={{ mt: "10%", textAlign: "center" , backgroundColor:"primary.main" }}>
+      <Box sx={{...styles.sectionBox, backgroundColor:"primary.main" }}>
         <Typography variant="h4" color='secondary.main'>nos produits</Typography>
         <HomePageList ventes={ventes} elemsPerLine={8} />
         <Grid container >

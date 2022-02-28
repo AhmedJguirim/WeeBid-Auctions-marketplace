@@ -97,8 +97,7 @@ const TopNavBar = () => {
                 size="large"
                 edge="end"
                 aria-label="open drawer"
-                sx={{ ml: "0.5%" ,
-                }}
+                sx={{ ml: "0.5%"}}
               >
                 <ShoppingCartIcon />
               </IconButton>

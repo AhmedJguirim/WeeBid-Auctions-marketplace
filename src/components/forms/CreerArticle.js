@@ -1,4 +1,5 @@
 import DateAdapter from "@mui/lab/AdapterDateFns";
+import { ButtonStyles, formBox } from "../base/customComponents/general";
 import { DesktopDatePicker, LocalizationProvider } from "@mui/lab";
 import * as React from "react";
 import Button from "@mui/material/Button";
@@ -46,27 +47,48 @@ export default function CreerArticle() {
   //#endregion
   const handleSubmit = (event) => {
     event.preventDefault();
-    const articleData = {
+    const axios = require("axios");
+    console.log(JSON.stringify({
       name: name,
       state: state,
+      fabricationDate: date,
       localisation: localisation,
-      codeBar: codeBar,
-      marque: marque,
+      codebar: codeBar,
+      brand: marque,
       description: description,
-    };
-    console.log(articleData);
+    }))
+    // axios
+    //   .post("http://127.0.0.1:8000/api/articles", {
+    //     name: name,
+    //     state: state,
+    //     fabricationDate: date,
+    //     localisation: localisation,
+    //     codebar: codeBar,
+    //     brand: marque,
+    //     description: description,
+    //   })
+    //   .then(function (response) {
+    //     console.log(response);
+    //   })
+    //   .catch(function (error) {
+    //     console.log(error);
+    //   });
   };
 
+  const myArticle = {
+    name: name,
+    state: state,
+    fabricationDate: date,
+    localisation: localisation,
+    codebar: codeBar,
+    brand: marque,
+    description: description,
+  }
   return (
     <Container component="main" maxWidth="xs">
       <CssBaseline />
       <Box
-        sx={{
-          marginTop: 8,
-          display: "flex",
-          flexDirection: "column",
-          alignItems: "center",
-        }}
+        sx={formBox}
       >
         <Typography variant="h2">enregistrer un article</Typography>
         <Box component="form" onSubmit={handleSubmit} sx={{ mt: 3 }}>
@@ -133,8 +155,8 @@ export default function CreerArticle() {
                   onChange={handleState}
                   value=""
                 >
-                  <MenuItem value="nouveau">nouveau</MenuItem>
-                  <MenuItem value="ancien">ancien</MenuItem>
+                  <MenuItem value="neuf">neuf</MenuItem>
+                  <MenuItem value="utilisé">utilisé</MenuItem>
                 </Select>
               </FormControl>
             </Grid>
@@ -165,7 +187,7 @@ export default function CreerArticle() {
                 multiple
                 type="file"
               />
-              <Button variant="contained" component="span">
+              <Button sx={{...ButtonStyles, margin: 2}} component="span">
                 Upload
               </Button>
             </label>
@@ -174,13 +196,13 @@ export default function CreerArticle() {
           <Button
             type="submit"
             fullWidth
-            variant="contained"
             sx={{ mt: 3, mb: 2 }}
+            sx={ButtonStyles}
           >
             soumettre
           </Button>
         </Box>
-        <CreerEnchere />
+        <CreerEnchere article = {myArticle}/>
       </Box>
     </Container>
   );

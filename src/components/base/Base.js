@@ -8,6 +8,8 @@ import VentesListing from '../productsPage/VentesListing.js'
 import CreerArticle from '../forms/CreerArticle.js'
 import { Register } from '../register/Register'
 import DetailedProduct from '../productsPage/DetailedProduct'
+import UserProfile from '../UserProfile';
+import EncheresHistory from '../userHistory/EncheresHistory'
 
 
 const styles = {
@@ -16,17 +18,20 @@ const styles = {
   }
 }
 const Base = () => {
+  
   return (
     <Box sx={styles.body}>
     
     <TopNavBar />
+    {/* <EncheresHistory /> */}
+<CreerArticle /> 
 
-    <DetailedProduct />
-{/* <CreerArticle /> 
+{/* <DetailedProduct />
+<Login />
     <Register /> 
     <Homepage /> 
+<UserProfile />
 
-    <Login />
     <VentesListing /> */}
     </Box>
   )

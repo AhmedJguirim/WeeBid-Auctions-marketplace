@@ -11,24 +11,21 @@ import React from "react";
 import DateAdapter from "@mui/lab/AdapterDateFns";
 import LocalizationProvider from "@mui/lab/LocalizationProvider";
 import DesktopDatePicker from "@mui/lab/DesktopDatePicker";
+import { ButtonStyles, formBox } from "../base/customComponents/general";
 
 export const Register = () => {
+
   //#region form data state
   const [date, setDate] = React.useState(new Date());
-  const [name, setName] = React.useState();
-  const [telephone, setTelephone] = React.useState();
-  const [email, setEmail] = React.useState();
-  const [password, setPassword] = React.useState();
-  const [displayName, setDisplayName] = React.useState();
+  const [name, setName] = React.useState("");
+  const [telephone, setTelephone] = React.useState("");
+  const [email, setEmail] = React.useState("");
+  const [password, setPassword] = React.useState("");
+  const [displayName, setDisplayName] = React.useState("");
   //#endregion
 
   //#region state manipulation mathods
-  const handleChange = (newValue) => {
-    setDate(newValue);
-  };
-  const handleDate = (event) => {
-    setDate(event.target.value);
-  };
+
   const handleName = (event) => {
     setName(event.target.value);
   };
@@ -45,6 +42,7 @@ export const Register = () => {
     setDisplayName(event.target.value);
   };
   //#endregion
+
 
   //#region registration POST request on submit
   const onSubmit = (event) => {
@@ -70,6 +68,7 @@ export const Register = () => {
   };
   //#endregion
 
+
   const styles = {
     form: {
       "& .MuiTextField-root": { m: 1, width: "25ch" },
@@ -82,12 +81,7 @@ export const Register = () => {
     <Container component="main" maxWidth="xs">
       <CssBaseline />
       <Box
-        sx={{
-          marginTop: 8,
-          display: "flex",
-          flexDirection: "column",
-          alignItems: "center",
-        }}
+        sx={formBox}
       >
         <Typography variant="h2">s'inscrir</Typography>
         <Box component="form" onSubmit={onSubmit} sx={{ mt: 3 }}>
@@ -139,7 +133,7 @@ export const Register = () => {
               />
             </LocalizationProvider></Grid>
             <Grid item>
-            <Button type="submit" sx={{color:"black"}}>soumettre</Button>
+            <Button type="submit" sx={ButtonStyles}>soumettre</Button>
             <br /><br /><br />
             </Grid>
           </Grid>
