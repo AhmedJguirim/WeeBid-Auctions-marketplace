@@ -1,4 +1,5 @@
 import DateAdapter from "@mui/lab/AdapterDateFns";
+import Api from '../../AxiosInstance'
 import { ButtonStyles, formBox } from "../base/customComponents/general";
 import { DesktopDatePicker, LocalizationProvider } from "@mui/lab";
 import * as React from "react";
@@ -11,11 +12,21 @@ import Grid from "@mui/material/Grid";
 import Box from "@mui/material/Box";
 import Typography from "@mui/material/Typography";
 import Container from "@mui/material/Container";
-import { FormControl, Input, InputLabel, MenuItem, Select } from "@mui/material";
-import CreerEnchere from "./CreerEnchere";
+import {
+  FormControl,
+  FormLabel,
+  Input,
+  InputLabel,
+  MenuItem,
+  Radio,
+  RadioGroup,
+  Select,
+} from "@mui/material";
 
 export default function CreerArticle() {
   //#region form data state
+
+  //specific to article
   const [date, setDate] = React.useState(new Date());
   const [name, setName] = React.useState("");
   const [state, setState] = React.useState("");
@@ -23,9 +34,20 @@ export default function CreerArticle() {
   const [codeBar, setCodeBar] = React.useState("");
   const [marque, setMarque] = React.useState("");
   const [description, setDescription] = React.useState("");
+  const [type, setType] = React.useState("enchere");
+
+  //specific to enchere/enchereInverse
+  const [quantity, setQuantity] = React.useState(0);
+  const [initPrice, setInitPrice] = React.useState(0);
+  const [immediatePrice, setImmediatePrice] = React.useState(0);
+  const [startDate, setStartDate] = React.useState(new Date());
+  const [endDate, setEndDate] = React.useState(new Date());
+  const [category, setCategory] = React.useState("");
+  
   //#endregion
 
   //#region state manipulation mathods
+  //specific to article
   const handleState = (event) => {
     setState(event.target.value);
   };
@@ -41,14 +63,51 @@ export default function CreerArticle() {
   const handleMarque = (event) => {
     setMarque(event.target.value);
   };
+
+  //specific to enchere/enchereInverse
   const handleDescription = (event) => {
     setDescription(event.target.value);
   };
+  const handleType = (event) => {
+    setType(event.target.value);
+  };
+  const handleQuantity = (event) => {
+    setQuantity(event.target.value);
+  };
+  const handleInitPrice = (event) => {
+    setInitPrice(event.target.value);
+  };
+  const handleImmediatePrice = (event) => {
+    setImmediatePrice(event.target.value);
+  };
+  const handleCategory = (event) => {
+    setCategory(event.target.value);
+  };
+
   //#endregion
+  
+  //#region categories for form
+  const [categories, setCategories] = React.useState({});
+   //categories GET request
+   async function getCategories() {
+    try {
+      const response = await Api.get('http://127.0.0.1:8000/api/categories');
+      
+      setCategories(response["data"]["hydra:member"])
+      
+    } catch (error) {
+      console.error(error);
+    }
+  }
+  //this makes getCategory run on render
+  React.useEffect(()=>{
+    getCategories()
+  },[])
+  //#endregion
+
   const handleSubmit = (event) => {
     event.preventDefault();
-    const axios = require("axios");
-    console.log(JSON.stringify({
+    Api.post('/articles', {
       name: name,
       state: state,
       fabricationDate: date,
@@ -56,40 +115,32 @@ export default function CreerArticle() {
       codebar: codeBar,
       brand: marque,
       description: description,
-    }))
-    // axios
-    //   .post("http://127.0.0.1:8000/api/articles", {
-    //     name: name,
-    //     state: state,
-    //     fabricationDate: date,
-    //     localisation: localisation,
-    //     codebar: codeBar,
-    //     brand: marque,
-    //     description: description,
-    //   })
-    //   .then(function (response) {
-    //     console.log(response);
-    //   })
-    //   .catch(function (error) {
-    //     console.log(error);
-    //   });
-  };
+    }
+    ).then(response=>{
 
-  const myArticle = {
-    name: name,
-    state: state,
-    fabricationDate: date,
-    localisation: localisation,
-    codebar: codeBar,
-    brand: marque,
-    description: description,
-  }
+      Api.post(`/${type}`, {
+        quantity: parseInt(quantity),
+        initPrice: parseFloat(initPrice),
+        currentPrice: parseFloat(initPrice),
+        immediatePrice: parseFloat(immediatePrice),
+        startDate: startDate,
+        endDate: endDate,
+        category: `/api/categories/${category}`,
+        article: `${response["data"]["@id"]}`,
+        //change this hardcoded line with user from store
+        user: `/api/users/28`
+      })
+    .then(response=>console.log(response))
+    .catch(error=>console.log(error))}
+
+      )
+    .catch(error=>console.log(error))}
+  
+
   return (
     <Container component="main" maxWidth="xs">
       <CssBaseline />
-      <Box
-        sx={formBox}
-      >
+      <Box sx={formBox}>
         <Typography variant="h2">enregistrer un article</Typography>
         <Box component="form" onSubmit={handleSubmit} sx={{ mt: 3 }}>
           <Grid container spacing={2}>
@@ -180,29 +231,117 @@ export default function CreerArticle() {
             </Grid>
             {/* handle saving documents here */}
             <Grid item xs={12}>
-            <label htmlFor="contained-button-file">
-              <Input
-                accept="image/*"
-                id="contained-button-file"
-                multiple
-                type="file"
-              />
-              <Button sx={{...ButtonStyles, margin: 2}} component="span">
-                Upload
-              </Button>
-            </label>
+              <label htmlFor="contained-button-file">
+                <Input
+                  accept="image/*"
+                  id="contained-button-file"
+                  multiple
+                  type="file"
+                />
+                <Button sx={{ ...ButtonStyles, margin: 2 }} component="span">
+                  Upload
+                </Button>
+              </label>
             </Grid>
-          </Grid>
-          <Button
-            type="submit"
-            fullWidth
-            sx={{ mt: 3, mb: 2 }}
-            sx={ButtonStyles}
+          
+        <FormControl>
+          <FormLabel id="demo-controlled-radio-buttons-group">Type</FormLabel>
+          <RadioGroup
+            aria-labelledby="demo-controlled-radio-buttons-group"
+            name="controlled-radio-buttons-group"
+            value={type}
+            onChange={handleType}
           >
-            soumettre
-          </Button>
+            <FormControlLabel
+              value="enchere_inverses"
+              control={<Radio />}
+              label="EnchereInversé"
+            />
+            <FormControlLabel value="encheres" control={<Radio />} label="Enchere" />
+          </RadioGroup>
+        </FormControl>
+        <Grid item xs={12}>
+              <TextField
+                fullWidth
+                required
+                type="number"
+                id="quantity"
+                label="quantité"
+                value={quantity}
+                onChange={handleQuantity}
+              />
+            </Grid>
+            <Grid item xs={12}>
+              <TextField
+                fullWidth
+                required
+                type="number"
+                id="immediatePrice"
+                label="prix immediat"
+                value={immediatePrice}
+                onChange={handleImmediatePrice}
+              />
+            </Grid>
+
+            <Grid item xs={12}>
+              <TextField
+                required
+                fullWidth
+                type="number"
+                id="initPrice"
+                label="prix initial"
+                value={initPrice}
+                onChange={handleInitPrice}
+              />
+            </Grid>
+            <Grid item xs={12}>
+              <LocalizationProvider dateAdapter={DateAdapter}>
+                <DesktopDatePicker
+                  label="date de debut"
+                  inputFormat="MM/dd/yyyy"
+                  value={startDate}
+                  onChange={setStartDate}
+                  renderInput={(params) => <TextField {...params} />}
+                />
+              </LocalizationProvider>
+            </Grid>
+            <Grid item xs={12}>
+              <LocalizationProvider dateAdapter={DateAdapter}>
+                <DesktopDatePicker
+                  label="date de fin"
+                  inputFormat="MM/dd/yyyy"
+                  value={endDate}
+                  onChange={setEndDate}
+                  renderInput={(params) => <TextField {...params} />}
+                />
+              </LocalizationProvider>
+            </Grid>
+            <Grid item xs={12}>
+              <FormControl fullWidth>
+                <InputLabel id="demo-simple-select-label">categorie</InputLabel>
+                <Select
+                  labelId="demo-simple-select-label"
+                  id="demo-simple-select"
+                  onChange={handleCategory}
+                  label="category"
+                  value=""
+                >
+
+                {Object.keys(categories).map((key, index) => (
+                    <MenuItem value={categories[key].id} key={index}>{categories[key].name}</MenuItem>))}
+                </Select>
+              </FormControl>
+            </Grid>
+          <Button
+                type="submit"
+                fullWidth
+                variant="contained"
+                sx={{...ButtonStyles ,mt: 3, mb: 2}}
+              >
+                soumettre
+              </Button>
+              </Grid>
         </Box>
-        <CreerEnchere article = {myArticle}/>
       </Box>
     </Container>
   );

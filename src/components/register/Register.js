@@ -12,6 +12,7 @@ import DateAdapter from "@mui/lab/AdapterDateFns";
 import LocalizationProvider from "@mui/lab/LocalizationProvider";
 import DesktopDatePicker from "@mui/lab/DesktopDatePicker";
 import { ButtonStyles, formBox } from "../base/customComponents/general";
+import { apiRoutes } from "../../config/routes";
 
 export const Register = () => {
 
@@ -49,7 +50,7 @@ export const Register = () => {
     event.preventDefault();
     const axios = require("axios");
     axios
-      .post("/api/register", {
+      .post(`${apiRoutes.API}/register`, {
         name: name,
         displayName: displayName,
         email: email,

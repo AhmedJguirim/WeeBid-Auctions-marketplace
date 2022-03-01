@@ -3,6 +3,8 @@ import { useState } from "react";
 import { Grid, Box, TextField, Button, Typography } from "@mui/material";
 import axios from "axios";
 import { ButtonStyles, formBox } from "../base/customComponents/general";
+import { apiRoutes } from "../../config/routes";
+import API from "../../AxiosInstance";
 
 const Login = () => {
   //#region form data state
@@ -20,10 +22,8 @@ const Login = () => {
   //#endregion
   async function getUser() {
     try {
-      const response = await axios.get("/api/userdata", {
-        headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
-      });
-      console.log(response);
+      const response = await API.get(`userdata`);
+      console.log(response["data"]);
     } catch (error) {
       console.error(error);
     }
@@ -32,8 +32,8 @@ const Login = () => {
   const onSubmit = (event) => {
     event.preventDefault();
     const axios = require("axios");
-    axios
-      .post("/api/login_check", {
+    API
+      .post(`login_check`, {
         username: email,
         password: password,
       })

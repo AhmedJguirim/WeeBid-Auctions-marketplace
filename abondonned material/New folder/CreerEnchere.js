@@ -10,18 +10,16 @@ import Typography from "@mui/material/Typography";
 import Container from "@mui/material/Container";
 import { FormControl, InputLabel, MenuItem, Select } from "@mui/material";
 import { ButtonStyles, formBox } from "../base/customComponents/general";
-import axios from "axios";
+import Api from '../../AxiosInstance';
 
 
- 
-  
 
-const CreerEnchere = ({article}) => {
+const CreerEnchere = ({article, type}) => {
   //#region form data state
   
-  const [quantity, setQuantity] = React.useState("");
-  const [initPrice, setInitPrice] = React.useState("");
-  const [immediatePrice, setImmediatePrice] = React.useState("");
+  const [quantity, setQuantity] = React.useState(0);
+  const [initPrice, setInitPrice] = React.useState(0);
+  const [immediatePrice, setImmediatePrice] = React.useState(0);
   const [startDate, setStartDate] = React.useState(new Date());
   const [endDate, setEndDate] = React.useState(new Date());
   const [category, setCategory] = React.useState("");
@@ -47,7 +45,7 @@ const CreerEnchere = ({article}) => {
    //categories GET request
    async function getCategories() {
     try {
-      const response = await axios.get('http://127.0.0.1:8000/api/categories');
+      const response = await Api.get('http://127.0.0.1:8000/api/categories');
       
       setCategories(response["data"]["hydra:member"])
       
@@ -58,28 +56,31 @@ const CreerEnchere = ({article}) => {
 
   const handleSubmit = (event) => {
     event.preventDefault();
-    const enchereData = {
-        quantity: quantity,
-        initPrice: initPrice,
-        currentPrice: initPrice,
-        immediatePrice: immediatePrice,
+    Api.post('/articles', article
+    ).then(response=>{
+
+      Api.post(`/${type}`, {
+        quantity: parseInt(quantity),
+        initPrice: parseFloat(initPrice),
+        currentPrice: parseFloat(initPrice),
+        immediatePrice: parseFloat(immediatePrice),
         startDate: startDate,
         endDate: endDate,
         category: `/api/categories/${category}`,
-        article: article
-    }
-    console.log(JSON.stringify(enchereData))
+        article: `${response["data"]["@id"]}`,
+        //change this hardcoded line with user from store
+        user: `/api/users/28`
+      })
+    .then(response=>console.log(response))
+    .catch(error=>console.log(error))}
 
-  };
-  //change this to categories from api!
+      )
+    .catch(error=>console.log(error))}
   
   React.useEffect(()=>{
     getCategories()
-    console.log("hi")
   },[])
-  
-  
-  
+
   const styles = {
     form: {
       "& .MuiTextField-root": { m: 1, width: "25ch" },
@@ -182,6 +183,6 @@ const CreerEnchere = ({article}) => {
       </Box>
     </Container>
   );
-};
+                }
 
 export default CreerEnchere;

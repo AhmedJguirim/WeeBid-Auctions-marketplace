@@ -8,6 +8,7 @@ import { createStore } from 'redux';
 import myReducers from './redux/reducers/index.js';
 import { Provider } from 'react-redux';
 import "./styles/app.css";
+import Api from './AxiosInstance';
 
 const store = createStore(myReducers, window.__REDUX_DEVTOOLS_EXTENSION__ && window.__REDUX_DEVTOOLS_EXTENSION__());
 
@@ -31,6 +32,17 @@ const theme = createTheme({
   },
   
 });
+
+
+async function getUser() {
+  try {
+    const response = await Api.get("http://127.0.0.1:8000/api/userdata");
+    console.log(response["data"]);
+  } catch (error) {
+    console.error(error);
+  }
+}
+
 ReactDOM.render(
   <ThemeProvider theme={theme}>
     <Base />

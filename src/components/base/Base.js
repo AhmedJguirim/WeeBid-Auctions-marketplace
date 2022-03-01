@@ -23,11 +23,13 @@ const Base = () => {
     <Box sx={styles.body}>
     
     <TopNavBar />
+    <CreerArticle />
+    {/* <Login /> */}
     {/* <EncheresHistory /> */}
-<CreerArticle /> 
+{/*  */}
 
 {/* <DetailedProduct />
-<Login />
+
     <Register /> 
     <Homepage /> 
 <UserProfile />

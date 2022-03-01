@@ -10,16 +10,20 @@ import Typography from "@mui/material/Typography";
 import Container from "@mui/material/Container";
 import { FormControl, InputLabel, MenuItem, Select } from "@mui/material";
 import { ButtonStyles, formBox } from "../base/customComponents/general";
+import Api from '../../AxiosInstance';
 
-const CreerEnchereInverse = () => {
+
+
+const CreerEnchere = ({article, type}) => {
   //#region form data state
   
-  const [quantity, setQuantity] = React.useState("");
-  const [initPrice, setInitPrice] = React.useState("");
-  const [immediatePrice, setImmediatePrice] = React.useState("");
+  const [quantity, setQuantity] = React.useState(0);
+  const [initPrice, setInitPrice] = React.useState(0);
+  const [immediatePrice, setImmediatePrice] = React.useState(0);
   const [startDate, setStartDate] = React.useState(new Date());
   const [endDate, setEndDate] = React.useState(new Date());
   const [category, setCategory] = React.useState("");
+  
   //#endregion
 
   //#region state manipulation mathods
@@ -37,28 +41,45 @@ const CreerEnchereInverse = () => {
   };
 
   //#endregion
-  
+  const [categories, setCategories] = React.useState({});
+   //categories GET request
+   async function getCategories() {
+    try {
+      const response = await Api.get('http://127.0.0.1:8000/api/categories');
+      
+      setCategories(response["data"]["hydra:member"])
+      
+    } catch (error) {
+      console.error(error);
+    }
+  }
+
   const handleSubmit = (event) => {
     event.preventDefault();
-    const enchereData = {
-        "quantity": quantity,
-        "initPrice": initPrice,
-        "immediatePrice": immediatePrice,
-        "startDate": startDate,
-        "endDate": endDate,
-        "category": category
-    }
-    console.log(enchereData)
+    Api.post('/articles', article
+    ).then(response=>{
 
-  };
-  //change this to categories from api!
-  const categories = {
-      1: {id: 1 , name:"informatique"},
-      2: {id: 2 , name:"informatique"},
-      3: {id: 3 , name:"informatique"},
-      4: {id: 4 , name:"informatique"},
-      5: {id: 5 , name:"informatique"},
-  }
+      Api.post(`/${type}`, {
+        quantity: parseInt(quantity),
+        initPrice: parseFloat(initPrice),
+        currentPrice: parseFloat(initPrice),
+        immediatePrice: parseFloat(immediatePrice),
+        startDate: startDate,
+        endDate: endDate,
+        category: `/api/categories/${category}`,
+        article: `${response["data"]["@id"]}`,
+        //change this hardcoded line with user from store
+        user: `/api/users/28`
+      })
+    .then(response=>console.log(response))
+    .catch(error=>console.log(error))}
+
+      )
+    .catch(error=>console.log(error))}
+  
+  React.useEffect(()=>{
+    getCategories()
+  },[])
 
   const styles = {
     form: {
@@ -76,7 +97,7 @@ const CreerEnchereInverse = () => {
       >
         <Box component="form" noValidate onSubmit={handleSubmit} sx={{ mt: 3 }}>
           <Grid container spacing={2}>
-        <Typography variant="h2">créer une enchere inversé</Typography>
+        <Typography variant="h2">créer une enchere</Typography>
             <Grid item xs={12}>
               <TextField
                 fullWidth
@@ -86,7 +107,6 @@ const CreerEnchereInverse = () => {
                 label="quantité"
                 value={quantity}
                 onChange={handleQuantity}
- 
               />
             </Grid>
             <Grid item xs={12}>
@@ -155,7 +175,7 @@ const CreerEnchereInverse = () => {
                 type="submit"
                 fullWidth
                 variant="contained"
-                sx={{...ButtonStyles ,mt: 3, mb: 2 }}
+                sx={{...ButtonStyles ,mt: 3, mb: 2}}
               >
                 soumettre
               </Button>
@@ -163,6 +183,6 @@ const CreerEnchereInverse = () => {
       </Box>
     </Container>
   );
-};
+                }
 
-export default CreerEnchereInverse;
+export default CreerEnchere;
