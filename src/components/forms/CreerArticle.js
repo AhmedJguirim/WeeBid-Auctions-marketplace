@@ -3,25 +3,12 @@ import Api from '../../AxiosInstance'
 import { ButtonStyles, formBox } from "../base/customComponents/general";
 import { DesktopDatePicker, LocalizationProvider } from "@mui/lab";
 import * as React from "react";
-import Button from "@mui/material/Button";
-import CssBaseline from "@mui/material/CssBaseline";
-import TextField from "@mui/material/TextField";
-import FormControlLabel from "@mui/material/FormControlLabel";
-import Checkbox from "@mui/material/Checkbox";
-import Grid from "@mui/material/Grid";
-import Box from "@mui/material/Box";
-import Typography from "@mui/material/Typography";
-import Container from "@mui/material/Container";
-import {
-  FormControl,
-  FormLabel,
-  Input,
-  InputLabel,
-  MenuItem,
-  Radio,
-  RadioGroup,
-  Select,
+
+import {FormControl,FormLabel,Input,InputLabel,MenuItem,Radio,RadioGroup,Select,
+  Container,Typography,Box,Grid,Checkbox,FormControlLabel,TextField,CssBaseline,
+  Button
 } from "@mui/material";
+import { useSelector } from "react-redux";
 
 export default function CreerArticle() {
   //#region form data state
@@ -105,6 +92,8 @@ export default function CreerArticle() {
   },[])
   //#endregion
 
+
+  const user = useSelector(state=>state.user)
   const handleSubmit = (event) => {
     event.preventDefault();
     Api.post('/articles', {
@@ -117,7 +106,7 @@ export default function CreerArticle() {
       description: description,
     }
     ).then(response=>{
-
+      
       Api.post(`/${type}`, {
         quantity: parseInt(quantity),
         initPrice: parseFloat(initPrice),
@@ -128,9 +117,14 @@ export default function CreerArticle() {
         category: `/api/categories/${category}`,
         article: `${response["data"]["@id"]}`,
         //change this hardcoded line with user from store
-        user: `/api/users/28`
-      })
-    .then(response=>console.log(response))
+        user: `/api/users/${user.id}`
+      }
+      
+      )
+    .then(response=>{
+      console.log(response)
+      
+    })
     .catch(error=>console.log(error))}
 
       )

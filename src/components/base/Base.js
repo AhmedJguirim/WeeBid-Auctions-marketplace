@@ -10,6 +10,9 @@ import { Register } from '../register/Register'
 import DetailedProduct from '../productsPage/DetailedProduct'
 import UserProfile from '../UserProfile';
 import EncheresHistory from '../userHistory/EncheresHistory'
+import {BrowserRouter as Router, Route,Routes} from 'react-router-dom';
+import { useDispatch } from 'react-redux'
+import { checkUser, getUserData } from '../../redux/actions'
 
 
 const styles = {
@@ -18,24 +21,31 @@ const styles = {
   }
 }
 const Base = () => {
+  const dispatch = useDispatch();  
+    window.addEventListener('storage', () => {
+      console.log("checkUser")
+      dispatch(getUserData())
+    });
+    React.useEffect(()=>{
+      dispatch(getUserData())
+    },[])
   
   return (
-    <Box sx={styles.body}>
-    
-    <TopNavBar />
-    <CreerArticle />
-    {/* <Login /> */}
-    {/* <EncheresHistory /> */}
-{/*  */}
-
-{/* <DetailedProduct />
-
-    <Register /> 
-    <Homepage /> 
-<UserProfile />
-
-    <VentesListing /> */}
-    </Box>
+    <Router>
+      <Box sx={styles.body}>
+        <TopNavBar />
+        <Routes>
+          <Route path="/makeEnchere" element={<CreerArticle />}></Route>
+          <Route path="/login" element={<Login />}></Route>
+          <Route path="/enchereHistory/:userId" element={<EncheresHistory />}></Route>
+          <Route path="/enchere/:id" element={<DetailedProduct />}></Route>
+          <Route path="/register" element={<Register />}></Route>
+          <Route path="/" element={<Homepage /> }></Route>
+          <Route path="/profile/:userId" element={<UserProfile />}></Route>
+          <Route path="/ventes" element={<VentesListing />}></Route>
+        </Routes>
+      </Box>
+    </Router>
   )
 }
 

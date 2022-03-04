@@ -18,7 +18,6 @@ import {
 } from "@mui/material";
 import MyDrawer from "./Drawer";
 
-
 const TopNavBar = () => {
   const styles = {
     topBox:{
@@ -27,7 +26,8 @@ const TopNavBar = () => {
     },
     secondGrid:{
       justifyContent: "flex-end",
-      paddingRight: 2
+      paddingRight: 2,
+      
     },
   }
 
@@ -58,8 +58,8 @@ const TopNavBar = () => {
                 <MenuIcon />
               </IconButton>
               <img src={logoPath} className="logo" />
-              <TopNavLink text="encheres"></TopNavLink>
-              <TopNavLink text="categories"></TopNavLink>
+              <TopNavLink text="encheres" path="#"></TopNavLink>
+              <TopNavLink text="categories" path="#"></TopNavLink>
               <Box sx={{ minWidth: 120 }}>
               <FormControl fullWidth>
                 <InputLabel>type</InputLabel>
@@ -91,8 +91,8 @@ const TopNavBar = () => {
               item
               sx={styles.secondGrid}
             > 
-              <TopNavLink text="se connecter" ></TopNavLink>
-              <TopNavLink text="créer un compte"></TopNavLink>
+              <TopNavLink text="se connecter" path="/login"></TopNavLink>
+              <TopNavLink text="créer un compte" path="/register"></TopNavLink>
               <IconButton
                 size="large"
                 edge="end"

@@ -5,6 +5,7 @@ import axios from "axios";
 import { ButtonStyles, formBox } from "../base/customComponents/general";
 import { apiRoutes } from "../../config/routes";
 import API from "../../AxiosInstance";
+import { useDispatch } from 'react-redux'
 
 const Login = () => {
   //#region form data state
@@ -23,7 +24,7 @@ const Login = () => {
   async function getUser() {
     try {
       const response = await API.get(`userdata`);
-      console.log(response["data"]);
+      console.log(response);
     } catch (error) {
       console.error(error);
     }
@@ -32,6 +33,8 @@ const Login = () => {
   const onSubmit = (event) => {
     event.preventDefault();
     const axios = require("axios");
+    
+
     API
       .post(`login_check`, {
         username: email,
