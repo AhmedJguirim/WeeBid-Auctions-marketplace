@@ -7,7 +7,6 @@ export function getUserData() {
   .then(function (response) {
     const data = response.data
     dispatch(checkUser(data))
-    console.log(data);
   })
   .catch(function (error) {
     dispatch(checkUser({}))

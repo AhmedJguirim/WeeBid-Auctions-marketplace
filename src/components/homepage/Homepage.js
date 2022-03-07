@@ -5,35 +5,14 @@ import {
   Grid,
   Typography,
 } from "@mui/material";
-import { Box, fontWeight } from "@mui/system";
+import { Box } from "@mui/system";
 import React from "react";
 import image from "../../media/images/homepageTopImage.jpg";
-
+import Api from "../../AxiosInstance";
 import HomePageList from "../generalComponents/ProductsListing";
 
-const encheresInverses = {
-  1: { nom: "pc", vendeur: "exemple123", prix: 80 },
-  2: { nom: "pc", vendeur: "exemple123", prix: 80 },
-  3: { nom: "pc", vendeur: "exemple123", prix: 80 },
-  4: { nom: "pc", vendeur: "exemple123", prix: 80 },
-};
 
-const encheres = {
-  1: { nom: "pc", vendeur: "exemple123", prix: 80 },
-  2: { nom: "pc", vendeur: "exemple123", prix: 80 },
-  3: { nom: "pc", vendeur: "exemple123", prix: 80 },
-  4: { nom: "pc", vendeur: "exemple123", prix: 80 },
-};
-const ventes = {
-  1: { nom: "pc", vendeur: "exemple123", prix: 80 },
-  2: { nom: "pc", vendeur: "exemple123", prix: 80 },
-  3: { nom: "pc", vendeur: "exemple123", prix: 80 },
-  4: { nom: "pc", vendeur: "exemple123", prix: 80 },
-  5: { nom: "pc", vendeur: "exemple123", prix: 80 },
-  6: { nom: "pc", vendeur: "exemple123", prix: 80 },
-  7: { nom: "pc", vendeur: "exemple123", prix: 80 },
-  8: { nom: "pc", vendeur: "exemple123", prix: 80 },
-};
+
 
 const styles = {
   subDiv: {
@@ -71,6 +50,44 @@ const styles = {
 };
 
 const Homepage = () => {
+  //#region get encheres inverses 
+const [encheresInverses, setEnchereInverses] = React.useState({});
+
+  
+function getEnchereInverses() {
+  Api.get('/enchere_inverses', {
+    params: {
+      page: "1",
+    }
+  })
+  .then(function (response) {
+    setEnchereInverses(response["data"]["hydra:member"].slice(0,4));
+  }).catch(error=>console.log(error))
+}
+//#endregion
+
+//#region get encheres
+const [encheres, setEncheres] = React.useState({});
+
+  
+  function getEncheres() {
+    Api.get('/encheres', {
+      params: {
+        page: "1",
+      }
+    })
+    .then(function (response) {
+      setEncheres(response["data"]["hydra:member"].slice(0,4));
+    }).catch(error=>console.log(error))
+  }
+//#endregion
+
+//TODO: get ventes
+React.useEffect(()=>{
+  getEncheres()
+  getEnchereInverses()
+},[])
+
   return (
     <Box sx={styles.mainDiv}>
       {/* section #1 */}
@@ -140,8 +157,9 @@ const Homepage = () => {
       </Box>
       {/* section #3 */}
       <Box sx={{...styles.sectionBox, backgroundColor:"primary.main" }}>
-        <Typography variant="h4" color='secondary.main'>nos produits</Typography>
-        <HomePageList ventes={ventes} elemsPerLine={8} />
+        {/* put ventes here */}
+        {/* <Typography variant="h4" color='secondary.main'>nos produits</Typography>
+        <HomePageList ventes={ventes} elemsPerLine={8} /> */}
         <Grid container >
           <Grid item xs={5.5}>
             <Typography variant="h4" color='secondary.main'>nos enchères</Typography>

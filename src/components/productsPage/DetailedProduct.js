@@ -3,37 +3,57 @@ import { Box, minHeight } from "@mui/system";
 import React from "react";
 import PersonIcon from "@mui/icons-material/Person";
 import { ButtonStyles, lightContainer } from "../base/customComponents/general";
+import Api from "../../AxiosInstance";
+import { useParams } from "react-router-dom";
 // import img1 from "../../media/images/demosToBeReplaced/pc1.jpg"
 // import img2 from "../../media/images/demosToBeReplaced/pc2.jpg"
 // import img3 from "../../media/images/demosToBeReplaced/pc3.jpg"
 // import img4 from "../../media/images/demosToBeReplaced/pc4.jpg"
 
 const DetailedProduct = () => {
-  // replace these with a real product
-  const articleData = {
-    name: "name",
-    state: "state",
-    localisation: "localisation",
-    codeBar: "codeBar",
-    marque: "marque",
-    description: "description",
-  };
+  const [enchere, setEnchere] = React.useState({});
+  const [article, setArticle] = React.useState({});
+  const [description, setDescription] = React.useState("");
+  const [seller, setSeller] = React.useState({});
+  // TODO: check why use params returns undefined then replace the hardcoded Id
+  const { enchereId } = useParams();
+  function getEnchere() {
+    Api.get(`/encheres/26`)
+      .then(function (response) {
+        const data = response["data"]
+        setEnchere(data);
+        setSeller({
+          ["nom d'utilisateur"]: data.user.displayName,
+          localistation: "TODO: change this to the user's city"
+        })
+        //get the articme as well
+    Api.get(`articles/${response["data"]["article"]["id"]}`)
+    .then(function (response) {
+      const data = response["data"]
+      console.log(response)
+      setArticle({
+        nom: data.name,
+        etat: data.state,
+        localisation: data.localisation,
+        marque: data.brand,
+        ["code a barre"]: data.codebar,
+        ["date de fabrication"]: data.fabrication_date.substring(0,10)
+      });
+      setDescription(data.description);
 
-  const enchereData = {
-    quantity: "quantity",
-    initPrice: "initPrice",
-    immediatePrice: 2500,
-    prixActuel: 1000,
-    startDate: "startDate",
-    endDate: "endDate",
-    category: "category",
-  };
-  //replace this with the actual user data
-  const user = {
-    displayName: "user1",
-    email: "exemple@gmail.com",
-  };
-  // replace these with paths of documents
+    })
+    .catch((error) => console.log(error));
+      })
+      .catch((error) => console.log(error));
+  }
+
+   React.useEffect(() => {
+    getEnchere();
+  }, []);
+
+
+
+  // TODO:replace these with paths of documents
   const myImg = require("../../media/images/demosToBeReplaced/pc1.jpg");
   const myImgss = {
     1: {
@@ -64,7 +84,6 @@ const DetailedProduct = () => {
 
       <Grid
         container
-        xs={10}
         sx={{
           backgroundColor: "secondary.main",
           padding: 5,
@@ -75,7 +94,7 @@ const DetailedProduct = () => {
       >
         <Grid item xs={12}>
           <Typography variant="h3" color="primary.main">
-            {articleData.name}
+            {article.name}
           </Typography>
         </Grid>
 
@@ -100,24 +119,20 @@ const DetailedProduct = () => {
           {/* seller userdata subsection */}
           <Grid container spacing={2} sx={{ mt: 2 }}>
             {/* title */}
-            <Grid
-              item
-              xs={12}
-              sx={lightContainer}
-            >
+            <Grid item xs={12} sx={lightContainer}>
               <Typography variant="h3">
                 <PersonIcon fontSize="large" sx={{ mr: 2 }} />
                 le vendeur
               </Typography>
               {/* seller data details */}
               <Grid item sx={{ mt: 2 }}>
-                {Object.keys(user).map((key, index) => (
+                {Object.keys(seller).map((key, index) => (
                   <Grid container key={index} sx={{ mb: 2 }}>
                     <Grid item xs={6}>
                       <Typography variant="h6">{key}: </Typography>
                     </Grid>
                     <Grid item xs={6}>
-                      <Typography variant="h6">{user[key]} </Typography>
+                      <Typography variant="h6">{seller[key]} </Typography>
                     </Grid>
                   </Grid>
                 ))}
@@ -129,98 +144,89 @@ const DetailedProduct = () => {
         {/* second section */}
         <Grid item xs={5.8} sx={{ color: "secondary.main" }}>
           {/* selling section */}
-          <Box
-            sx={lightContainer}
-          >
+          <Box sx={lightContainer}>
             <Grid container spacing={2}>
               <Grid item xs={4}>
                 <Typography variant="h6">prix immediat:</Typography>{" "}
               </Grid>
               <Grid item xs={4}>
                 <Typography variant="h6" color="info.main">
-                  {enchereData.immediatePrice}TND
+                  {enchere.immediatePrice}TND
                 </Typography>
               </Grid>
               <Grid item xs={4}>
-                <Button
-                  sx={ButtonStyles}
-                >
-                  {" "}
-                  acheter maintenant
-                </Button>
+                <Button sx={ButtonStyles}> acheter maintenant</Button>
               </Grid>
             </Grid>
             <hr style={{ width: "60%" }} />
 
-              <Grid container spacing={2}>
-                <Grid item xs={4}>
-                  <Typography variant="h6">encherir:</Typography>{" "}                              
-                </Grid>
-                <Grid item xs={4}>
-                  <Typography variant="h6" color="info.main">prix actuel: {enchereData.prixActuel}TND</Typography>                
-                </Grid>
-                <Grid item xs={4}> 
-
-                  <Typography variant="h8">
-                    prix apres l'augmentation:{" "}
-                    {enchereData.prixActuel + augmentation} TND
-                  </Typography>
-                </Grid>
-                <Grid xs={4}></Grid>
-                <Grid item xs={4}>
+            <Grid container spacing={2}>
+              <Grid item xs={4}>
+                <Typography variant="h6">encherir:</Typography>{" "}
+              </Grid>
+              <Grid item xs={4}>
+                <Typography variant="h6" color="info.main">
+                  prix actuel: {enchere.currentPrice}TND
+                </Typography>
+              </Grid>
+              <Grid item xs={4}>
+                <Typography variant="h8">
+                  prix apres l'augmentation:{" "}
+                  {enchere.currentPrice + augmentation} TND
+                </Typography>
+              </Grid>
+              <Grid item xs={4}></Grid>
+              <Grid item xs={4}>
                 <TextField
-                    required
-                    type="number"
-                    id="augmentation"
-                    label="augmentation"
-                    value={augmentation}
-                    onChange={handleAugmentation}
-                  />
-                </Grid>
+                  required
+                  type="number"
+                  id="augmentation"
+                  label="augmentation"
+                  value={augmentation}
+                  onChange={handleAugmentation}
+                />
+              </Grid>
 
-                <Grid item xs={4}>
-                <Button
-                  sx={ButtonStyles}
-                >
-                  {" "}
-                  encherir
-                </Button>
+              <Grid item xs={4}>
+                <Button sx={ButtonStyles}> encherir</Button>
               </Grid>
             </Grid>
           </Box>
           {/* sale details section*/}
           <Box>
-          <Grid container spacing={2} sx={{ mt: 2 }}>
-            {/* title */}
-            <Grid
-              item
-              xs={12}
-              sx={{
-                backgroundColor: "primary.main",
-                borderRadius: 10,
-                padding: 4,
-                mt: 5,
-              }}
-            >
-              <Typography variant="h3">
-                <PersonIcon fontSize="large" sx={{ mr: 2 }} />
-                details sur produit
-              </Typography>
-              {/* seller data details */}
-              <Grid item sx={{ mt: 2 }}>
-                {Object.keys(articleData).map((key, index) => (
-                  <Grid container key={index} sx={{ mb: 2 }}>
-                    <Grid item xs={6}>
-                      <Typography variant="h6">{key}: </Typography>
+            <Grid container spacing={2} sx={{ mt: 2 }}>
+              {/* title */}
+              <Grid
+                item
+                xs={12}
+                sx={{
+                  backgroundColor: "primary.main",
+                  borderRadius: 10,
+                  padding: 4,
+                  mt: 5,
+                }}
+              >
+                <Typography variant="h3">
+                  <PersonIcon fontSize="large" sx={{ mr: 2 }} />
+                  details sur produit
+                </Typography>
+                {/* article details section */}
+                <Grid item sx={{ mt: 2 }}>
+                  {Object.keys(article).map((key, index) => (
+                    <Grid container key={index} sx={{ mb: 2 }}>
+                      <Grid item xs={6}>
+                        <Typography variant="h6">{key}: </Typography>
+                      </Grid>
+                      <Grid item xs={6}>
+                        <Typography variant="h6">
+                          {article[key]}{" "}
+                        </Typography>
+                      </Grid>
                     </Grid>
-                    <Grid item xs={6}>
-                      <Typography variant="h6">{articleData[key]} </Typography>
-                    </Grid>
-                  </Grid>
-                ))}
+                  ))}
+                </Grid>
               </Grid>
             </Grid>
-          </Grid>
           </Box>
         </Grid>
       </Grid>

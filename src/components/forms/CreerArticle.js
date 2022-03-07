@@ -92,8 +92,10 @@ export default function CreerArticle() {
   },[])
   //#endregion
 
-
+  //to get the state of the user from store
   const user = useSelector(state=>state.user)
+
+
   const handleSubmit = (event) => {
     event.preventDefault();
     Api.post('/articles', {
@@ -123,6 +125,18 @@ export default function CreerArticle() {
       )
     .then(response=>{
       console.log(response)
+      if(type === "enchere_inverses"){
+        Api.post("/surveilles", {
+          user: `/api/users/${user.id}`,
+          enchereInverse:  `${response["data"]["@id"]}`
+        }).then(response=>console.log(response)).catch(error=>console.log(error))
+      }
+      else{
+        Api.post("/surveilles", {
+          user: `/api/users/${user.id}`,
+          enchere:  `${response["data"]["@id"]}`
+        }).then(response=>console.log(response)).catch(error=>console.log(error))
+      }
       
     })
     .catch(error=>console.log(error))}

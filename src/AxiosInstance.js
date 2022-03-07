@@ -38,9 +38,11 @@ const Api = () => {
         //   },
         // });
       }
-      else if (status === StatusCodes.UNAUTHORIZED) {
-        document.location.href = navRoutes.LOGIN;
-      }
+      
+      //make this smarter by redirecting just when you visit a page that requires permission
+      // else if (status === StatusCodes.UNAUTHORIZED) {
+      //   document.location.href = navRoutes.LOGIN;
+      // }
 
       return Promise.reject(error);
     }

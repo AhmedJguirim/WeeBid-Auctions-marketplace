@@ -1,10 +1,10 @@
 import { Avatar, IconButton, Grid, Typography } from "@mui/material";
 import React from "react";
-import EditIcon from '@mui/icons-material/Edit';
+import EditIcon from "@mui/icons-material/Edit";
 import { darkContainer } from "./base/customComponents/general";
+import API from "../AxiosInstance";
 
-
-
+// TODO: check for weird unique key error
 
 const UserProfile = () => {
   //#region form data state
@@ -36,65 +36,114 @@ const UserProfile = () => {
   };
   //#endregion
 
-  const userData = {
-    name: "name",
-    displayName: "displayName",
-    email: "email",
-    password: "password",
-    telephone: "telephone",
-    avatar: "demo",
-    birthDate: "date",
-  };
-const handleClick = ()=>{
-    setIsEditing(true)
+  //get user and set it to state
+  const [user, setUser] = React.useState({});
+  async function getUser() {
+    try {
+      const response = await API.get(`userdata`);
+      const data = response["data"];
+      setUser({
+        name: data.name,
+        displayName: data.displayName,
+        email: data.email,
+        password: "******",
+        telephone: data.telephone,
+        birthDate: data.birthDate,
+      });
+    } catch (error) {
+      console.error(error);
+    }
+  }
+
+  // const userData = {
+  //   name: "name",
+  //   displayName: "displayName",
+  //   email: "email",
+  //   password: "password",
+  //   telephone: "telephone",
+  //   avatar: "demo",
+  //   birthDate: "date",
+  // };
+
+  const handleClick = () => {
+    setIsEditing(true);
     //TODO: editing display and logic , an idea is to make display none/visible textFields and add edite fields to an object then put on submit (use the sstates up)
-    console.log("work under construction")
-}
-if(isEditing===false){
+    console.log("work under construction");
+  };
+  React.useEffect(() => {
+    getUser();
+  }, []);
+
+  if (isEditing === false) {
     return (
-        <Grid Container sx={darkContainer}>
-          {/* title */}
-          <Grid container>
-            <Grid item xs={1}><Avatar>AH</Avatar></Grid>
-            <Grid item xs={3.5} sx={{textAlign:"left"}}><Typography variant="h2">{userData.displayName}</Typography>  </Grid>
-            
-            </Grid>
-          <Grid item xs={6} sx={{mt:5}}>
-          {Object.keys(userData).map((key, index) => (
-              <Grid container>
-                <Grid item xs={6} key={index}> <Typography variant="h4">{key}:</Typography></Grid>
-                <Grid item xs={5} key={index}> <Typography variant="h4">{userData[key]}</Typography></Grid>
-                <Grid item xs={1} key={index}><IconButton onClick={handleClick}><EditIcon color="primary" size="large" /> </IconButton></Grid>
-                </Grid>
-              ))}
-          </Grid>
-          </Grid>
-      );
-}
-else{
-    return(<Grid Container sx={darkContainer}>
-    {/* title */}
-    <Grid item xs={6}>
-    <Grid container>
-      <Grid item xs={1}><Avatar>AH</Avatar></Grid>
-      <Grid item xs={3.5} sx={{textAlign:"left"}}><Typography variant="h2">{userData.displayName}</Typography>  </Grid>
-      <Grid item xs={1}><IconButton onClick={handleClick}><EditIcon color="primary" size="large" /> </IconButton></Grid>
-      </Grid>
-    <Grid item xs={6} sx={{mt:5}}>
-    {Object.keys(userData).map((key, index) => (
+      <Grid Container sx={darkContainer}>
+        {/* title */}
         <Grid container>
-          <Grid item xs={6} key={index}> <Typography variant="h4">{key}:</Typography></Grid>
-          <Grid item xs={6} key={index}> <Typography variant="h4">{userData[key]}</Typography></Grid>
+          <Grid item xs={1}>
+            <Avatar>AH</Avatar>
           </Grid>
-        ))}
-    </Grid>
-    </Grid>
-    <Grid item xs={6}>
-        
-    </Grid>
-    </Grid>)
-}
-  
+          <Grid item xs={3.5} sx={{ textAlign: "left" }}>
+            <Typography variant="h2">{user.displayName}</Typography>{" "}
+          </Grid>
+        </Grid>
+        <Grid item xs={9} sx={{ mt: 5 }}>
+          {Object.keys(user).map((key, index) => (
+            <Grid container key={index}>
+              <Grid item xs={6}>
+                {" "}
+                <Typography variant="h4">{key}:</Typography>
+              </Grid>
+              <Grid item xs={5}>
+                {" "}
+                <Typography variant="h4">{user[key]}</Typography>
+              </Grid>
+              <Grid item xs={1}>
+                <IconButton onClick={handleClick}>
+                  <EditIcon color="primary" size="large" />{" "}
+                </IconButton>
+              </Grid>
+            </Grid>
+          ))}
+        </Grid>
+      </Grid>
+    );
+  } else {
+    return (
+      <Grid Container sx={darkContainer}>
+        {/* title */}
+        <Grid item xs={6}>
+          <Grid container>
+            <Grid item xs={1}>
+              <Avatar>AH</Avatar>
+            </Grid>
+            <Grid item xs={3.5} sx={{ textAlign: "left" }}>
+              <Typography variant="h2">{user.displayName}</Typography>{" "}
+            </Grid>
+            <Grid item xs={1}>
+              <IconButton onClick={handleClick}>
+                <EditIcon color="primary" size="large" />{" "}
+              </IconButton>
+            </Grid>
+          </Grid>
+          <Grid item xs={6} sx={{ mt: 5 }}>
+            {Object.keys(user).map((key, index) => (
+              <Grid container key={index}>
+                <Grid item xs={6}>
+                  {" "}
+                  <Typography variant="h4">{key}:</Typography>
+                </Grid>
+                <Grid item xs={6}>
+                  {" "}
+                  <Typography variant="h4">{user[key]}</Typography>
+                </Grid>
+              </Grid>
+            ))}
+          </Grid>
+        </Grid>
+        <Grid item xs={4}></Grid>
+      </Grid>
+    );
+  }
 };
 
 export default UserProfile;

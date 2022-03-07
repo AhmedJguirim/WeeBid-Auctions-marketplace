@@ -6,7 +6,6 @@ const userReducer = (state = {} , action)=>{
         
         case 'CHECKUSER':          
             const user = action.payload
-            console.log(user)
             if(user){
                 return {
                     id: user.id,

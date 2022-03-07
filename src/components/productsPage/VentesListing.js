@@ -16,8 +16,8 @@ const VentesListing = () => {
   return (
     <Grid container>
         <Typography variant='h2'>nos ventes</Typography>
-        <ProductsListing elemsPerLine={6} ventes={ventes}>
-        </ProductsListing>
+        {/* <ProductsListing elemsPerLine={6} ventes={ventes}>
+        </ProductsListing> */}
     </Grid>
   )
 }

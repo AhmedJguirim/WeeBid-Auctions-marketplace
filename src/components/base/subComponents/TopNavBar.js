@@ -17,6 +17,7 @@ import {
   
 } from "@mui/material";
 import MyDrawer from "./Drawer";
+import { useSelector } from "react-redux";
 
 const TopNavBar = () => {
   const styles = {
@@ -30,7 +31,33 @@ const TopNavBar = () => {
       
     },
   }
-
+  const user = useSelector(state=>state.user)
+  let variableLinks = {}
+  if(user.id == undefined){
+    variableLinks = {
+      0: {
+        text: "connection",
+        path: "/login"
+      },
+      1: {
+        text: "inscription",
+        path:"/register"
+      }
+    }
+  }
+  else{
+    variableLinks = {
+      0: {
+        text: "mes encheres",
+        path: "#"
+      },
+      1: {
+        text: "profile",
+        path:"/userProfile"
+      }
+    }
+  }
+  
   const [open, setOpen] = React.useState(false);
 
   const handleDrawerOpen = () => {
@@ -41,6 +68,7 @@ const TopNavBar = () => {
       <Box
         sx={styles.topBox}
       >
+        {/* TODO: store all links in config/routes.js */}
         <TopAppBar position="static" >
           <Grid container>
             <TopNavGrid
@@ -59,7 +87,7 @@ const TopNavBar = () => {
               </IconButton>
               <img src={logoPath} className="logo" />
               <TopNavLink text="encheres" path="#"></TopNavLink>
-              <TopNavLink text="categories" path="#"></TopNavLink>
+              <TopNavLink text="categories" path="/categories"></TopNavLink>
               <Box sx={{ minWidth: 120 }}>
               <FormControl fullWidth>
                 <InputLabel>type</InputLabel>
@@ -91,8 +119,10 @@ const TopNavBar = () => {
               item
               sx={styles.secondGrid}
             > 
-              <TopNavLink text="se connecter" path="/login"></TopNavLink>
-              <TopNavLink text="créer un compte" path="/register"></TopNavLink>
+            {Object.keys(variableLinks).map((key, index) => (
+            <TopNavLink key={index} text={variableLinks[key].text} path={variableLinks[key].path}></TopNavLink>
+          ))}
+              
               <IconButton
                 size="large"
                 edge="end"
