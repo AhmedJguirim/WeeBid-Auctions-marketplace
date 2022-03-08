@@ -39,10 +39,11 @@ const Api = () => {
         // });
       }
       
-      //make this smarter by redirecting just when you visit a page that requires permission
-      // else if (status === StatusCodes.UNAUTHORIZED) {
-      //   document.location.href = navRoutes.LOGIN;
-      // }
+     
+      else if (status === StatusCodes.UNAUTHORIZED) {
+        window.localStorage.clear();
+        document.location.href = navRoutes.LOGIN;
+      }
 
       return Promise.reject(error);
     }

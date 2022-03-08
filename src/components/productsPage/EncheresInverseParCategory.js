@@ -1,8 +1,9 @@
 import { Grid, Typography } from '@mui/material';
 import React from 'react'
 import ProductsListing from '../generalComponents/ProductsListing';
-import Api from "../../AxiosInstance";
+import axios from 'axios';
 import { useParams } from 'react-router-dom';
+import { apiRoutes } from '../../config/routes';
 
 const EncheresInverseParCategory = () => {
   const {categoryId} = useParams();
@@ -10,18 +11,19 @@ const EncheresInverseParCategory = () => {
   const [categoryName, setCategoryName] = React.useState("");
   
   function getEnchereInverses() {
-    Api.get('/enchere_inverses', {
+    axios.get(`${apiRoutes.API}/enchere_inverses`, {
       params: {
         page: "1",
         category: categoryId
       }
     })
     .then(function (response) {
+      console.log(response["data"]["hydra:member"])
       setEnchereInverses(response["data"]["hydra:member"]);
     }).catch(error=>console.log(error))
   }
   const getCategoryName = ()=>{
-    Api.get(`/categories/${categoryId}`).then(response=>{setCategoryName(response["data"].name)}).catch(error=>{return error})
+    axios.get(`${apiRoutes.API}/categories/${categoryId}`).then(response=>{setCategoryName(response["data"].name)}).catch(error=>{return error})
   }
   React.useEffect(()=>{
     getEnchereInverses()

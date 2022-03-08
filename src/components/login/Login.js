@@ -2,8 +2,9 @@ import React from "react";
 import { Grid, Box, TextField, Button, Typography } from "@mui/material";
 
 import { ButtonStyles, formBox } from "../base/customComponents/general";
-import API from "../../AxiosInstance";
+import axios from "axios";
 import { useDispatch } from 'react-redux'
+import { apiRoutes } from "../../config/routes";
 
 const Login = () => {
   //#region form data state
@@ -19,28 +20,26 @@ const Login = () => {
     setPassword(event.target.value);
   };
   //#endregion
-  async function getUser() {
-    try {
-      const response = await API.get(`userdata`);
-      console.log(response);
-    } catch (error) {
-      console.error(error);
-    }
-  }
+  // async function getUser() {
+  //   try {
+  //     const response = await API.get(`userdata`);
+  //     console.log(response);
+  //   } catch (error) {
+  //     console.error(error);
+  //   }
+  // }
 
   const onSubmit = (event) => {
     event.preventDefault();
-    const axios = require("axios");
-    
-
-    API
-      .post(`login_check`, {
+    axios
+      .post(`${apiRoutes.API}/login_check`, {
         username: email,
         password: password,
       })
       .then(function (response) {
         localStorage.setItem("token", response.data.token);
         localStorage.setItem("refresh", response.data.refresh_token);
+        document.location.href = "/"
       })
       .catch(function (error) {
         console.log(error);
@@ -79,7 +78,7 @@ const Login = () => {
             onChange={handlePassword}
           />
           <Button type="submit" sx={ButtonStyles}>sub</Button>
-          <Button onClick={getUser} sx={ButtonStyles}>get infos</Button>
+          {/* <Button onClick={getUser} sx={ButtonStyles}>get infos</Button> */}
         </Box>
       </Grid>
     </Grid>

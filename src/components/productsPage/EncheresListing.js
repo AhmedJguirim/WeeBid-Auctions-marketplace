@@ -1,14 +1,15 @@
 import { Grid, Typography } from '@mui/material';
 import React from 'react'
 import ProductsListing from '../generalComponents/ProductsListing';
-import Api from "../../AxiosInstance";
+import axios from 'axios';
+import { apiRoutes } from '../../config/routes';
 
 const EncheresListing = () => {
   const [encheres, setEncheres] = React.useState({});
 
   
   function getEncheres() {
-    Api.get('/encheres', {
+    axios.get(`${apiRoutes.API}/encheres`, {
       params: {
         page: "1",
       }

@@ -8,8 +8,9 @@ import {
 import { Box } from "@mui/system";
 import React from "react";
 import image from "../../media/images/homepageTopImage.jpg";
-import Api from "../../AxiosInstance";
+import axios from "axios";
 import HomePageList from "../generalComponents/ProductsListing";
+import { apiRoutes } from "../../config/routes";
 
 
 
@@ -55,7 +56,7 @@ const [encheresInverses, setEnchereInverses] = React.useState({});
 
   
 function getEnchereInverses() {
-  Api.get('/enchere_inverses', {
+  axios.get(`${apiRoutes.API}/enchere_inverses`, {
     params: {
       page: "1",
     }
@@ -71,7 +72,7 @@ const [encheres, setEncheres] = React.useState({});
 
   
   function getEncheres() {
-    Api.get('/encheres', {
+    axios.get(`${apiRoutes.API}/encheres`, {
       params: {
         page: "1",
       }

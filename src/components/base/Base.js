@@ -10,7 +10,7 @@ import { Register } from '../register/Register'
 import DetailedProduct from '../productsPage/DetailedProduct'
 import UserProfile from '../UserProfile';
 import EncheresHistory from '../userHistory/EncheresHistory'
-import {BrowserRouter as Router, Route,Routes} from 'react-router-dom';
+import {BrowserRouter as Router,  Route,Routes} from 'react-router-dom';
 import { useDispatch } from 'react-redux'
 import { checkUser, getUserData } from '../../redux/actions'
 import CategoriesList from '../productsPage/CategoriesList'
@@ -18,6 +18,9 @@ import EncheresParCategory from '../productsPage/EncheresParCategory'
 import EncheresInverseParCategory from '../productsPage/EncheresInverseParCategory'
 import EncheresListing from '../productsPage/EncheresListing'
 import EncheresInvListing from '../productsPage/EncheresInvListing'
+import Logout from '../login/logout'
+import { navRoutes } from '../../config/routes'
+import WorkInProgress from './customComponents/WorkInProgress'
 
 
 const styles = {
@@ -40,22 +43,23 @@ const Base = () => {
         <TopNavBar />
         <Routes>
           {/* TODO: declare the routes in config/route.js */}
-          <Route path="/makeEnchere" element={<CreerArticle />}></Route>
-          <Route path="/login" element={<Login />}></Route>
+          <Route path={navRoutes.MAKE_ARTICLE} element={<CreerArticle />}></Route>
+          <Route path={navRoutes.LOGIN} element={<Login />}></Route>
           <Route path="/enchereHistory/:userId" element={<EncheresHistory />}></Route>
-          <Route path="/enchere/:id" element={<DetailedProduct />}></Route>
-          <Route path="/register" element={<Register />}></Route>
+          <Route path={`${navRoutes.ENCHERE}/:id`} element={<DetailedProduct />}></Route>
+          <Route path={navRoutes.REGISTER} element={<Register />}></Route>
           <Route path="/" element={<Homepage /> }></Route>
-          <Route path="/profile/:userId" element={<UserProfile />}></Route>
-          <Route path="/ventes" element={<VentesListing />}></Route>
-          <Route path="/categories" element={<CategoriesList />}></Route>
-          <Route path="/encheres/:categoryId" element={<EncheresParCategory />}></Route>
-          <Route path="/encheresInverses/:categoryId" element={<EncheresInverseParCategory />}></Route>
-          <Route path="/encheres/:categoryId" element={<EncheresParCategory />}></Route>
-          <Route path="/encheresInverses" element={<EncheresInvListing />}></Route>
-          <Route path="/encheres" element={<EncheresListing />}></Route>
-          <Route path="/enchere/:enchereId" element={<DetailedProduct />}></Route>
-          
+          <Route path={navRoutes.USERPROFILE} element={<UserProfile />}></Route>
+          <Route path={navRoutes.VENTES} element={<VentesListing />}></Route>
+          <Route path={navRoutes.CATEGORIES} element={<CategoriesList />}></Route>
+          <Route path={`${navRoutes.ENCHERES}/:categoryId`} element={<EncheresParCategory />}></Route>
+          <Route path={`${navRoutes.ENCHERESINVERSES}/:categoryId`} element={<EncheresInverseParCategory />}></Route>
+          <Route path={navRoutes.ENCHERESINVERSES} element={<EncheresInvListing />}></Route>
+          <Route path={navRoutes.ENCHERES} element={<EncheresListing />}></Route>
+          {/* TODO: make a seperate page for detailed ENCCHEREINVERSE */}
+          <Route path={`${navRoutes.ENCHEREINVERSE}/:id`} element={<DetailedProduct />}></Route>
+          <Route path={navRoutes.LOGOUT} element={<Logout />}></Route>
+          <Route path={navRoutes.INPROGRESS}element={<WorkInProgress />}></Route>
           
         </Routes>
       </Box>

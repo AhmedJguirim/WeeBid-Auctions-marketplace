@@ -3,22 +3,22 @@ import { Box, minHeight } from "@mui/system";
 import React from "react";
 import PersonIcon from "@mui/icons-material/Person";
 import { ButtonStyles, lightContainer } from "../base/customComponents/general";
-import Api from "../../AxiosInstance";
+import axios from "axios";
 import { useParams } from "react-router-dom";
-// import img1 from "../../media/images/demosToBeReplaced/pc1.jpg"
-// import img2 from "../../media/images/demosToBeReplaced/pc2.jpg"
-// import img3 from "../../media/images/demosToBeReplaced/pc3.jpg"
-// import img4 from "../../media/images/demosToBeReplaced/pc4.jpg"
+import { apiRoutes } from "../../config/routes";
+
 
 const DetailedProduct = () => {
   const [enchere, setEnchere] = React.useState({});
   const [article, setArticle] = React.useState({});
   const [description, setDescription] = React.useState("");
   const [seller, setSeller] = React.useState({});
-  // TODO: check why use params returns undefined then replace the hardcoded Id
-  const { enchereId } = useParams();
+
+
+
+  let { id } = useParams();
   function getEnchere() {
-    Api.get(`/encheres/26`)
+    axios.get(`${apiRoutes.API}/encheres/${id}`)
       .then(function (response) {
         const data = response["data"]
         setEnchere(data);
@@ -27,7 +27,7 @@ const DetailedProduct = () => {
           localistation: "TODO: change this to the user's city"
         })
         //get the articme as well
-    Api.get(`articles/${response["data"]["article"]["id"]}`)
+    axios.get(`${apiRoutes.API}/articles/${response["data"]["article"]["id"]}`)
     .then(function (response) {
       const data = response["data"]
       console.log(response)

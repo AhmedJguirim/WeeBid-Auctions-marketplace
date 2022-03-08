@@ -1,7 +1,8 @@
 import { Grid, Typography } from '@mui/material';
 import React from 'react'
 import ProductsListing from '../generalComponents/ProductsListing';
-import Api from "../../AxiosInstance";
+import axios from 'axios';
+import { apiRoutes } from '../../config/routes';
 
 
 const EncheresInvListing = () => {
@@ -9,7 +10,7 @@ const EncheresInvListing = () => {
 
   
   function getEnchereInverses() {
-    Api.get('/enchere_inverses', {
+    axios.get(`${apiRoutes.API}/enchere_inverses`, {
       params: {
         page: "1",
       }

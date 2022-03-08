@@ -1,15 +1,22 @@
-import Api from "../../AxiosInstance"
+import axios from 'axios'
 import { useDispatch } from 'react-redux'
+import { apiRoutes } from '../../config/routes'
 
 export function getUserData() {
+  
   return dispatch=>{
-  Api.get("http://127.0.0.1:8000/api/userdata")
+  axios.get(`${apiRoutes.API}/userdata`,{
+    headers:{
+      "Authorization": `Bearer ${localStorage.getItem("token")}`
+    }
+  })
   .then(function (response) {
     const data = response.data
     dispatch(checkUser(data))
   })
   .catch(function (error) {
     dispatch(checkUser({}))
+    window.localStorage.clear()
     console.log(error);
   })
 

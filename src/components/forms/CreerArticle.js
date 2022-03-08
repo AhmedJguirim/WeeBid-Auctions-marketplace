@@ -9,6 +9,7 @@ import {FormControl,FormLabel,Input,InputLabel,MenuItem,Radio,RadioGroup,Select,
   Button
 } from "@mui/material";
 import { useSelector } from "react-redux";
+import { apiRoutes, navRoutes } from "../../config/routes";
 
 export default function CreerArticle() {
   //#region form data state
@@ -126,16 +127,29 @@ export default function CreerArticle() {
     .then(response=>{
       console.log(response)
       if(type === "enchere_inverses"){
+        const enchereInverseId= response["data"]["id"]
         Api.post("/surveilles", {
           user: `/api/users/${user.id}`,
           enchereInverse:  `${response["data"]["@id"]}`
-        }).then(response=>console.log(response)).catch(error=>console.log(error))
+        }).then(
+          response=>{console.log(response)
+          document.location.href=`${navRoutes.ENCHEREINVERSE}/${enchereInverseId}`
+        }
+        
+        ).catch(error=>{
+          console.log(error)
+          
+        })
       }
       else{
+        const enchereId= response["data"]["id"]
         Api.post("/surveilles", {
           user: `/api/users/${user.id}`,
           enchere:  `${response["data"]["@id"]}`
-        }).then(response=>console.log(response)).catch(error=>console.log(error))
+        }).then(response=>{
+          console.log(response)
+          document.location.href=`${navRoutes.ENCHERE}/${enchereId}`
+        }).catch(error=>console.log(error))
       }
       
     })

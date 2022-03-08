@@ -4,7 +4,6 @@ import EditIcon from "@mui/icons-material/Edit";
 import { darkContainer } from "./base/customComponents/general";
 import API from "../AxiosInstance";
 
-// TODO: check for weird unique key error
 
 const UserProfile = () => {
   //#region form data state
@@ -42,13 +41,14 @@ const UserProfile = () => {
     try {
       const response = await API.get(`userdata`);
       const data = response["data"];
+      console.log(data)
       setUser({
         name: data.name,
-        displayName: data.displayName,
+        username: data.displayName,
         email: data.email,
         password: "******",
         telephone: data.telephone,
-        birthDate: data.birthDate,
+        birthDate: data.birthDate.slice(0,10),
       });
     } catch (error) {
       console.error(error);
@@ -76,7 +76,7 @@ const UserProfile = () => {
 
   if (isEditing === false) {
     return (
-      <Grid Container sx={darkContainer}>
+      <Grid container sx={darkContainer}>
         {/* title */}
         <Grid container>
           <Grid item xs={1}>

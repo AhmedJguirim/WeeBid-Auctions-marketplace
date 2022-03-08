@@ -16,6 +16,7 @@ const VentesListing = () => {
   return (
     <Grid container>
         <Typography variant='h2'>nos ventes</Typography>
+        <Typography variant='h2'>PAGE INVALABLE POUR LE MOMENT</Typography>
         {/* <ProductsListing elemsPerLine={6} ventes={ventes}>
         </ProductsListing> */}
     </Grid>

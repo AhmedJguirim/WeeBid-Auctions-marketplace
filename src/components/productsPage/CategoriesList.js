@@ -1,8 +1,8 @@
 import { Card, CardContent, Grid, Typography } from "@mui/material";
 import React from "react";
-import Api from "../../AxiosInstance";
-import { Link } from "react-router-dom";
+import axios from "axios";
 import { CustomLink } from "../base/customComponents/TopNavLink";
+import { apiRoutes } from "../../config/routes";
 
 const CategoriesList = () => {
 
@@ -12,7 +12,7 @@ const CategoriesList = () => {
   const [categories, setCategories] = React.useState({});
   async function getCategories() {
     try {
-      const response = await Api.get("/categories");
+      const response = await axios.get(`${apiRoutes.API}/categories`);
 
       setCategories(response["data"]["hydra:member"]);
     } catch (error) {

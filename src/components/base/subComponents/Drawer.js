@@ -13,6 +13,7 @@ import { DrawerHeader } from "../customComponents/general";
 import { ChevronLeft } from "@mui/icons-material";
 import { useNavigate } from "react-router-dom";
 import { useSelector } from "react-redux";
+import { navRoutes } from "../../../config/routes";
 
 const styles = {
   drawer: {
@@ -35,34 +36,36 @@ const MyDrawer = ({ open, setOpen }) => {
   const user = useSelector((state) => state.user);
 
   const listeElems1 = {
-    "tous les encheres": "/encheres",
-    categories: "/categories",
-    "nos produits": "/ventes",
-    "a propos de nous": "/about",
-    "contactez nous": "/contact",
+    "tous les encheres": navRoutes.ENCHERES,
+    "nos enchères inversées": navRoutes.ENCHERESINVERSES,
+    "nos produits": navRoutes.VENTES,
+    categories: navRoutes.CATEGORIES,
+
+    "a propos de nous": navRoutes.INPROGRESS,
+    "contactez nous": navRoutes.INPROGRESS,
   };
 
   let listeElems2 = {};
   if (user.id === undefined) {
     listeElems2 = {
-      "créer un compte": "/register",
-      "se connecter": "/login",
-      "politiques d'intimité": "/privacyPolicies",
+      "créer un compte": navRoutes.REGISTER,
+      "se connecter": navRoutes.LOGIN,
+      "politiques d'intimité": navRoutes.INPROGRESS,
     };
   } else {
     listeElems2 = {
-      "commancer un enchère ou enchere inversé": "/postArticle",
-      "envoyer une demande de devis": "/devis",
+      "commancer un enchère ou enchere inversé": navRoutes.MAKE_ARTICLE,
+      "envoyer une demande de devis": navRoutes.INPROGRESS,
 
-      "liste de surveilles": "/watchList",
-      "vos Encheres": "/Encheres/userId",
-      "vos Encheres Inversés": "/EncheresInverses/userId",
-      "les demandes de devis recus": "/demandes/userId",
-      "les propositions recus": "/propositions/userId",
+      "liste de surveilles": navRoutes.INPROGRESS,
+      "vos Encheres": navRoutes.INPROGRESS,
+      "vos Encheres Inversés": navRoutes.INPROGRESS,
+      "les demandes de devis recus": navRoutes.INPROGRESS,
+      "les propositions recus": navRoutes.INPROGRESS,
 
-      "mon compte": "/profile/userId",
-      "se déconnecter": "/logout",
-      "politiques d'intimité": "/privacyPolicies",
+      "mon compte": navRoutes.USERPROFILE,
+      "se déconnecter": navRoutes.LOGOUT,
+      "politiques d'intimité": navRoutes.INPROGRESS,
     };
   }
 

@@ -13,6 +13,7 @@ import LocalizationProvider from "@mui/lab/LocalizationProvider";
 import DesktopDatePicker from "@mui/lab/DesktopDatePicker";
 import { ButtonStyles, formBox } from "../base/customComponents/general";
 import { apiRoutes } from "../../config/routes";
+import axios from "axios";
 
 export const Register = () => {
 
@@ -44,11 +45,28 @@ export const Register = () => {
   };
   //#endregion
 
+//login after registration
+const login = ()=>{
+  axios
+      .post(`${apiRoutes.API}/login_check`, {
+        username: email,
+        password: password,
+      })
+      .then(function (response) {
+        localStorage.setItem("token", response.data.token);
+        localStorage.setItem("refresh", response.data.refresh_token);
+        document.location.href = "/"
+      })
+      .catch(function (error) {
+        console.log(error);
+      });
+}
+
 
   //#region registration POST request on submit
   const onSubmit = (event) => {
     event.preventDefault();
-    const axios = require("axios");
+    //TODO: fix error
     axios
       .post(`${apiRoutes.API}/register`, {
         name: name,
@@ -62,9 +80,11 @@ export const Register = () => {
       })
       .then(function (response) {
         console.log(response);
+        login()
       })
       .catch(function (error) {
         console.log(error);
+        login()
       });
   };
   //#endregion

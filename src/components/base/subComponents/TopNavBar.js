@@ -18,6 +18,8 @@ import {
 } from "@mui/material";
 import MyDrawer from "./Drawer";
 import { useSelector } from "react-redux";
+import { Link } from "react-router-dom";
+import { navRoutes } from "../../../config/routes";
 
 const TopNavBar = () => {
   const styles = {
@@ -37,24 +39,34 @@ const TopNavBar = () => {
     variableLinks = {
       0: {
         text: "connection",
-        path: "/login"
+        path: navRoutes.LOGIN
       },
       1: {
         text: "inscription",
-        path:"/register"
+        path: navRoutes.REGISTER
       }
     }
   }
   else{
     variableLinks = {
       0: {
-        text: "mes encheres",
-        path: "#"
+        text: "se deconnecter",
+        path: navRoutes.LOGOUT
       },
       1: {
         text: "profile",
-        path:"/userProfile"
+        path: navRoutes.USERPROFILE
       }
+    }
+  }
+  const constLinks = {
+    0: {
+      text: "categories",
+      path: navRoutes.CATEGORIES
+    },
+    1: {
+      text: "produits",
+      path: navRoutes.VENTES
     }
   }
   
@@ -68,7 +80,6 @@ const TopNavBar = () => {
       <Box
         sx={styles.topBox}
       >
-        {/* TODO: store all links in config/routes.js */}
         <TopAppBar position="static" >
           <Grid container>
             <TopNavGrid
@@ -85,9 +96,12 @@ const TopNavBar = () => {
               >
                 <MenuIcon />
               </IconButton>
-              <img src={logoPath} className="logo" />
-              <TopNavLink text="encheres" path="#"></TopNavLink>
-              <TopNavLink text="categories" path="/categories"></TopNavLink>
+              <Link to="/">
+                <img src={logoPath} className="logo" />
+              </Link>
+              {Object.keys(constLinks).map((key, index) => (
+            <TopNavLink key={index} text={constLinks[key].text} path={constLinks[key].path}></TopNavLink>
+          ))}
               <Box sx={{ minWidth: 120 }}>
               <FormControl fullWidth>
                 <InputLabel>type</InputLabel>
