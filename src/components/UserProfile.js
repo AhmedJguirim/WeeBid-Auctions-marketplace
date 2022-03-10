@@ -55,15 +55,6 @@ const UserProfile = () => {
     }
   }
 
-  // const userData = {
-  //   name: "name",
-  //   displayName: "displayName",
-  //   email: "email",
-  //   password: "password",
-  //   telephone: "telephone",
-  //   avatar: "demo",
-  //   birthDate: "date",
-  // };
 
   const handleClick = () => {
     setIsEditing(true);

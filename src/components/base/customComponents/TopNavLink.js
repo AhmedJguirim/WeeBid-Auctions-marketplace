@@ -1,7 +1,6 @@
 import React from "react";
 import { styled } from "@mui/system";
 import { Link } from "react-router-dom";
-import { NoEncryptionTwoTone } from "@mui/icons-material";
 
 
 export const CustomLink = styled(Link)(({ theme }) => ({
@@ -18,8 +17,6 @@ export const CustomLink = styled(Link)(({ theme }) => ({
     backgroundColor: theme.palette.info.main,
     color: theme.palette.primary.main
   }
-
-
 }));
 const TopNavLink = ({text, path}) => {
   

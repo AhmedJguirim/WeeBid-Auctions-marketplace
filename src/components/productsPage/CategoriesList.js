@@ -2,7 +2,7 @@ import { Card, CardContent, Grid, Typography } from "@mui/material";
 import React from "react";
 import axios from "axios";
 import { CustomLink } from "../base/customComponents/TopNavLink";
-import { apiRoutes } from "../../config/routes";
+import { apiRoutes, navRoutes } from "../../config/routes";
 
 const CategoriesList = () => {
 
@@ -44,10 +44,10 @@ const CategoriesList = () => {
             <CardContent>
               <Typography variant="h4">{categories[key].name}</Typography>
               <br /><br />
-              <CustomLink to={`/encheres/${categories[key].id}`}>
+              <CustomLink to={`${navRoutes.ENCHERES}${navRoutes.PERCATEGORY}/${categories[key].id}`}>
                 encheres
               </CustomLink> <br /><br />
-              <CustomLink to={`/encheresInverses/${categories[key].id}`}>
+              <CustomLink to={`${navRoutes.ENCHERESINVERSES}${navRoutes.PERCATEGORY}/${categories[key].id}`}>
                 encheres inversés
               </CustomLink>
             </CardContent>
