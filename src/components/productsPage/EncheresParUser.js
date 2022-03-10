@@ -3,18 +3,27 @@ import React from 'react'
 import ProductsListing from '../generalComponents/ProductsListing';
 import axios from 'axios';
 import { useParams } from 'react-router-dom';
-import { apiRoutes } from "../../config/routes";
+import { apiRoutes, navRoutes } from "../../config/routes";
 
-const EncheresParCategory = () => {
-  const {categoryId} = useParams();
+const EncheresParUser = () => {
+  const {id} = useParams();
   const [encheres, setEncheres] = React.useState({});
-  const [categoryName, setCategoryName] = React.useState("");
+  const [userName, setUserName] = React.useState("")
+  //just to get the username
+  function getUser() {
+    console.log(id)
+    axios.get(`${apiRoutes.API}/users/${id}`)
+    .then(function (response) {
+      setUserName(response["data"].displayName);
+    }).catch(error=>console.log(error))
+  }
   
   function getEnchere() {
+    console.log(id)
     axios.get(`${apiRoutes.API}/encheres`, {
       params: {
         page: "1",
-        category: `${categoryId}`
+        user: `${id}`
       }
     })
     .then(function (response) {
@@ -22,21 +31,19 @@ const EncheresParCategory = () => {
       setEncheres(response["data"]["hydra:member"]);
     }).catch(error=>console.log(error))
   }
-  const getCategoryName = ()=>{
-    axios.get(`${apiRoutes.API}/categories/${categoryId}`).then(response=>{setCategoryName(response["data"].name)}).catch(error=>{return error})
-  }
   React.useEffect(()=>{
     getEnchere()
-    getCategoryName()
+    getUser()
+
   },[])
 
       return (
         <Grid container>
-            <Typography variant='h3'>nos encheres de {categoryName}</Typography>
+            <Typography variant='h3'>nos encheres de {userName}</Typography>
             <ProductsListing elemsPerLine={6} ventes={encheres}>
             </ProductsListing>
         </Grid>
       )
 }
 
-export default EncheresParCategory
+export default EncheresParUser

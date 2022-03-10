@@ -56,13 +56,14 @@ const [encheresInverses, setEnchereInverses] = React.useState({});
 
   
 function getEnchereInverses() {
-  axios.get(`${apiRoutes.API}/enchere_inverses`, {
+  axios.get(`${apiRoutes.API}/enchere_inverses/getFour`, {
     params: {
       page: "1",
     }
   })
   .then(function (response) {
-    setEnchereInverses(response["data"]["hydra:member"].slice(0,4));
+    console.log(response)
+    setEnchereInverses(response["data"]["hydra:member"]);
   }).catch(error=>console.log(error))
 }
 //#endregion
@@ -72,19 +73,21 @@ const [encheres, setEncheres] = React.useState({});
 
   
   function getEncheres() {
-    axios.get(`${apiRoutes.API}/encheres`, {
+    axios.get(`${apiRoutes.API}/encheres/getFour`, {
       params: {
         page: "1",
       }
     })
     .then(function (response) {
-      setEncheres(response["data"]["hydra:member"].slice(0,4));
+      console.log(response)
+      setEncheres(response["data"]["hydra:member"]);
     }).catch(error=>console.log(error))
   }
 //#endregion
 
 //TODO: get ventes
 React.useEffect(()=>{
+  
   getEncheres()
   getEnchereInverses()
 },[])

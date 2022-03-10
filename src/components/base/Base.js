@@ -21,6 +21,9 @@ import EncheresInvListing from '../productsPage/EncheresInvListing'
 import Logout from '../login/logout'
 import { navRoutes } from '../../config/routes'
 import WorkInProgress from './customComponents/WorkInProgress'
+import EncheresParUser from '../productsPage/EncheresParUser'
+import EncheresInversesParUser from '../productsPage/EncheresInversesParUser'
+import WatchList from '../productsPage/WatchList'
 
 
 const styles = {
@@ -35,6 +38,7 @@ const Base = () => {
     });
     React.useEffect(()=>{
       dispatch(getUserData())
+      
     },[])
   
   return (
@@ -52,14 +56,18 @@ const Base = () => {
           <Route path={navRoutes.USERPROFILE} element={<UserProfile />}></Route>
           <Route path={navRoutes.VENTES} element={<VentesListing />}></Route>
           <Route path={navRoutes.CATEGORIES} element={<CategoriesList />}></Route>
-          <Route path={`${navRoutes.ENCHERES}/:categoryId`} element={<EncheresParCategory />}></Route>
-          <Route path={`${navRoutes.ENCHERESINVERSES}/:categoryId`} element={<EncheresInverseParCategory />}></Route>
+          <Route path={`${navRoutes.ENCHERES}${navRoutes.PERCATEGORY}/:categoryId`} element={<EncheresParCategory />}></Route>
+          <Route path={`${navRoutes.ENCHERESINVERSES}${navRoutes.PERCATEGORY}/:categoryId`} element={<EncheresInverseParCategory />}></Route>
           <Route path={navRoutes.ENCHERESINVERSES} element={<EncheresInvListing />}></Route>
           <Route path={navRoutes.ENCHERES} element={<EncheresListing />}></Route>
           {/* TODO: make a seperate page for detailed ENCCHEREINVERSE */}
           <Route path={`${navRoutes.ENCHEREINVERSE}/:id`} element={<DetailedProduct />}></Route>
           <Route path={navRoutes.LOGOUT} element={<Logout />}></Route>
           <Route path={navRoutes.INPROGRESS}element={<WorkInProgress />}></Route>
+          <Route path={`${navRoutes.ENCHERES}${navRoutes.PERUSER}/:id`}element={<EncheresParUser />}></Route>
+          <Route path={`${navRoutes.ENCHERESINVERSES}${navRoutes.PERUSER}/:id`}element={<EncheresInversesParUser />}></Route>
+          <Route path={navRoutes.WATCHLIST}element={<WatchList />}></Route>
+
           
         </Routes>
       </Box>

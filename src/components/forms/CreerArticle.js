@@ -208,6 +208,7 @@ export default function CreerArticle() {
               />
             </Grid>
             <Grid item xs={12}>
+              {/* TODO: date stays as default , fix it */}
               <LocalizationProvider dateAdapter={DateAdapter}>
                 <DesktopDatePicker
                   label="date de fabrication"

@@ -19,7 +19,6 @@ export const CustomLink = styled(Link)(({ theme }) => ({
   }
 }));
 const TopNavLink = ({text, path}) => {
-  
     return (
       <CustomLink to={path} sx={{color:"secondary.main"}} >
         {text}
