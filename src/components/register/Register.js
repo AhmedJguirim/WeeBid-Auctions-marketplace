@@ -16,7 +16,6 @@ import { apiRoutes } from "../../config/routes";
 import axios from "axios";
 
 export const Register = () => {
-
   //#region form data state
   const [date, setDate] = React.useState(new Date());
   const [name, setName] = React.useState("");
@@ -24,6 +23,10 @@ export const Register = () => {
   const [email, setEmail] = React.useState("");
   const [password, setPassword] = React.useState("");
   const [displayName, setDisplayName] = React.useState("");
+  const [pays, setPays] = React.useState("");
+  const [ville, setVille] = React.useState("");
+  const [rue, setRue] = React.useState("");
+  const [zipcode, setZipcode] = React.useState("");
   //#endregion
 
   //#region state manipulation mathods
@@ -43,25 +46,36 @@ export const Register = () => {
   const handleDisplayName = (event) => {
     setDisplayName(event.target.value);
   };
+  const handlePays = (event) => {
+    setPays(event.target.value);
+  };
+  const handleVille = (event) => {
+    setVille(event.target.value);
+  };
+  const handleRue = (event) => {
+    setRue(event.target.value);
+  };
+  const handleZipcode = (event) => {
+    setZipcode(event.target.value);
+  };
   //#endregion
 
-//login after registration
-const login = ()=>{
-  axios
+  //login after registration
+  const login = () => {
+    axios
       .post(`${apiRoutes.API}/login_check`, {
         username: email,
         password: password,
       })
       .then(function (response) {
         localStorage.setItem("token", response.data.token);
-        localStorage.setItem("refresh", response.data.refresh_token);
-        document.location.href = "/"
+        // localStorage.setItem("refresh", response.data.refresh_token);
+        document.location.href = "/";
       })
       .catch(function (error) {
         console.log(error);
       });
-}
-
+  };
 
   //#region registration POST request on submit
   const onSubmit = (event) => {
@@ -80,15 +94,25 @@ const login = ()=>{
       })
       .then(function (response) {
         console.log(response);
-        login()
+        axios.post(`${apiRoutes.API}/adresses`, {
+          pays: pays,
+          ville: ville,
+          rue: rue,
+          zipcode: zipcode,
+          user: response["data"]["@id"]
+        }).then(response=>{
+          console.log("address created")
+        login();
+      })
+        .catch(error=>console.log(error));
+        
       })
       .catch(function (error) {
         console.log(error);
-        login()
+        login();
       });
   };
   //#endregion
-
 
   const styles = {
     form: {
@@ -101,61 +125,113 @@ const login = ()=>{
   return (
     <Container component="main" maxWidth="xs">
       <CssBaseline />
-      <Box
-        sx={formBox}
-      >
+      <Box sx={formBox}>
         <Typography variant="h2">s'inscrir</Typography>
         <Box component="form" onSubmit={onSubmit} sx={{ mt: 3 }}>
           <Grid container spacing={2}>
             <Grid item>
-            <TextField
-              required
-              id="name"
-              label="Nom complet"
-              value={name}
-              onChange={handleName}
-            /></Grid><Grid item>
-            <TextField
-              required
-              id="displayName"
-              label="Nom d'utilisateur"
-              value={displayName}
-              onChange={handleDisplayName}
-            /></Grid><Grid item>
-            <TextField
-              required
-              id="email"
-              label="Adresse Email"
-              value={email}
-              onChange={handleEmail}
-            /></Grid><Grid item>
-            <TextField
-              required
-              id="password"
-              label="mot de passe"
-              type="password"
-              value={password}
-              onChange={handlePassword}
-            /></Grid><Grid item>
-            <TextField
-              required
-              id="telephone"
-              label="numero de téléphone"
-              value={telephone}
-              onChange={handleTelephone}
-            /></Grid><Grid item>
-            <LocalizationProvider dateAdapter={DateAdapter}>
-              <DesktopDatePicker
-                label="date de naissance"
-                inputFormat="MM/dd/yyyy"
-                value={date}
-                onChange={setDate}
-                renderInput={(params) => <TextField {...params} />}
+              <TextField
+                required
+                id="name"
+                label="Nom complet"
+                value={name}
+                onChange={handleName}
               />
-            </LocalizationProvider></Grid>
+            </Grid>
             <Grid item>
-            <Button type="submit" sx={ButtonStyles}>soumettre</Button>
-            <br /><br /><br />
+              <TextField
+                required
+                id="displayName"
+                label="Nom d'utilisateur"
+                value={displayName}
+                onChange={handleDisplayName}
+              />
+            </Grid>
+            <Grid item>
+              <TextField
+                required
+                id="email"
+                label="Adresse Email"
+                value={email}
+                onChange={handleEmail}
+              />
+            </Grid>
+            <Grid item>
+              <TextField
+                required
+                id="password"
+                label="mot de passe"
+                type="password"
+                value={password}
+                onChange={handlePassword}
+              />
+            </Grid>
+            <Grid item>
+              <TextField
+                required
+                id="telephone"
+                label="numero de téléphone"
+                value={telephone}
+                onChange={handleTelephone}
+              />
+            </Grid>
+            <Grid item>
+              <LocalizationProvider dateAdapter={DateAdapter}>
+                <DesktopDatePicker
+                  label="date de naissance"
+                  inputFormat="MM/dd/yyyy"
+                  value={date}
+                  onChange={setDate}
+                  renderInput={(params) => <TextField {...params} />}
+                />
+              </LocalizationProvider>
+            </Grid>
+            
+            <Grid item>
+            <Typography variant="h4">adresse:</Typography>
+              <TextField
+                required
+                id="pays"
+                label="Pays"
+                value={pays}
+                onChange={handlePays}
+              />
+            </Grid>
+            <Grid item>
+              <TextField
+                required
+                id="ville"
+                label="ville"
+                value={ville}
+                onChange={handleVille}
+              />
+            </Grid>
+            <Grid item>
+              <TextField
+                required
+                id="rue"
+                label="rue"
+                value={rue}
+                onChange={handleRue}
+              />
+            </Grid>
+            <Grid item>
+              <TextField
+                required
+                id="zipcode"
+                label="code zip"
+                value={zipcode}
+                onChange={handleZipcode}
+              />
+              
+            </Grid>
+            <Grid item>
+            <Button type="submit" sx={ButtonStyles}>
+                soumettre
+              </Button>
+              <br />
+              <br />
+              <br />
             </Grid>
           </Grid>
         </Box>

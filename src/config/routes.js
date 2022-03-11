@@ -13,6 +13,10 @@ export const navRoutes = {
     ENCHERE: "/enchere",
     ENCHEREINVERSE: "/enchereInverse",
     VENTE:"/vente",
+    PERCATEGORY: "/category",
+    PERUSER: "/user",
+    WATCHLIST: "/watchList",
+
 
     //posting things
     MAKE_ARTICLE: "/makeArticle",

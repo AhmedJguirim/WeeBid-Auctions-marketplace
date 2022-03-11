@@ -57,9 +57,9 @@ const MyDrawer = ({ open, setOpen }) => {
       "commancer un enchère ou enchere inversé": navRoutes.MAKE_ARTICLE,
       "envoyer une demande de devis": navRoutes.INPROGRESS,
 
-      "liste de surveilles": navRoutes.INPROGRESS,
-      "vos Encheres": navRoutes.INPROGRESS,
-      "vos Encheres Inversés": navRoutes.INPROGRESS,
+      "liste de surveilles": navRoutes.WATCHLIST,
+      "vos Encheres": `${navRoutes.ENCHERES}${navRoutes.PERUSER}/${user.id}`,
+      "vos Encheres Inversés": `${navRoutes.ENCHERESINVERSES}${navRoutes.PERUSER}/${user.id}`,
       "les demandes de devis recus": navRoutes.INPROGRESS,
       "les propositions recus": navRoutes.INPROGRESS,
 
