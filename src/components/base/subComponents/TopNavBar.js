@@ -24,6 +24,26 @@ import SearchBar from "./SearchBar";
 
 
 const TopNavBar = () => {
+
+
+  //#region type of search (default "enchere" to avoid unnecessary headache))
+  const [type, setType] = React.useState("/encheres");
+  const typesOptions  = {
+    0 : {
+      value:"/encheres",
+      text: "encheres"
+    },
+    1 : {
+      value:"/enchere_inverses",
+      text: "encheres inversés"
+    },
+    //TODO: ajouter ventes et utilisateurs 
+  }
+  const handleType = (event) => {
+    setType(event.target.value);
+  };  
+
+  //#endregion
   const styles = {
     topBox: {
       height: 70,
@@ -108,11 +128,9 @@ const TopNavBar = () => {
             <Box sx={{ minWidth: 120 }}>
               <FormControl fullWidth>
                 <InputLabel>type</InputLabel>
-                <Select value="">
-                  <MenuItem value={"enchere"}>enchere</MenuItem>
-                  <MenuItem value={"enchereInv"}>enchere inverse</MenuItem>
-                  <MenuItem value={"vente"}>ventes</MenuItem>
-                  <MenuItem value={"user"}>utilisateurs</MenuItem>
+                <Select value={type} onChange={handleType}>
+                {Object.keys(typesOptions).map((key, index) => (
+                    <MenuItem value={typesOptions[key].value} key={index}>{typesOptions[key].text}</MenuItem>))}
                 </Select>
               </FormControl>
             </Box>
@@ -124,7 +142,7 @@ const TopNavBar = () => {
               fullWidth
               label="Search"
             /> */}
-            <SearchBar />
+            <SearchBar type={type} />
 
             </Box>
           </TopNavGrid>

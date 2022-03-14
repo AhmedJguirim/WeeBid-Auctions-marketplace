@@ -133,7 +133,7 @@ export default function CreerArticle() {
           enchereInverse:  `${response["data"]["@id"]}`
         }).then(
           response=>{console.log(response)
-          document.location.href=`${navRoutes.ENCHEREINVERSE}/${enchereInverseId}`
+          // document.location.href=`${navRoutes.ENCHEREINVERSE}/${enchereInverseId}`
         }
         
         ).catch(error=>{
@@ -148,7 +148,7 @@ export default function CreerArticle() {
           enchere:  `${response["data"]["@id"]}`
         }).then(response=>{
           console.log(response)
-          document.location.href=`${navRoutes.ENCHERE}/${enchereId}`
+          // document.location.href=`${navRoutes.ENCHERE}/${enchereId}`
         }).catch(error=>console.log(error))
       }
       
