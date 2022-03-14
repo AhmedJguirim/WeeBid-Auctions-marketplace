@@ -49,7 +49,8 @@ const DetailedProduct = () => {
 
    React.useEffect(() => {
     getEnchere();
-  }, []);
+  }, [id]);
+  
 
 
 
