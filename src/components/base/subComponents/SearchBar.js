@@ -1,85 +1,103 @@
-import * as React from 'react';
-import TextField from '@mui/material/TextField';
-import Autocomplete from '@mui/material/Autocomplete';
-import CircularProgress from '@mui/material/CircularProgress';
-import { search } from '../customComponents/Utils';
-import { apiRoutes , navRoutes } from '../../../config/routes';
-import axios from 'axios';
-import { useNavigate } from 'react-router-dom';
-
-
+import * as React from "react";
+import TextField from "@mui/material/TextField";
+import Autocomplete from "@mui/material/Autocomplete";
+import CircularProgress from "@mui/material/CircularProgress";
+import { search } from "../customComponents/Utils";
+import { apiRoutes, navRoutes } from "../../../config/routes";
+import axios from "axios";
+import { useNavigate } from "react-router-dom";
 
 function sleep(delay = 0) {
   return new Promise((resolve) => {
     setTimeout(resolve, delay);
   });
 }
-
-export default function SearchBar({type}) {
+let cancelToken;
+export default function SearchBar({ type }) {
   const [open, setOpen] = React.useState(false);
   const [options, setOptions] = React.useState([]);
-  const [data, setData] = React.useState({})
-  const [input, setInput]= React.useState("");
-  const [loading, setLoading]= React.useState(false)
-  let source = axios.CancelToken.source();
+  const [data, setData] = React.useState({});
+  const [input, setInput] = React.useState("");
+  const [loading, setLoading] = React.useState(false);
+  
 
   let navigate = useNavigate();
-
-  const handleInput = async (event)=>{
-
-        setOptions([])
-        setInput(event.target.value);
-        setLoading(true)
-        getOptions()
-
-  }
-
-    //#region getting encheres ou encheres inverses
+  
+  const handleInput = async (event) => {
+    setOptions([]);
+    setInput(event.target.value);
+    setLoading(true);
+    //Check if there are any previous pending requests
+    if (cancelToken != undefined) {
+      cancelToken.cancel("Operation canceled due to new request.");
+    }
+      //Save the cancel token for the current request
+      cancelToken = axios.CancelToken.source();
 
       
-      function getOptions() {
-          setLoading(true)
-          setOptions([])
-        axios.get(`${apiRoutes.API}${type}/search`, {
-          params: {
-            page: "1",
-            "article.name": input
-          },
-          cancelToken: source.token
-        })
-        .then(function (response) {
-          console.log(response)
-          console.log("requested")
-          preparation(response["data"]["hydra:member"]);
-        }).catch(error=>console.log(error))
-      }
-      //#endregion
-
-      function preparation(data){
-        let searchResult = [];
-        
-        data.map((value, index)=>{
-          if(type==="/enchere_inverses")
-            searchResult.push({
-                id: value.id,
-                link: `${navRoutes.ENCHEREINVERSE}/${value.id}`,
-                name: value.article.name,
-            })
-          else{
-            searchResult.push({
-              id: value.id,
-              link: `${navRoutes.ENCHERE}/${value.id}`,
-              name: value.article.name,
-          })
+      try {
+        const response = await axios.get(
+          `${apiRoutes.API}${type}/search`, {
+            params: {
+              page: "1",
+              "article.name": input,
+            },
+            cancelToken: cancelToken.token,
           }
-
-        })
-        
-        setOptions(searchResult)
-        console.log(options)
-        setLoading(false)
+        );
+        console.log("requested");
+        preparation(response["data"]["hydra:member"]);
+      } catch (error) {
+        console.log(error);
       }
+    };
 
+
+
+  //#region getting encheres ou encheres inverses
+
+  // function getOptions() {
+  //   setLoading(true);
+  //   setOptions([]);
+  //   axios
+  //     .get(`${apiRoutes.API}${type}/search`, {
+  //       params: {
+  //         page: "1",
+  //         "article.name": input,
+  //       },
+  //       cancelToken: source.token,
+  //     })
+  //     .then(function (response) {
+  //       console.log(response);
+  //       console.log("requested");
+  //       preparation(response["data"]["hydra:member"]);
+  //     })
+  //     .catch((error) => console.log(error));
+  // }
+  //#endregion
+
+  function preparation(data) {
+    let searchResult = [];
+
+    data.map((value, index) => {
+      if (type === "/enchere_inverses")
+        searchResult.push({
+          id: value.id,
+          link: `${navRoutes.ENCHEREINVERSE}/${value.id}`,
+          name: value.article.name,
+        });
+      else {
+        searchResult.push({
+          id: value.id,
+          link: `${navRoutes.ENCHERE}/${value.id}`,
+          name: value.article.name,
+        });
+      }
+    });
+
+    setOptions(searchResult);
+    setLoading(false);
+  }
 
   return (
     <Autocomplete
@@ -93,7 +111,7 @@ export default function SearchBar({type}) {
       onClose={() => {
         setOpen(false);
       }}
-      isOptionEqualToValue={(option, value) => option.id === value.id}
+      isOptionEqualToValue={(option, value) => true}
       getOptionLabel={(option) => option.name}
       renderOption={(props, option) => {
         return (
@@ -105,7 +123,7 @@ export default function SearchBar({type}) {
       options={options}
       loading={loading}
       onChange={(event, option) => {
-        console.log(option.link)
+        console.log(option.link);
         navigate(option.link);
       }}
       renderInput={(params) => (
@@ -118,7 +136,9 @@ export default function SearchBar({type}) {
             ...params.InputProps,
             endAdornment: (
               <React.Fragment>
-                {loading ? <CircularProgress color="inherit" size={20} /> : null}
+                {loading ? (
+                  <CircularProgress color="inherit" size={20} />
+                ) : null}
                 {params.InputProps.endAdornment}
               </React.Fragment>
             ),
@@ -127,4 +147,5 @@ export default function SearchBar({type}) {
       )}
     />
   );
-}
+        
+        }
