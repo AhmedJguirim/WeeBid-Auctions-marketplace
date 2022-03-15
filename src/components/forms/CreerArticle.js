@@ -1,7 +1,7 @@
 import DateAdapter from "@mui/lab/AdapterDateFns";
 import Api from '../../AxiosInstance'
 import { ButtonStyles, formBox } from "../base/customComponents/general";
-import { DesktopDatePicker, LocalizationProvider } from "@mui/lab";
+import { DateTimePicker, DesktopDatePicker, LocalizationProvider } from "@mui/lab";
 import * as React from "react";
 
 import {FormControl,FormLabel,Input,InputLabel,MenuItem,Radio,RadioGroup,Select,
@@ -96,7 +96,7 @@ export default function CreerArticle() {
   //to get the state of the user from store
   const user = useSelector(state=>state.user)
 
-
+//calling the api to post
   const handleSubmit = (event) => {
     event.preventDefault();
     Api.post('/articles', {
@@ -319,9 +319,9 @@ export default function CreerArticle() {
             </Grid>
             <Grid item xs={12}>
               <LocalizationProvider dateAdapter={DateAdapter}>
-                <DesktopDatePicker
+                <DateTimePicker
                   label="date de debut"
-                  inputFormat="MM/dd/yyyy"
+                  // inputFormat="MM/dd/yyyy"
                   value={startDate}
                   onChange={setStartDate}
                   renderInput={(params) => <TextField {...params} />}

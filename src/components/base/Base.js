@@ -24,6 +24,7 @@ import WorkInProgress from './customComponents/WorkInProgress'
 import EncheresParUser from '../productsPage/EncheresParUser'
 import EncheresInversesParUser from '../productsPage/EncheresInversesParUser'
 import WatchList from '../productsPage/WatchList'
+import CreateArticle from '../forms/MultiStepArticle'
 
 
 const styles = {
@@ -47,7 +48,7 @@ const Base = () => {
         <TopNavBar />
         <Routes>
           {/* TODO: declare the routes in config/route.js */}
-          <Route path={navRoutes.MAKE_ARTICLE} element={<CreerArticle />}></Route>
+          <Route path={navRoutes.MAKE_ARTICLE} element={<CreateArticle />}></Route>
           <Route path={navRoutes.LOGIN} element={<Login />}></Route>
           <Route path="/enchereHistory/:userId" element={<EncheresHistory />}></Route>
           <Route path={`${navRoutes.ENCHERE}/:id`} element={<DetailedProduct />}></Route>

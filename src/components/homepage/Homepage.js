@@ -71,11 +71,14 @@ function getEnchereInverses() {
 //#region get encheres
 const [encheres, setEncheres] = React.useState({});
 
-  
+  var today = new Date();
+
+  var date = today.getFullYear()+'-'+(today.getMonth()+1)+'-'+today.getDate();
   function getEncheres() {
     axios.get(`${apiRoutes.API}/encheres/getFour`, {
       params: {
         page: "1",
+        "startDate[after]" : date
       }
     })
     .then(function (response) {

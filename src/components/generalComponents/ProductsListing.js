@@ -42,7 +42,7 @@ const ProductsListing = ({ventes ,elemsPerLine}) => {
                     {ventes[key].currentPrice} TND
                   </Typography>
                   <Typography sx={styles.productsTypography}>
-                    {ventes[key].endDate.substring(0,10)}
+                    {ventes[key].startDate.substring(0,10)}
                   </Typography>
                 
               </CardContent>
