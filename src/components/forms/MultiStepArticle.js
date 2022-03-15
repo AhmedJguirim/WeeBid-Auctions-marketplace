@@ -39,6 +39,58 @@ const steps = [
 ];
 
 export default function CreateArticle() {
+  //file upload
+  // const [selectedFile, setSelectedFile] = React.useState(null);
+
+  // const onFileChange = (event) => {
+  //   setSelectedFile(event.target.files[0]);
+  // };
+
+  // const onFileUpload = () => {
+  //   // Create an object of formData
+  //   const formData = new FormData();
+  //   let data = selectedFile;
+  //   data.lastModifiedDate = 
+  //   // Update the formData object
+  //   formData.append(
+  //     "myFile",
+  //     selectedFile,
+  //     selectedFile.name
+  //   );
+
+  //   // Details of the uploaded file
+  //   console.log(selectedFile);
+
+  //   // Request made to the backend api
+  //   // Send formData object
+  //   Api.post("documents", formData);
+  // };
+  // const fileData = () => {
+  //   if (selectedFile) {
+  //     return (
+  //       <div>
+  //         <h2>File Details:</h2>
+
+  //         <p>File Name: {selectedFile.name}</p>
+
+  //         <p>File Type: {selectedFile.type}</p>
+
+  //         <p>
+  //           Last Modified:{" "}
+  //           {selectedFile.lastModifiedDate.toDateString()}
+  //         </p>
+  //       </div>
+  //     );
+  //   } else {
+  //     return (
+  //       <div>
+  //         <br />
+  //         <h4>Choose before Pressing the Upload button</h4>
+  //       </div>
+  //     );
+  //   }
+  // };
+
   //#region stepper part
   const [activeStep, setActiveStep] = React.useState(0);
 
@@ -51,7 +103,6 @@ export default function CreateArticle() {
 
   const handleBack = () => {
     setActiveStep((prevActiveStep) => prevActiveStep - 1);
-
   };
 
   //#endregion
@@ -67,6 +118,7 @@ export default function CreateArticle() {
   const [marque, setMarque] = React.useState("");
   const [description, setDescription] = React.useState("");
   const [type, setType] = React.useState("enchere");
+  const [images, setImages] = React.useState(null);
 
   //specific to enchere/enchereInverse
   const [quantity, setQuantity] = React.useState(0);
@@ -152,7 +204,6 @@ export default function CreateArticle() {
       description: description,
     })
       .then((response) => {
-        
         Api.post(`/${type}`, {
           quantity: parseInt(quantity),
           initPrice: parseFloat(initPrice),
@@ -175,7 +226,7 @@ export default function CreateArticle() {
               })
                 .then((response) => {
                   console.log(response);
-                  document.location.href=`${navRoutes.ENCHEREINVERSE}/${enchereInverseId}`
+                  document.location.href = `${navRoutes.ENCHEREINVERSE}/${enchereInverseId}`;
                 })
                 .catch((error) => {
                   console.log(error);
@@ -188,7 +239,7 @@ export default function CreateArticle() {
               })
                 .then((response) => {
                   console.log(response);
-                  document.location.href=`${navRoutes.ENCHERE}/${enchereId}`
+                  document.location.href = `${navRoutes.ENCHERE}/${enchereId}`;
                 })
                 .catch((error) => console.log(error));
             }
@@ -199,7 +250,7 @@ export default function CreateArticle() {
   };
   //#endregion
   return (
-    <Box sx={{ width: "60%" , display:"blocks", mr:"auto", ml:"auto" }}>
+    <Box sx={{ width: "60%", display: "blocks", mr: "auto", ml: "auto" }}>
       <Stepper activeStep={activeStep}>
         {steps.map((label, index) => {
           const stepProps = {};
@@ -214,12 +265,13 @@ export default function CreateArticle() {
       <Container component="main" maxWidth="xs">
         <CssBaseline />
         <Box sx={formBox}>
-          
           <Box component="form" onSubmit={handleSubmit} sx={{ mt: 3 }}>
             <Grid container spacing={2}>
               {activeStep === 0 && (
                 <div className="step1">
-                    <Typography variant="h2" sx={{mb:2}}>{steps[0]}</Typography>
+                  <Typography variant="h2" sx={{ mb: 2 }}>
+                    {steps[0]}
+                  </Typography>
                   <Grid item xs={12}>
                     <TextField
                       fullWidth
@@ -308,13 +360,45 @@ export default function CreateArticle() {
                       label="vous guarentissez la validité de ces informations"
                     />
                   </Grid>
+                  {/* TODO: make it upload multiple files at the end by mapping through the dataform object */}
+                  <Grid item xs={12}>
+                    <label htmlFor="contained-button-file">
+                      <Input
+                        accept="image/*"
+                        id="contained-button-file"
+                        multiple
+                        type="file"
+                        onChange={(event) => {
+                          const data = new FormData();
+                          data.append(
+                            "file",
+                            event.target.files[0],
+                            event.target.files[0].name
+                          );
+                          console.log(event.target.files[0])
+                          Api.post("documents", data, {
+                            headers: {
+                              "Content-Type": "multipart/form-data",
+                            },
+                          });
+                        }}
+                      />
+                      <Button
+                        sx={{ ...ButtonStyles, margin: 2 }}
+                        component="span"
+                      >
+                        Upload
+                      </Button>
+                    </label>
+                  </Grid>
                 </div>
               )}
               {/* TODO: make an optional step for documents */}
               {activeStep === 1 && (
-                  
                 <div className="step2">
-                    <Typography variant="h2" sx={{mb:2}}>{steps[1]}</Typography>
+                  <Typography variant="h2" sx={{ mb: 2 }}>
+                    {steps[1]}
+                  </Typography>
                   <FormControl>
                     <FormLabel id="demo-controlled-radio-buttons-group">
                       Type :
@@ -395,7 +479,9 @@ export default function CreateArticle() {
               )}
               {activeStep === 2 && (
                 <div className="step3">
-                    <Typography variant="h2" sx={{mb:2}}>{steps[2]}</Typography>
+                  <Typography variant="h2" sx={{ mb: 2 }}>
+                    {steps[2]}
+                  </Typography>
                   <Grid item xs={12}>
                     <LocalizationProvider dateAdapter={DateAdapter}>
                       <DateTimePicker
@@ -421,38 +507,38 @@ export default function CreateArticle() {
                 </div>
               )}
               <Grid item xs={12}>
-              {activeStep === steps.length ? (
-                <React.Fragment>
-                  <Typography sx={{ mt: 2, mb: 1 }}>
-                    All steps completed - you&apos;re finished {activeStep} {steps.length}
-                  </Typography>
-                </React.Fragment>
-              ) : (
-                <React.Fragment>
-                  
-                  <Box sx={{ display: "flex", flexDirection: "row", pt: 2 }}>
-                    <Button
-                      color="inherit"
-                      disabled={activeStep === 0}
-                      onClick={handleBack}
-                      sx={{ ...ButtonStyles , mr: 1 }}
-                    >
-                      Back
-                    </Button>
-                    <Box sx={{ flex: "1 1 auto" }} />
+                {activeStep === steps.length ? (
+                  <React.Fragment>
+                    <Typography sx={{ mt: 2, mb: 1 }}>
+                      All steps completed - you&apos;re finished {activeStep}{" "}
+                      {steps.length}
+                    </Typography>
+                  </React.Fragment>
+                ) : (
+                  <React.Fragment>
+                    <Box sx={{ display: "flex", flexDirection: "row", pt: 2 }}>
+                      <Button
+                        color="inherit"
+                        disabled={activeStep === 0}
+                        onClick={handleBack}
+                        sx={{ ...ButtonStyles, mr: 1 }}
+                      >
+                        Back
+                      </Button>
+                      <Box sx={{ flex: "1 1 auto" }} />
 
-
-                    {activeStep === steps.length - 1 ? <Button sx={ButtonStyles} type="submit">
-                        soumettre
-                      
-                    </Button> : 
-                    <Button sx={ButtonStyles} onClick={handleNext}>
-                    next
-                  
-                </Button>}
-                  </Box>
-                </React.Fragment>
-              )}
+                      {activeStep === steps.length - 1 ? (
+                        <Button sx={ButtonStyles} type="submit">
+                          soumettre
+                        </Button>
+                      ) : (
+                        <Button sx={ButtonStyles} onClick={handleNext}>
+                          next
+                        </Button>
+                      )}
+                    </Box>
+                  </React.Fragment>
+                )}
               </Grid>
             </Grid>
           </Box>

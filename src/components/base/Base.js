@@ -25,6 +25,7 @@ import EncheresParUser from '../productsPage/EncheresParUser'
 import EncheresInversesParUser from '../productsPage/EncheresInversesParUser'
 import WatchList from '../productsPage/WatchList'
 import CreateArticle from '../forms/MultiStepArticle'
+import MultiStepRegister from '../register/MultiStepRegister'
 
 
 const styles = {
@@ -52,7 +53,7 @@ const Base = () => {
           <Route path={navRoutes.LOGIN} element={<Login />}></Route>
           <Route path="/enchereHistory/:userId" element={<EncheresHistory />}></Route>
           <Route path={`${navRoutes.ENCHERE}/:id`} element={<DetailedProduct />}></Route>
-          <Route path={navRoutes.REGISTER} element={<Register />}></Route>
+          <Route path={navRoutes.REGISTER} element={<MultiStepRegister />}></Route>
           <Route path="/" element={<Homepage /> }></Route>
           <Route path={navRoutes.USERPROFILE} element={<UserProfile />}></Route>
           <Route path={navRoutes.VENTES} element={<VentesListing />}></Route>

@@ -22,6 +22,7 @@ const DetailedProduct = () => {
       .then(function (response) {
         const data = response["data"]
         setEnchere(data);
+        console.log(data);
         setSeller({
           ["nom d'utilisateur"]: data.user.displayName,
           localistation: "TODO: change this to the user's city"
