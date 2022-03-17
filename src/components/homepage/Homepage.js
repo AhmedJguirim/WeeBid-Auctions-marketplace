@@ -62,7 +62,6 @@ function getEnchereInverses() {
     }
   })
   .then(function (response) {
-    console.log(response)
     setEnchereInverses(response["data"]["hydra:member"]);
   }).catch(error=>console.log(error))
 }
@@ -82,7 +81,6 @@ const [encheres, setEncheres] = React.useState({});
       }
     })
     .then(function (response) {
-      console.log(response)
       setEncheres(response["data"]["hydra:member"]);
     }).catch(error=>console.log(error))
   }

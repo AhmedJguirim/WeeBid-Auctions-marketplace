@@ -162,6 +162,17 @@ export default function CreateArticle() {
             });
           });
         }
+        console.log(JSON.stringify({
+          quantity: parseInt(quantity),
+          initPrice: parseFloat(initPrice),
+          currentPrice: parseFloat(initPrice),
+          immediatePrice: parseFloat(immediatePrice),
+          startDate: startDate,
+          endDate: endDate,
+          category: `/api/categories/${category}`,
+          article: `${response["data"]["@id"]}`,
+          //change this hardcoded line with user from store
+          user: `/api/users/${user.id}`}))
         Api.post(`/${type}`, {
           quantity: parseInt(quantity),
           initPrice: parseFloat(initPrice),
