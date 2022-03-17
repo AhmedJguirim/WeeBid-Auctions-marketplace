@@ -39,66 +39,11 @@ const steps = [
 ];
 
 export default function CreateArticle() {
-  //file upload
-  // const [selectedFile, setSelectedFile] = React.useState(null);
-
-  // const onFileChange = (event) => {
-  //   setSelectedFile(event.target.files[0]);
-  // };
-
-  // const onFileUpload = () => {
-  //   // Create an object of formData
-  //   const formData = new FormData();
-  //   let data = selectedFile;
-  //   data.lastModifiedDate = 
-  //   // Update the formData object
-  //   formData.append(
-  //     "myFile",
-  //     selectedFile,
-  //     selectedFile.name
-  //   );
-
-  //   // Details of the uploaded file
-  //   console.log(selectedFile);
-
-  //   // Request made to the backend api
-  //   // Send formData object
-  //   Api.post("documents", formData);
-  // };
-  // const fileData = () => {
-  //   if (selectedFile) {
-  //     return (
-  //       <div>
-  //         <h2>File Details:</h2>
-
-  //         <p>File Name: {selectedFile.name}</p>
-
-  //         <p>File Type: {selectedFile.type}</p>
-
-  //         <p>
-  //           Last Modified:{" "}
-  //           {selectedFile.lastModifiedDate.toDateString()}
-  //         </p>
-  //       </div>
-  //     );
-  //   } else {
-  //     return (
-  //       <div>
-  //         <br />
-  //         <h4>Choose before Pressing the Upload button</h4>
-  //       </div>
-  //     );
-  //   }
-  // };
-
   //#region stepper part
   const [activeStep, setActiveStep] = React.useState(0);
 
   const handleNext = () => {
     setActiveStep((prevActiveStep) => prevActiveStep + 1);
-    // if(activeStep === steps.length){
-    //     handleSubmit();
-    // }
   };
 
   const handleBack = () => {
@@ -106,7 +51,9 @@ export default function CreateArticle() {
   };
 
   //#endregion
+
   //#region form part
+
   //#region form data state
 
   //specific to article
@@ -118,7 +65,7 @@ export default function CreateArticle() {
   const [marque, setMarque] = React.useState("");
   const [description, setDescription] = React.useState("");
   const [type, setType] = React.useState("enchere");
-  const [images, setImages] = React.useState(null);
+  const [images, setImages] = React.useState([]);
 
   //specific to enchere/enchereInverse
   const [quantity, setQuantity] = React.useState(0);
@@ -182,6 +129,7 @@ export default function CreateArticle() {
       console.error(error);
     }
   }
+
   //this makes getCategory run on render
   React.useEffect(() => {
     getCategories();
@@ -204,6 +152,16 @@ export default function CreateArticle() {
       description: description,
     })
       .then((response) => {
+        if (images.length > 0) {
+          images.map((image) => {
+            image.append("article", response["data"]["id"]);
+            Api.post("documents", image, {
+              headers: {
+                "Content-Type": "multipart/form-data",
+              },
+            });
+          });
+        }
         Api.post(`/${type}`, {
           quantity: parseInt(quantity),
           initPrice: parseFloat(initPrice),
@@ -265,7 +223,7 @@ export default function CreateArticle() {
       <Container component="main" maxWidth="xs">
         <CssBaseline />
         <Box sx={formBox}>
-          <Box component="form" onSubmit={handleSubmit} sx={{ mt: 3 }}>
+          <Box component="form" sx={{ mt: 3 }}>
             <Grid container spacing={2}>
               {activeStep === 0 && (
                 <div className="step1">
@@ -369,18 +327,19 @@ export default function CreateArticle() {
                         multiple
                         type="file"
                         onChange={(event) => {
-                          const data = new FormData();
-                          data.append(
-                            "file",
-                            event.target.files[0],
-                            event.target.files[0].name
-                          );
-                          console.log(event.target.files[0])
-                          Api.post("documents", data, {
-                            headers: {
-                              "Content-Type": "multipart/form-data",
-                            },
-                          });
+                          if (images.length < 4) {
+                            const data = new FormData();
+                            data.append(
+                              "file",
+                              event.target.files[0],
+                              event.target.files[0].name
+                            );
+
+                            setImages([...images, data]);
+                          }
+                          else{
+                            alert("max 4 images")
+                          }
                         }}
                       />
                       <Button
@@ -528,7 +487,7 @@ export default function CreateArticle() {
                       <Box sx={{ flex: "1 1 auto" }} />
 
                       {activeStep === steps.length - 1 ? (
-                        <Button sx={ButtonStyles} type="submit">
+                        <Button sx={ButtonStyles} onClick={handleSubmit}>
                           soumettre
                         </Button>
                       ) : (
