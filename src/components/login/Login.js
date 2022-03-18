@@ -5,6 +5,7 @@ import { ButtonStyles, formBox } from "../base/customComponents/general";
 import axios from "axios";
 import { useDispatch } from 'react-redux'
 import { apiRoutes } from "../../config/routes";
+import { Navigate } from "react-router-dom";
 
 const Login = () => {
   //#region form data state
@@ -39,7 +40,7 @@ const Login = () => {
       .then(function (response) {
         localStorage.setItem("token", response.data.token);
         localStorage.setItem("refresh", response.data.refresh_token);
-        document.location.href = "/"
+        Navigate("/");
       })
       .catch(function (error) {
         console.log(error);

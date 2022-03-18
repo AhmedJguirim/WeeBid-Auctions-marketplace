@@ -19,6 +19,7 @@ import Stepper from "@mui/material/Stepper";
 import Step from "@mui/material/Step";
 import StepLabel from "@mui/material/StepLabel";
   import axios from "axios";
+import { useNavigate } from "react-router-dom";
 
 const steps = [
   "données générales",
@@ -26,6 +27,7 @@ const steps = [
 ];
 
 export default function MultiStepRegister() {
+  const navigate= new useNavigate()
   //#region stepper part
   const [activeStep, setActiveStep] = React.useState(0);
 
@@ -97,7 +99,7 @@ export default function MultiStepRegister() {
       .then(function (response) {
         localStorage.setItem("token", response.data.token);
         // localStorage.setItem("refresh", response.data.refresh_token);
-        document.location.href = "/";
+        navigate("/");
       })
       .catch(function (error) {
         console.log(error);

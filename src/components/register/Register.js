@@ -14,8 +14,11 @@ import DesktopDatePicker from "@mui/lab/DesktopDatePicker";
 import { ButtonStyles, formBox } from "../base/customComponents/general";
 import { apiRoutes } from "../../config/routes";
 import axios from "axios";
+import { useNavigate } from "react-router-dom";
 
 export const Register = () => {
+
+  const navigate= new useNavigate()
   //#region form data state
   const [date, setDate] = React.useState(new Date());
   const [name, setName] = React.useState("");
@@ -70,7 +73,7 @@ export const Register = () => {
       .then(function (response) {
         localStorage.setItem("token", response.data.token);
         // localStorage.setItem("refresh", response.data.refresh_token);
-        document.location.href = "/";
+        navigate("/");
       })
       .catch(function (error) {
         console.log(error);

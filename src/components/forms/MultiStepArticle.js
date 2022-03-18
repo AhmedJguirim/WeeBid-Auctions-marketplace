@@ -31,6 +31,7 @@ import { apiRoutes, navRoutes } from "../../config/routes";
 import Stepper from "@mui/material/Stepper";
 import Step from "@mui/material/Step";
 import StepLabel from "@mui/material/StepLabel";
+import { useNavigate } from "react-router-dom";
 
 const steps = [
   "enregistrer un article",
@@ -39,6 +40,7 @@ const steps = [
 ];
 
 export default function CreateArticle() {
+  const navigate= new useNavigate()
   //#region stepper part
   const [activeStep, setActiveStep] = React.useState(0);
 
@@ -195,7 +197,7 @@ export default function CreateArticle() {
               })
                 .then((response) => {
                   console.log(response);
-                  document.location.href = `${navRoutes.ENCHEREINVERSE}/${enchereInverseId}`;
+                  navigate(`${navRoutes.ENCHEREINVERSE}/${enchereInverseId}`);
                 })
                 .catch((error) => {
                   console.log(error);
@@ -208,7 +210,7 @@ export default function CreateArticle() {
               })
                 .then((response) => {
                   console.log(response);
-                  document.location.href = `${navRoutes.ENCHERE}/${enchereId}`;
+                  navigate(`${navRoutes.ENCHERE}/${enchereId}`);
                 })
                 .catch((error) => console.log(error));
             }

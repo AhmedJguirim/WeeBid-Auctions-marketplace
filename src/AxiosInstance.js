@@ -7,7 +7,7 @@ const Api = () => {
   const api = axios.create({
     baseURL: `${apiRoutes.API}`,
   });
-
+  
   api.interceptors.request.use(
     (config) => {
       //   const token = await AsyncStorage.getItem("token");
