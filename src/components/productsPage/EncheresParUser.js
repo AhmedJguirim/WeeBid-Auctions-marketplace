@@ -11,7 +11,7 @@ const EncheresParUser = () => {
   const [userName, setUserName] = React.useState("")
   //just to get the username
   function getUser() {
-    console.log(id)
+    console.log("user id:",id)
     axios.get(`${apiRoutes.API}/users/${id}`)
     .then(function (response) {
       setUserName(response["data"].displayName);
@@ -19,7 +19,7 @@ const EncheresParUser = () => {
   }
   
   function getEnchere() {
-    console.log(id)
+    console.log("user id",id)
     axios.get(`${apiRoutes.API}/encheres`, {
       params: {
         page: "1",

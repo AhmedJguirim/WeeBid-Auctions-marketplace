@@ -18,7 +18,7 @@ const EncheresInverseParCategory = () => {
       }
     })
     .then(function (response) {
-      console.log(response["data"]["hydra:member"])
+      console.log(response["data"]["@id"], "retrieved successfully!")
       setEnchereInverses(response["data"]["hydra:member"]);
     }).catch(error=>console.log(error))
   }

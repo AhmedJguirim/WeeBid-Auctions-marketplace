@@ -130,7 +130,7 @@ export default function MultiStepRegister() {
           zipcode: zipcode,
           user: response["data"]["@id"]
         }).then(response=>{
-          console.log("address created")
+          console.log(response["data"]["@id"], "created successfully!")
         login();
       })
         .catch(error=>console.log(error));

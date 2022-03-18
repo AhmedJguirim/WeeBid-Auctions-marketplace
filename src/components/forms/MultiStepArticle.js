@@ -164,17 +164,6 @@ export default function CreateArticle() {
             });
           });
         }
-        console.log(JSON.stringify({
-          quantity: parseInt(quantity),
-          initPrice: parseFloat(initPrice),
-          currentPrice: parseFloat(initPrice),
-          immediatePrice: parseFloat(immediatePrice),
-          startDate: startDate,
-          endDate: endDate,
-          category: `/api/categories/${category}`,
-          article: `${response["data"]["@id"]}`,
-          //change this hardcoded line with user from store
-          user: `/api/users/${user.id}`}))
         Api.post(`/${type}`, {
           quantity: parseInt(quantity),
           initPrice: parseFloat(initPrice),
@@ -188,7 +177,7 @@ export default function CreateArticle() {
           user: `/api/users/${user.id}`,
         })
           .then((response) => {
-            console.log(response);
+            console.log(response["data"]["@id"], "created successfully!");
             if (type === "enchere_inverses") {
               const enchereInverseId = response["data"]["id"];
               Api.post("/surveilles", {
@@ -196,7 +185,7 @@ export default function CreateArticle() {
                 enchereInverse: `${response["data"]["@id"]}`,
               })
                 .then((response) => {
-                  console.log(response);
+                  console.log(response["data"]["@id"], "created successfully!");
                   navigate(`${navRoutes.ENCHEREINVERSE}/${enchereInverseId}`);
                 })
                 .catch((error) => {
@@ -209,7 +198,7 @@ export default function CreateArticle() {
                 enchere: `${response["data"]["@id"]}`,
               })
                 .then((response) => {
-                  console.log(response);
+                  console.log(response["data"]["@id"], "created successfully!");
                   navigate(`${navRoutes.ENCHERE}/${enchereId}`);
                 })
                 .catch((error) => console.log(error));

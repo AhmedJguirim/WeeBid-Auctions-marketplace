@@ -18,7 +18,7 @@ const EncheresParCategory = () => {
       }
     })
     .then(function (response) {
-      console.log(response["data"]["hydra:member"])
+      console.log(response["data"]["@id"], "retrieved successfully!")
       setEncheres(response["data"]["hydra:member"]);
     }).catch(error=>console.log(error))
   }

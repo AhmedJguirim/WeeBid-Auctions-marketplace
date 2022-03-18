@@ -35,7 +35,7 @@ const DetailedProduct = () => {
     axios.get(`${apiRoutes.API}/encheres/${id}`)
       .then(function (response) {
         const data = response["data"]
-        console.log(data)
+        console.log(response["data"]["@id"], "retrieved successfully!")
         setEnchere(data);
         setSeller({
           ["nom d'utilisateur"]: data.user.displayName,
@@ -76,18 +76,18 @@ const DetailedProduct = () => {
   }
   function augmenter(){
     const newPrice = enchere.currentPrice + augmentation;
-  
+    
     Api.post('/augmentations', {
       user: `/api/users/${user.id}`,
       enchere: `/api/encheres/${id}`,
         value: newPrice,
         date: new Date()
     }).then(response=>{
-      console.log(response)
-      Api.put(`/encheres/${id}`,{
+      console.log(response["data"]["@id"], "created successfully!")
+      Api.put(`/encheres/${id}/bid`,{
         currentPrice:  newPrice
       }).then(response=>{
-        console.log(response);
+        console.log(response["data"]["@id"], "created successfully!");
         getAugmentations()
       }).catch(error=>console.log(error))
     }).catch(error=>console.log(error))
@@ -101,7 +101,7 @@ const DetailedProduct = () => {
         "order[date]": "desc"
       }
     }).then(response =>{
-      console.log(response["data"]["hydra:member"])
+      console.log(response["data"]["@id"], "retrieved successfully!")
       setAugmentationList(response["data"]["hydra:member"])
     }).catch(error=>console.log(error))
   }

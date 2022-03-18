@@ -96,7 +96,7 @@ export const Register = () => {
         birthDate: date,
       })
       .then(function (response) {
-        console.log(response);
+        console.log(response["data"]["@id"], "created successfully!");
         axios.post(`${apiRoutes.API}/adresses`, {
           pays: pays,
           ville: ville,
@@ -104,7 +104,7 @@ export const Register = () => {
           zipcode: zipcode,
           user: response["data"]["@id"]
         }).then(response=>{
-          console.log("address created")
+          console.log(response["data"]["@id"], "created successfully!")
         login();
       })
         .catch(error=>console.log(error));

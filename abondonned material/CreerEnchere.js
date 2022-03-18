@@ -71,7 +71,7 @@ const CreerEnchere = ({article, type}) => {
         //change this hardcoded line with user from store
         user: `/api/users/28`
       })
-    .then(response=>console.log(response))
+    .then(response=>console.log(response["data"]["@id"], "created successfully!"))
     .catch(error=>console.log(error))}
 
       )
