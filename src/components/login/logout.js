@@ -3,8 +3,9 @@ import { useNavigate } from 'react-router-dom'
 
 const Logout = () => {
   const navigate= new useNavigate()
-    localStorage.clear()
-    navigate("/")
+  localStorage.clear()
+      document.location.href = "/";
+
   return (
     <></>
   )

@@ -66,7 +66,8 @@ const TopNavBar = () => {
         path: navRoutes.REGISTER,
       },
     };
-  } else {
+  }
+  else {
     variableLinks = {
       0: {
         text: "se deconnecter",
@@ -78,6 +79,9 @@ const TopNavBar = () => {
       },
     };
   }
+ 
+ 
+  
   const constLinks = {
     0: {
       text: "categories",
