@@ -84,7 +84,7 @@ const DetailedProduct = () => {
         date: new Date()
     }).then(response=>{
       console.log(response["data"]["@id"], "created successfully!")
-      Api.put(`/encheres/${id}/bid`,{
+      Api.put(`/encheresBid/${id}`,{
         currentPrice:  newPrice
       }).then(response=>{
         console.log(response["data"]["@id"], "created successfully!");
