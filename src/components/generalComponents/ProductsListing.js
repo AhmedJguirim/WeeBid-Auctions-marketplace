@@ -20,7 +20,7 @@ const styles = {
       fontFamily: `"Roboto","Helvetica","Arial",sans-serif`,
     }
 }
-const ProductsListing = ({ventes ,elemsPerLine}) => {
+const ProductsListing = ({ventes ,elemsPerLine , type}) => {
     // TODO: create links that don't get invisible in small screens like topnav ones
   return (
     <Grid container sx={{...styles.productsGrid, textAlign: "center"}} spacing={3}>
@@ -30,7 +30,7 @@ const ProductsListing = ({ventes ,elemsPerLine}) => {
               <CardContent>
                 <img src={demoListImage} className="cardImage" />
                 <br />
-                  <Link style={styles.productLink} to={`/enchere/${ventes[key].id}`} >{ventes[key].article.name}</Link>
+                  <Link style={styles.productLink} to={`${type}/${ventes[key].id}`} >{ventes[key].article.name}</Link>
                   <Typography sx={styles.productsTypography}>
                     quantité: {ventes[key].quantity}
                   </Typography>

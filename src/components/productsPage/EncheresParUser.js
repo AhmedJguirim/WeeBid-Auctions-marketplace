@@ -40,7 +40,7 @@ const EncheresParUser = () => {
       return (
         <Grid container>
             <Typography variant='h3'>nos encheres de {userName}</Typography>
-            <ProductsListing elemsPerLine={6} ventes={encheres}>
+            <ProductsListing elemsPerLine={6} type={navRoutes.ENCHERE} ventes={encheres}>
             </ProductsListing>
         </Grid>
       )

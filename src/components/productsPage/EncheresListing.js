@@ -2,7 +2,7 @@ import { Grid, Typography } from '@mui/material';
 import React from 'react'
 import ProductsListing from '../generalComponents/ProductsListing';
 import axios from 'axios';
-import { apiRoutes } from '../../config/routes';
+import { apiRoutes, navRoutes } from '../../config/routes';
 
 const EncheresListing = () => {
   const [encheres, setEncheres] = React.useState({});
@@ -26,7 +26,7 @@ const EncheresListing = () => {
       return (
         <Grid container>
             <Typography variant='h3'>nos encheres</Typography>
-            <ProductsListing elemsPerLine={6} ventes={encheres}>
+            <ProductsListing elemsPerLine={6} type={navRoutes.ENCHERE} ventes={encheres}>
             </ProductsListing>
         </Grid>
       )

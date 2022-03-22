@@ -10,7 +10,8 @@ import React from "react";
 import image from "../../media/images/homepageTopImage.jpg";
 import axios from "axios";
 import HomePageList from "../generalComponents/ProductsListing";
-import { apiRoutes } from "../../config/routes";
+import { apiRoutes, navRoutes } from "../../config/routes";
+
 
 
 
@@ -168,12 +169,12 @@ React.useEffect(()=>{
         <Grid container >
           <Grid item xs={5.5}>
             <Typography variant="h4" color='secondary.main'>nos enchères</Typography>
-            <HomePageList ventes={encheres} elemsPerLine={4} />
+            <HomePageList ventes={encheres} type={navRoutes.ENCHERE} elemsPerLine={4} />
           </Grid>
           <Grid item xs={1}></Grid>
           <Grid item xs={5.5}>
             <Typography variant="h4" color='secondary.main'>nos enchères inverses</Typography>
-            <HomePageList ventes={encheresInverses} elemsPerLine={4} />
+            <HomePageList ventes={encheresInverses} type={navRoutes.ENCHEREINVERSE} elemsPerLine={4} />
           </Grid>
         </Grid>
       </Box>

@@ -2,7 +2,7 @@ import { Grid, Typography } from '@mui/material';
 import React from 'react'
 import ProductsListing from '../generalComponents/ProductsListing';
 import axios from 'axios';
-import { apiRoutes } from '../../config/routes';
+import { apiRoutes, navRoutes } from '../../config/routes';
 
 
 const EncheresInvListing = () => {
@@ -27,7 +27,7 @@ const EncheresInvListing = () => {
       return (
         <Grid container>
             <Typography variant='h3'>nos encheres inversées</Typography>
-            <ProductsListing elemsPerLine={6} ventes={enchereInverses}>
+            <ProductsListing elemsPerLine={6} type={navRoutes.ENCHEREINVERSE} ventes={enchereInverses}>
             </ProductsListing>
         </Grid>
       )

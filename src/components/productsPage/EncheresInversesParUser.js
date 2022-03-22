@@ -40,7 +40,7 @@ const EncheresInversesParUser = () => {
       return (
         <Grid container>
             <Typography variant='h3'>nos encheres inversés de {userName}</Typography>
-            <ProductsListing elemsPerLine={6} ventes={encheres}>
+            <ProductsListing elemsPerLine={6} type={navRoutes.ENCHEREINVERSE} ventes={encheres}>
             </ProductsListing>
         </Grid>
       )

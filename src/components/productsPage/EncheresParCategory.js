@@ -3,7 +3,7 @@ import React from 'react'
 import ProductsListing from '../generalComponents/ProductsListing';
 import axios from 'axios';
 import { useParams } from 'react-router-dom';
-import { apiRoutes } from "../../config/routes";
+import { apiRoutes, navRoutes } from "../../config/routes";
 
 const EncheresParCategory = () => {
   const {categoryId} = useParams();
@@ -33,7 +33,7 @@ const EncheresParCategory = () => {
       return (
         <Grid container>
             <Typography variant='h3'>nos encheres de {categoryName}</Typography>
-            <ProductsListing elemsPerLine={6} ventes={encheres}>
+            <ProductsListing elemsPerLine={6} type={navRoutes.ENCHERE} ventes={encheres}>
             </ProductsListing>
         </Grid>
       )

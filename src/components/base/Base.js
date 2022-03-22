@@ -5,9 +5,6 @@ import { Box } from '@mui/material'
 import Login from '../login/Login.js'
 import Homepage from '../homepage/Homepage.js'
 import VentesListing from '../productsPage/VentesListing.js'
-import CreerArticle from '../forms/CreerArticle.js'
-import { Register } from '../register/Register'
-import DetailedProduct from '../productsPage/DetailedProduct'
 import UserProfile from '../UserProfile';
 import EncheresHistory from '../userHistory/EncheresHistory'
 import {BrowserRouter as Router,  Route,Routes} from 'react-router-dom';
@@ -26,6 +23,8 @@ import EncheresInversesParUser from '../productsPage/EncheresInversesParUser'
 import WatchList from '../productsPage/WatchList'
 import CreateArticle from '../forms/MultiStepArticle'
 import MultiStepRegister from '../register/MultiStepRegister'
+import DetailedEnchereInverse from '../productsPage/DetailedEnchereInverse'
+import DetailedEnchere from '../productsPage/DetailedEnchere'
 
 
 const styles = {
@@ -52,7 +51,7 @@ const Base = () => {
           <Route path={navRoutes.MAKE_ARTICLE} element={<CreateArticle />}></Route>
           <Route path={navRoutes.LOGIN} element={<Login />}></Route>
           <Route path="/enchereHistory/:userId" element={<EncheresHistory />}></Route>
-          <Route path={`${navRoutes.ENCHERE}/:id`} element={<DetailedProduct />}></Route>
+          <Route path={`${navRoutes.ENCHERE}/:id`} element={<DetailedEnchere />}></Route>
           <Route path={navRoutes.REGISTER} element={<MultiStepRegister />}></Route>
           <Route path="/" element={<Homepage /> }></Route>
           <Route path={navRoutes.USERPROFILE} element={<UserProfile />}></Route>
@@ -63,7 +62,7 @@ const Base = () => {
           <Route path={navRoutes.ENCHERESINVERSES} element={<EncheresInvListing />}></Route>
           <Route path={navRoutes.ENCHERES} element={<EncheresListing />}></Route>
           {/* TODO: make a seperate page for detailed ENCCHEREINVERSE */}
-          <Route path={`${navRoutes.ENCHEREINVERSE}/:id`} element={<DetailedProduct />}></Route>
+          <Route path={`${navRoutes.ENCHEREINVERSE}/:id`} element={<DetailedEnchereInverse />}></Route>
           <Route path={navRoutes.LOGOUT} element={<Logout />}></Route>
           <Route path={navRoutes.INPROGRESS}element={<WorkInProgress />}></Route>
           <Route path={`${navRoutes.ENCHERES}${navRoutes.PERUSER}/:id`}element={<EncheresParUser />}></Route>

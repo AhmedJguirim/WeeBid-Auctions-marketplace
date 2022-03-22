@@ -56,11 +56,11 @@ const user = useSelector((state) => state.user);
             <Typography variant='h3'>votre liste de surveilles</Typography>
             <Grid item xs={12}>
             <Typography variant='h5'>encheres Surveillés</Typography>
-            <ProductsListing elemsPerLine={6} ventes={encheres}></ProductsListing>
+            <ProductsListing elemsPerLine={6} type={navRoutes.ENCHERE} ventes={encheres}></ProductsListing>
             </Grid>
             <Grid item xs={12}>
             <Typography variant='h5'>encheresInverses Surveillés</Typography>
-            <ProductsListing elemsPerLine={6} ventes={encheresInverses}></ProductsListing>
+            <ProductsListing elemsPerLine={6} type={navRoutes.ENCHEREINVERSE} ventes={encheresInverses}></ProductsListing>
             </Grid>
         </Grid>
       )

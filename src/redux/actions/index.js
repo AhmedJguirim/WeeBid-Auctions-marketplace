@@ -1,4 +1,5 @@
 import axios from 'axios'
+import { StatusCodes } from 'http-status-codes'
 import { useDispatch } from 'react-redux'
 import { apiRoutes } from '../../config/routes'
 
@@ -17,7 +18,13 @@ export function getUserData() {
   .catch(function (error) {
     dispatch(checkUser({}))
     window.localStorage.clear()
-    console.log(error);
+    const { status } = error.response;
+      if (status === StatusCodes.INTERNAL_SERVER_ERROR) {
+        console.log("le serveur fait face a un probleme , veuillez patienter")
+      }
+      else if(status === StatusCodes.UNAUTHORIZED){
+        console.log("vous n'etes pas authetifié")
+      }
   })
 
   }}

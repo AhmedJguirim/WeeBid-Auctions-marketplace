@@ -3,7 +3,7 @@ import React from 'react'
 import ProductsListing from '../generalComponents/ProductsListing';
 import axios from 'axios';
 import { useParams } from 'react-router-dom';
-import { apiRoutes } from '../../config/routes';
+import { apiRoutes, navRoutes } from '../../config/routes';
 
 const EncheresInverseParCategory = () => {
   const {categoryId} = useParams();
@@ -33,7 +33,7 @@ const EncheresInverseParCategory = () => {
       return (
         <Grid container>
             <Typography variant='h3'>nos encheres inversées de {categoryName}</Typography>
-            <ProductsListing elemsPerLine={6} ventes={enchereInverses}>
+            <ProductsListing elemsPerLine={6} type={navRoutes.ENCHEREINVERSE} ventes={enchereInverses}>
             </ProductsListing>
         </Grid>
       )

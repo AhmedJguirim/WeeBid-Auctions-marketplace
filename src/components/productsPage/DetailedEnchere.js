@@ -1,4 +1,14 @@
-import { Grid, Typography, Button, TextField, DialogContentText, DialogContent, Dialog, DialogActions, DialogTitle } from "@mui/material";
+import {
+  Grid,
+  Typography,
+  Button,
+  TextField,
+  DialogContentText,
+  DialogContent,
+  Dialog,
+  DialogActions,
+  DialogTitle,
+} from "@mui/material";
 import { Box, minHeight } from "@mui/system";
 import React from "react";
 import PersonIcon from "@mui/icons-material/Person";
@@ -9,7 +19,7 @@ import { apiRoutes } from "../../config/routes";
 import Api from "../../AxiosInstance";
 import { useSelector } from "react-redux";
 
-const DetailedProduct = () => {
+const DetailedEnchere = () => {
   //#region states
   // TODO: display the augmentationList
   const [augmentationList, setAugmentationList] = React.useState({});
@@ -18,8 +28,9 @@ const DetailedProduct = () => {
   const [description, setDescription] = React.useState("");
   const [seller, setSeller] = React.useState({});
   const [images, setImages] = React.useState({});
+  const [currentPrice, setCurrentPrice] = React.useState(0);
   const [augmentation, setAugmentation] = React.useState(0.1);
-
+  const [newAugment, setNewAugment] = React.useState({});
   //#endregion
 
   //#region state handlers
@@ -27,92 +38,123 @@ const DetailedProduct = () => {
     setAugmentation(parseFloat(event.target.value));
   };
   //#endregion
-
-
+  //gets current user data from redux store
   const user = useSelector((state) => state.user);
+
+  //gets enchere id from url
   let { id } = useParams();
-  function getEnchere() {
-    axios.get(`${apiRoutes.API}/encheres/${id}`)
-      .then(function (response) {
-        const data = response["data"]
-        console.log(response["data"]["@id"], "retrieved successfully!")
-        setEnchere(data);
-        setSeller({
-          ["nom d'utilisateur"]: data.user.displayName,
-          localistation: data.user.adresse.ville
-        })
-        //get the articme as well
-    axios.get(`${apiRoutes.API}/articles/${response["data"]["article"]["id"]}`)
-    .then(function (response) {
-      const data = response["data"]
-      // TODO: fix documents
-      // axios.get(`${apiRoutes.API}/documents`,
-      // {
-      //   params: {
-      //     page:1,
-      //     article: response["data"]["@id"],
-      //   },
-      //   headers:{
-      //     "Content-Type": "multipart/form-data",
-      //   }
 
-      // }).then(response=>{setImages(response["data"]["hydra:member"])
-    // console.log(response["data"]["hydra:member"])})
-    //   .catch(error=>console.log(error))
-      setArticle({
-        nom: data.name,
-        etat: data.state,
-        localisation: data.localisation,
-        marque: data.brand,
-        ["code a barre"]: data.codebar,
-        ["date de fabrication"]: data.fabrication_date.substring(0,10)
-      });
-      setDescription(data.description);
-
-    })
-    .catch((error) => console.log(error));
+  //gets the value given in the latest augmentation
+  function getCurrentPrice(initPrice, myId) {
+    axios
+      .get(`${apiRoutes.API}/augmentationHighest`, {
+        params: {
+          page: 1,
+          enchere: `/api/encheres/${myId}`,
+          "order[date]" : "desc"
+        },
+      })
+      .then((response) => {
+        //sets the result (augmentation) in the state
+        if (response["data"]["hydra:member"]["0"] != undefined) {
+          setNewAugment(response["data"]["hydra:member"]["0"]);
+        } else {
+          setCurrentPrice(initPrice);
+        }
       })
       .catch((error) => console.log(error));
   }
-  function augmenter(){
-    const newPrice = enchere.currentPrice + augmentation;
-    
-    Api.post('/augmentations', {
+
+  //gets the actual enchere
+  function getEnchere() {
+    axios
+      .get(`${apiRoutes.API}/encheres/${id}`)
+      .then(function (response) {
+        const data = response["data"];
+        console.log(response["data"]["@id"], "retrieved successfully!");
+        setEnchere(data);
+        //gets the current augmentation from the latest augmentation
+        getCurrentPrice(response["data"].initPrice, id);
+        //sets seller details
+        setSeller({
+          ["nom d'utilisateur"]: data.user.displayName,
+          localistation: data.user.adresse.ville,
+        });
+        //get the article
+        axios
+          .get(`${apiRoutes.API}/articles/${response["data"]["article"]["id"]}`)
+          .then(function (response) {
+            const data = response["data"];
+            // TODO: fix documents
+
+            // axios.get(`${apiRoutes.API}/documents`,
+            // {
+            //   params: {
+            //     page:1,
+            //     article: response["data"]["@id"],
+            //   },
+            //   headers:{
+            //     "Content-Type": "multipart/form-data",
+            //   }
+
+            // }).then(response=>{setImages(response["data"]["hydra:member"])
+            // console.log(response["data"]["hydra:member"])})
+            //   .catch(error=>console.log(error))
+            setArticle({
+              nom: data.name,
+              etat: data.state,
+              localisation: data.localisation,
+              marque: data.brand,
+              ["code a barre"]: data.codebar,
+              ["date de fabrication"]: data.fabrication_date.substring(0, 10),
+            });
+            setDescription(data.description);
+          })
+          .catch((error) => console.log(error));
+      })
+      .catch((error) => console.log(error));
+  }
+  function augmenter() {
+    const newPrice = currentPrice + augmentation;
+
+    Api.post("/augmentations", {
       user: `/api/users/${user.id}`,
       enchere: `/api/encheres/${id}`,
-        value: newPrice,
-        date: new Date()
-    }).then(response=>{
-      console.log(response["data"]["@id"], "created successfully!")
-      Api.put(`/encheresBid/${id}`,{
-        currentPrice:  newPrice
-      }).then(response=>{
+      value: newPrice,
+      date: new Date(),
+    })
+      .then((response) => {
         console.log(response["data"]["@id"], "created successfully!");
-        getAugmentations()
-      }).catch(error=>console.log(error))
-    }).catch(error=>console.log(error))
+        getCurrentPrice(enchere.initPrice, id);
+      })
+      .catch((error) => console.log(error));
   }
 
-  function getAugmentations(){
-    axios.get(`${apiRoutes.API}/augmentations`, {
-      params:{
-        page:1,
-        enchere:`/api/encheres/${id}`,
-        "order[date]": "desc"
-      }
-    }).then(response =>{
-      console.log(response["data"]["@id"], "retrieved successfully!")
-      setAugmentationList(response["data"]["hydra:member"])
-    }).catch(error=>console.log(error))
+  function getAugmentations() {
+    axios
+      .get(`${apiRoutes.API}/augmentations`, {
+        params: {
+          page: 1,
+          enchere: `/api/encheres/${id}`,
+          "order[date]": "desc",
+        },
+      })
+      .then((response) => {
+        console.log(response["data"]["@id"], "retrieved successfully!");
+        setAugmentationList(response["data"]["hydra:member"]);
+      })
+      .catch((error) => console.log(error));
   }
-   React.useEffect(() => {
-    getEnchere();
-  }, [id]);
+
   React.useEffect(() => {
     getEnchere();
-  }, [augmentationList]);
-
-  
+  }, [augmentationList, id]);
+  React.useEffect(() => {
+    console.log("getting the new value!!")
+    console.log(newAugment)
+    
+    setCurrentPrice(newAugment.value);
+  }, [newAugment]);
 
 
 
@@ -129,17 +171,17 @@ const DetailedProduct = () => {
       path: "../../media/images/demosToBeReplaced/pc4.jpg",
     },
   };
-  
+
   //#region concerning verification popup
-    const [open, setOpen] = React.useState(false);
-  
-    const handleClickOpen = () => {
-      setOpen(true);
-    };
-  
-    const handleClose = () => {
-      setOpen(false);
-    };
+  const [open, setOpen] = React.useState(false);
+
+  const handleClickOpen = () => {
+    setOpen(true);
+  };
+
+  const handleClose = () => {
+    setOpen(false);
+  };
   //#endregion
 
   return (
@@ -152,24 +194,31 @@ const DetailedProduct = () => {
         aria-labelledby="alert-dialog-title"
         aria-describedby="alert-dialog-description"
       >
-        <DialogTitle id="alert-dialog-title">
-          verification
-        </DialogTitle>
+        <DialogTitle id="alert-dialog-title">verification</DialogTitle>
         <DialogContent>
           <DialogContentText id="alert-dialog-description">
-            are you sure ? if the seller complains about you not paying the given amount we will add your cin to the blackList and you'll be banned permanently
+            are you sure ? if the seller complains about you not paying the
+            given amount we will add your cin to the blackList and you'll be
+            banned permanently
           </DialogContentText>
         </DialogContent>
         <DialogActions>
-          <Button sx={ButtonStyles} onClick={()=>{
-            handleClose();
-
-          }
-            }>Disagree</Button>
-          <Button sx={ButtonStyles} onClick={()=>{
-            augmenter()
-            handleClose()
-          } } autoFocus>
+          <Button
+            sx={ButtonStyles}
+            onClick={() => {
+              handleClose();
+            }}
+          >
+            Disagree
+          </Button>
+          <Button
+            sx={ButtonStyles}
+            onClick={() => {
+              augmenter();
+              handleClose();
+            }}
+            autoFocus
+          >
             Agree
           </Button>
         </DialogActions>
@@ -260,13 +309,12 @@ const DetailedProduct = () => {
               </Grid>
               <Grid item xs={4}>
                 <Typography variant="h6" color="info.main">
-                  prix actuel: {enchere.currentPrice}TND
+                  prix actuel: {currentPrice}TND
                 </Typography>
               </Grid>
               <Grid item xs={4}>
                 <Typography variant="h8">
-                  prix apres l'augmentation:{" "}
-                  {enchere.currentPrice + augmentation} TND
+                  prix apres l'augmentation: {currentPrice + augmentation} TND
                 </Typography>
               </Grid>
               <Grid item xs={4}></Grid>
@@ -282,7 +330,10 @@ const DetailedProduct = () => {
               </Grid>
 
               <Grid item xs={4}>
-                <Button sx={ButtonStyles} onClick={handleClickOpen}> encherir</Button>
+                <Button sx={ButtonStyles} onClick={handleClickOpen}>
+                  {" "}
+                  encherir
+                </Button>
               </Grid>
             </Grid>
           </Box>
@@ -312,9 +363,7 @@ const DetailedProduct = () => {
                         <Typography variant="h6">{key}: </Typography>
                       </Grid>
                       <Grid item xs={6}>
-                        <Typography variant="h6">
-                          {article[key]}{" "}
-                        </Typography>
+                        <Typography variant="h6">{article[key]} </Typography>
                       </Grid>
                     </Grid>
                   ))}
@@ -328,4 +377,4 @@ const DetailedProduct = () => {
   );
 };
 
-export default DetailedProduct;
+export default DetailedEnchere;
