@@ -32,6 +32,8 @@ import Stepper from "@mui/material/Stepper";
 import Step from "@mui/material/Step";
 import StepLabel from "@mui/material/StepLabel";
 import { useNavigate } from "react-router-dom";
+import { FormTextField } from "../base/customComponents/general";
+import { width } from "@mui/system";
 
 const steps = [
   "enregistrer un article",
@@ -265,12 +267,10 @@ export default function CreateArticle() {
 
                   <Grid item xs={12}>
                     <TextField
-                      fullWidth
                       id="codeBar"
                       label="code a barre"
                       value={codeBar}
                       onChange={handleCodeBar}
-                      placeholder="hello bro"
                     />
                   </Grid>
                   <Grid item xs={12}>

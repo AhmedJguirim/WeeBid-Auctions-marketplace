@@ -9,23 +9,40 @@ import "./styles/app.css";
 import Api from './AxiosInstance';
 import { store } from './redux/store';
 
+const colorCollection = {
+  main: {
+    primary:'#FCF8FF',
+    secondary: "#362B48",
+    info: "#5927E5"
+  },
+  light:{
+    primary:'#FCF8FF',
+    secondary: "#362B48",
+    info: "#5927E5"
+  },
+  dark: {
+    primary:'#362B48',
+    secondary: "#FCF8FF",
+    info: "#5927E5"
+  }
+}
 
 const theme = createTheme({
   palette: {
     primary: {
-      main: '#FCF8FF',
-      dark: '#362B48',
-      light: '#FCF8FF'
+      main: colorCollection.main.primary,
+      dark: colorCollection.dark.primary,
+      light: colorCollection.light.primary
     },
     secondary: {
-      main: '#362B48',
-      dark: '#FCF8FF',
-      light: '#362B48'
+      main: colorCollection.main.secondary,
+      dark: colorCollection.dark.secondary,
+      light: colorCollection.light.secondary
     },
     info: {
-      main: '#5927E5',
-      dark: '#5927E5',
-      light: '#5927E5'
+      main: colorCollection.main.info,
+      dark: colorCollection.dark.info,
+      light: colorCollection.light.info
     }
   },
   breakpoints:{
@@ -38,15 +55,29 @@ const theme = createTheme({
     }
   },
   components:{
+
     MuiInputLabel:{
       styleOverrides:{
-        '& .MuiFormLabel-root.Mui-disabled': {
-          color: 'red',
+          root:{"&.Mui-focused" :{
+            color:colorCollection.main.secondary,
+            backgroundColor:colorCollection.main.primary
+          }},
         },
         
-      }}
+      },
+      MuiInputBase:{
+        styleOverrides:{
+            root:{"&.Mui-focused" :{
+              border:"1px solid #362B48"
+            }},
+          },
+          
+        },
+        
     
-  }
+    }
+    
+  
 
   
 });

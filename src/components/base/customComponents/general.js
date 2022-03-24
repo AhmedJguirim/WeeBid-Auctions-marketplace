@@ -1,4 +1,4 @@
-import { Grid , AppBar } from "@mui/material";
+import { Grid , AppBar, TextField } from "@mui/material";
 import { styled } from "@mui/system";
 
 export const TopNavGrid = styled(Grid)(() => ({
@@ -34,6 +34,14 @@ export const DrawerHeader = styled('div')(({ theme }) => ({
     justifyContent: 'flex-end',
   }));
 
+export const FormTextField = styled(TextField)(({theme})=>({
+  '&.Mui-focus': {
+    border: "1px solid black"
+  },
+  '&.Mui-active': {
+    border: "1px solid black"
+  },
+}))
 export const ButtonStyles = {
   color: "secondary.main",
   border: "1px solid black",
