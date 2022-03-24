@@ -336,7 +336,7 @@ export default function CreateArticle() {
                               event.target.files[0],
                               event.target.files[0].name
                             );
-
+                            console.log(data.get("file").name)
                             setImages([...images, data]);
                           }
                           else{
@@ -345,12 +345,20 @@ export default function CreateArticle() {
                         }}
                       />
                       <Button
-                        sx={{ ...ButtonStyles, margin: 2 }}
+                        sx={{ ...ButtonStyles, margin: 2 , display:"none"}}
                         component="span"
                       >
                         Upload
                       </Button>
                     </label>
+                  </Grid>
+                  <Grid item xs={12}>
+                  {images.map((image) => (
+                          <MenuItem value={image} key={image.get("file").name}>
+                            {image.get("file").name}<Button>delete</Button>
+                          </MenuItem>
+                          
+                        ))}
                   </Grid>
                 </div>
               )}

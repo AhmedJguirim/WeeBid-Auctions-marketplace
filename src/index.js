@@ -55,31 +55,27 @@ const theme = createTheme({
     }
   },
   components:{
-
     MuiInputLabel:{
       styleOverrides:{
-          root:{"&.Mui-focused" :{
+          root:
+          {marginTop: 20,
+            "&.Mui-focused" :{
             color:colorCollection.main.secondary,
             backgroundColor:colorCollection.main.primary
           }},
-        },
-        
+        },     
       },
       MuiInputBase:{
         styleOverrides:{
-            root:{"&.Mui-focused" :{
+            root:
+              {marginTop: 20
+                ,"&.Mui-focused" :{
               border:"1px solid #362B48"
             }},
           },
           
         },
-        
-    
     }
-    
-  
-
-  
 });
 
 
