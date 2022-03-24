@@ -107,8 +107,8 @@ const TopNavBar = () => {
 
   return (
     <Box sx={styles.topBox}>
-      <TopAppBar position="static">
-        <Grid container>
+      <TopAppBar position="static" >
+        <Grid container >
           <TopNavGrid md={8} sm={11} item>
             <IconButton
               size="large"

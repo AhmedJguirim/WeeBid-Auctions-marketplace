@@ -36,7 +36,18 @@ const theme = createTheme({
       lg: 1200,
       xl: 1536,
     }
+  },
+  components:{
+    MuiInputLabel:{
+      styleOverrides:{
+        '& .MuiFormLabel-root.Mui-disabled': {
+          color: 'red',
+        },
+        
+      }}
+    
   }
+
   
 });
 

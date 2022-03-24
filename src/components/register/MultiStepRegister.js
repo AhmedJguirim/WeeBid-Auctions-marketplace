@@ -22,6 +22,8 @@ import StepLabel from "@mui/material/StepLabel";
 import { useNavigate } from "react-router-dom";
 
 const steps = [
+  
+  "données de connection",
   "données générales",
   "votre adresse",
 ];

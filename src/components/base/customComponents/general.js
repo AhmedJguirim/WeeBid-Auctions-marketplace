@@ -6,6 +6,7 @@ export const TopNavGrid = styled(Grid)(() => ({
   paddingLeft: "20px",
   alignItems: "center",
   alignContent: "space-between",
+  
 }));
 export const TopAppBar = styled(AppBar, {
     shouldForwardProp: (prop) => prop !== 'open',

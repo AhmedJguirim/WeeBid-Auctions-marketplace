@@ -15,6 +15,7 @@ const Api = () => {
       if (token) {
         config.headers.Authorization = `Bearer ${token}`;
       }
+      
       else{
         document.location.href = navRoutes.LOGIN;
       }
