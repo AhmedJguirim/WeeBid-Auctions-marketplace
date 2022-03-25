@@ -25,6 +25,7 @@ import {
   TextField,
   CssBaseline,
   Button,
+  IconButton,
 } from "@mui/material";
 import { useSelector } from "react-redux";
 import { navRoutes } from "../../config/routes";
@@ -32,6 +33,7 @@ import Stepper from "@mui/material/Stepper";
 import Step from "@mui/material/Step";
 import StepLabel from "@mui/material/StepLabel";
 import { useNavigate } from "react-router-dom";
+import CancelIcon from '@mui/icons-material/Cancel';
 
 const steps = [
   "enregistrer un article",
@@ -116,6 +118,9 @@ export default function CreateArticle() {
   const handleCategory = (event) => {
     setCategory(event.target.value);
   };
+  const handleImageDelete = (imageName) =>{
+    setImages(images.filter(item => item.get("file").name !== imageName));
+  }
 
   //#endregion
 
@@ -334,8 +339,9 @@ export default function CreateArticle() {
                               event.target.files[0],
                               event.target.files[0].name
                             );
-                            console.log(data.get("file").name)
+                            
                             setImages([...images, data]);
+                            console.log(data.get("file").name)
                           }
                           else{
                             alert("max 4 images")
@@ -354,7 +360,9 @@ export default function CreateArticle() {
                   {images.map((image) => (
                           <MenuItem value={image} key={image.get("file").name}>
                             <Typography>{image.get("file").name}</Typography>
-                            <Button>delete</Button>
+                            <IconButton  onClick={() =>handleImageDelete(image.get("file").name)}>
+                              <CancelIcon color="warning" />
+                            </IconButton>
                           </MenuItem>
                           
                         ))}
