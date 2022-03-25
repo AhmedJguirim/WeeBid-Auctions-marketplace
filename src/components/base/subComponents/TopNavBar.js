@@ -1,7 +1,6 @@
 import * as React from "react";
 import MenuIcon from "@mui/icons-material/Menu";
 import logoPath from "../../../media/images/logo.png";
-import Autowhatever from "react-autowhatever/dist/Autowhatever";
 import ShoppingCartIcon from "@mui/icons-material/ShoppingCart";
 import TopNavLink from "../customComponents/TopNavLink";
 import { TopNavGrid, TopAppBar } from "../customComponents/general";
@@ -10,7 +9,6 @@ import {
   Select,
   MenuItem,
   IconButton,
-  TextField,
   FormControl,
   InputLabel,
   Grid,
@@ -55,7 +53,7 @@ const TopNavBar = () => {
   };
   const user = useSelector((state) => state.user);
   let variableLinks = {};
-  if (user.id == undefined) {
+  if (user.id === undefined) {
     variableLinks = {
       0: {
         text: "connection",
@@ -120,7 +118,7 @@ const TopNavBar = () => {
               <MenuIcon />
             </IconButton>
             <Link to="/">
-              <img src={logoPath} className="logo" />
+              <img src={logoPath} alt="logo" className="logo" />
             </Link>
             {Object.keys(constLinks).map((key, index) => (
               <TopNavLink
@@ -130,9 +128,9 @@ const TopNavBar = () => {
               ></TopNavLink>
             ))}
             <Box sx={{ minWidth: 120 }}>
-              <FormControl fullWidth>
-                <InputLabel>type</InputLabel>
-                <Select value={type} onChange={handleType}>
+              <FormControl  fullWidth>
+                <InputLabel sx={{mt:0}}>type</InputLabel>
+                <Select sx={{mt:0}} value={type} onChange={handleType}>
                 {Object.keys(typesOptions).map((key, index) => (
                     <MenuItem value={typesOptions[key].value} key={index}>{typesOptions[key].text}</MenuItem>))}
                 </Select>

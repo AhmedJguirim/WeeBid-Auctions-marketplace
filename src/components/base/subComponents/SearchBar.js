@@ -2,21 +2,15 @@ import * as React from "react";
 import TextField from "@mui/material/TextField";
 import Autocomplete from "@mui/material/Autocomplete";
 import CircularProgress from "@mui/material/CircularProgress";
-import { search } from "../customComponents/Utils";
 import { apiRoutes, navRoutes } from "../../../config/routes";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 
-function sleep(delay = 0) {
-  return new Promise((resolve) => {
-    setTimeout(resolve, delay);
-  });
-}
+
 let cancelToken;
 export default function SearchBar({ type }) {
   const [open, setOpen] = React.useState(false);
   const [options, setOptions] = React.useState([]);
-  const [data, setData] = React.useState({});
   const [input, setInput] = React.useState("");
   const [loading, setLoading] = React.useState(false);
   
@@ -28,7 +22,7 @@ export default function SearchBar({ type }) {
     setInput(event.target.value);
     setLoading(true);
     //Check if there are any previous pending requests
-    if (cancelToken != undefined) {
+    if (cancelToken !== undefined) {
       cancelToken.cancel("Operation canceled due to new request.");
     }
       //Save the cancel token for the current request
@@ -53,29 +47,6 @@ export default function SearchBar({ type }) {
     };
 
 
-
-  //#region getting encheres ou encheres inverses
-
-  // function getOptions() {
-  //   setLoading(true);
-  //   setOptions([]);
-  //   axios
-  //     .get(`${apiRoutes.API}${type}/search`, {
-  //       params: {
-  //         page: "1",
-  //         "article.name": input,
-  //       },
-  //       cancelToken: source.token,
-  //     })
-  //     .then(function (response) {
-  //       console.log(response);
-  //       console.log("requested");
-  //       preparation(response["data"]["hydra:member"]);
-  //     })
-  //     .catch((error) => console.log(error));
-  // }
-  //#endregion
-
   function preparation(data) {
     let searchResult = [];
 
@@ -93,6 +64,7 @@ export default function SearchBar({ type }) {
           name: value.article.name,
         });
       }
+      
     });
 
     setOptions(searchResult);
@@ -100,9 +72,10 @@ export default function SearchBar({ type }) {
   }
 
   return (
+    // TODO: adjust the height of the input
     <Autocomplete
       id="seachBar"
-      sx={{ width: 300 }}
+      sx={{ width: 300 , marginTop:0}}
       filterOptions={(x) => x}
       open={open}
       onOpen={() => {
@@ -129,6 +102,7 @@ export default function SearchBar({ type }) {
       renderInput={(params) => (
         <TextField
           {...params}
+          sx={{mt:0}}
           label="cherchez"
           value={input}
           onChange={handleInput}

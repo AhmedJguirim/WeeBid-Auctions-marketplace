@@ -6,7 +6,6 @@ import React from 'react'
 import { createTheme, ThemeProvider  } from '@mui/material/styles';
 import { Provider } from 'react-redux';
 import "./styles/app.css";
-import Api from './AxiosInstance';
 import { store } from './redux/store';
 
 const colorCollection = {

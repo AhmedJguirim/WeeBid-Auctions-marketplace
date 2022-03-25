@@ -27,13 +27,11 @@ import {
   Button,
 } from "@mui/material";
 import { useSelector } from "react-redux";
-import { apiRoutes, navRoutes } from "../../config/routes";
+import { navRoutes } from "../../config/routes";
 import Stepper from "@mui/material/Stepper";
 import Step from "@mui/material/Step";
 import StepLabel from "@mui/material/StepLabel";
 import { useNavigate } from "react-router-dom";
-import { FormTextField } from "../base/customComponents/general";
-import { width } from "@mui/system";
 
 const steps = [
   "enregistrer un article",
@@ -355,7 +353,8 @@ export default function CreateArticle() {
                   <Grid item xs={12}>
                   {images.map((image) => (
                           <MenuItem value={image} key={image.get("file").name}>
-                            {image.get("file").name}<Button>delete</Button>
+                            <Typography>{image.get("file").name}</Typography>
+                            <Button>delete</Button>
                           </MenuItem>
                           
                         ))}
