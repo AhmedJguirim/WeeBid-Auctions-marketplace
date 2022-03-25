@@ -34,6 +34,13 @@ export const DrawerHeader = styled('div')(({ theme }) => ({
     justifyContent: 'flex-end',
   }));
 
+  export const ArticleImage = styled('img')(({ theme }) => ({
+    maxWidth: 300
+  }));
+  export const ArticleSubImage = styled('img')(({ theme }) => ({
+    maxWidth: 100
+  }));
+
 export const FormTextField = styled(TextField)(({theme})=>({
   '&.Mui-focus': {
     border: "1px solid black"

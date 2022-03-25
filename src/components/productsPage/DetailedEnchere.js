@@ -12,7 +12,7 @@ import {
 import { Box, minHeight } from "@mui/system";
 import React from "react";
 import PersonIcon from "@mui/icons-material/Person";
-import { ButtonStyles, lightContainer } from "../base/customComponents/general";
+import { ButtonStyles, lightContainer, ArticleImage, ArticleSubImage } from "../base/customComponents/general";
 import axios from "axios";
 import { useParams } from "react-router-dom";
 import { apiRoutes } from "../../config/routes";
@@ -27,7 +27,7 @@ const DetailedEnchere = () => {
   const [article, setArticle] = React.useState({});
   const [description, setDescription] = React.useState("");
   const [seller, setSeller] = React.useState({});
-  const [images, setImages] = React.useState({});
+  const [images, setImages] = React.useState([]);
   const [currentPrice, setCurrentPrice] = React.useState(0);
   const [augmentation, setAugmentation] = React.useState(0.1);
   const [newAugment, setNewAugment] = React.useState({});
@@ -86,20 +86,17 @@ const DetailedEnchere = () => {
           .then(function (response) {
             const data = response["data"];
             // TODO: fix documents
-
-            // axios.get(`${apiRoutes.API}/documents`,
-            // {
-            //   params: {
-            //     page:1,
-            //     article: response["data"]["@id"],
-            //   },
-            //   headers:{
-            //     "Content-Type": "multipart/form-data",
-            //   }
-
-            // }).then(response=>{setImages(response["data"]["hydra:member"])
-            // console.log(response["data"]["hydra:member"])})
-            //   .catch(error=>console.log(error))
+            axios.get(`${apiRoutes.API}/documents`,
+            {
+              params: {
+                page:1,
+                article: response["data"]["@id"],
+              },
+              headers:{
+                "Content-Type": "multipart/form-data",
+              }
+            }).then(response=>{getImages(response["data"]["hydra:member"])})
+              .catch(error=>console.log(error))
             setArticle({
               nom: data.name,
               etat: data.state,
@@ -114,6 +111,7 @@ const DetailedEnchere = () => {
       })
       .catch((error) => console.log(error));
   }
+  //#region augmentation zone
   function augmenter() {
     const newPrice = currentPrice + augmentation;
 
@@ -129,7 +127,7 @@ const DetailedEnchere = () => {
       })
       .catch((error) => console.log(error));
   }
-
+//not currently used
   function getAugmentations() {
     axios
       .get(`${apiRoutes.API}/augmentations`, {
@@ -145,6 +143,7 @@ const DetailedEnchere = () => {
       })
       .catch((error) => console.log(error));
   }
+  //#endregion
 
   React.useEffect(() => {
     getEnchere();
@@ -156,22 +155,16 @@ const DetailedEnchere = () => {
     setCurrentPrice(newAugment.value);
   }, [newAugment]);
 
-
-
-  // TODO:replace these with paths of documents
-  const myImg = require("../../media/images/demosToBeReplaced/pc1.jpg");
-  const myImgss = {
-    1: {
-      path: "../../media/images/demosToBeReplaced/pc2.jpg",
-    },
-    2: {
-      path: "../../media/images/demosToBeReplaced/pc3.jpg",
-    },
-    3: {
-      path: "../../media/images/demosToBeReplaced/pc4.jpg",
-    },
-  };
-
+  const getImages = (rawImages)=>{
+    let tempImages = []
+    let path = "http://127.0.0.1:8000"
+    rawImages.map((image)=>{
+      const myImg = path.concat(image.contentUrl);
+      tempImages.push(myImg)
+    });
+    setImages(tempImages);
+    console.log(tempImages) 
+  }
   //#region concerning verification popup
   const [open, setOpen] = React.useState(false);
 
@@ -246,18 +239,20 @@ const DetailedEnchere = () => {
           <Grid item></Grid>
           {/* documents */}
           <Grid item>
-            <img src={myImg} alt="" />
+            <ArticleImage src={images[0]} alt=""/>
           </Grid>
           <Grid container spacing={2}>
             {/* TODO: map throught your documents here */}
-            {/* {Object.keys(myImgss).map((key, index) => (
+            {images.map((image) => (
               <Grid
                 item
                 xs={4}
-                key={index}
-                sx={{ height: 100, backgroundColor: "green" }}
-              ></Grid>
-            ))} */}
+                key={Math.random()}
+                sx={{ height: 100}}
+              >
+               <ArticleSubImage src={image} alt={image} />
+              </Grid>
+            ))}
           </Grid>
           {/* seller userdata subsection */}
           <Grid container spacing={2} sx={{ mt: 2 }}>
