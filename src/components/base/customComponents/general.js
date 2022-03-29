@@ -41,6 +41,11 @@ export const DrawerHeader = styled('div')(({ theme }) => ({
     maxWidth: 100
   }));
 
+  // export const errorDiv = styled('div')(({theme})=>{
+  //   color: theme.palette.mode.
+  // })
+  
+
 export const FormTextField = styled(TextField)(({theme})=>({
   '&.Mui-focus': {
     border: "1px solid black"

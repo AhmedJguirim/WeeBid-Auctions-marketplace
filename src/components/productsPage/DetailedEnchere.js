@@ -43,6 +43,12 @@ const DetailedEnchere = () => {
 
   //gets enchere id from url
   let { id } = useParams();
+  //TODO take care of the socket
+//   const url = new URL('http://127.0.0.1:8000/.well-known/mercure');
+// url.searchParams.append('topic', 'https://127.0.0.1:8000/api/encheres/6');
+// const eventSource = new EventSource(url);
+//     eventSource.onmessage = e => console.log(e)
+
 
   //gets the value given in the latest augmentation
   function getCurrentPrice(initPrice, myId) {

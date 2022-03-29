@@ -68,7 +68,7 @@ const DetailedEnchereInverse = () => {
   //gets the actual enchere
   function getEnchere() {
     axios
-      .get(`${apiRoutes.API}/encheres/${id}`)
+      .get(`${apiRoutes.API}/enchere_inverses/${id}`)
       .then(function (response) {
         const data = response["data"];
         console.log(response["data"]["@id"], "retrieved successfully!");

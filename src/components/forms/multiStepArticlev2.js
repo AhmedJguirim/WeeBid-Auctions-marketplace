@@ -155,14 +155,6 @@ export default function CreateArticle() {
       }
         return errors;
       };
-//#region patches TODO put them in their places
-
-
-
-
-
-
-//#endregion
 
   const navigate = new useNavigate();
   //#region stepper part

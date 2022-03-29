@@ -22,7 +22,7 @@ import EncheresParUser from '../productsPage/EncheresParUser'
 import EncheresInversesParUser from '../productsPage/EncheresInversesParUser'
 import WatchList from '../productsPage/WatchList'
 import CreateArticle from '../forms/multiStepArticlev2'
-import MultiStepRegister from '../register/MultiStepRegister'
+import MultiStepRegister from '../register/MultiStepRegisterv2'
 import DetailedEnchereInverse from '../productsPage/DetailedEnchereInverse'
 import DetailedEnchere from '../productsPage/DetailedEnchere'
 
@@ -61,7 +61,6 @@ const Base = () => {
           <Route path={`${navRoutes.ENCHERESINVERSES}${navRoutes.PERCATEGORY}/:categoryId`} element={<EncheresInverseParCategory />}></Route>
           <Route path={navRoutes.ENCHERESINVERSES} element={<EncheresInvListing />}></Route>
           <Route path={navRoutes.ENCHERES} element={<EncheresListing />}></Route>
-          {/* TODO: make a seperate page for detailed ENCCHEREINVERSE */}
           <Route path={`${navRoutes.ENCHEREINVERSE}/:id`} element={<DetailedEnchereInverse />}></Route>
           <Route path={navRoutes.LOGOUT} element={<Logout />}></Route>
           <Route path={navRoutes.INPROGRESS}element={<WorkInProgress />}></Route>
