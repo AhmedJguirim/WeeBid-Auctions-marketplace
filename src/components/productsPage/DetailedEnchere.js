@@ -18,7 +18,9 @@ import { useParams } from "react-router-dom";
 import { apiRoutes } from "../../config/routes";
 import Api from "../../AxiosInstance";
 import { useSelector } from "react-redux";
+import {io} from "socket.io-client"
 
+let socket = io("http://127.0.0.1:8081");
 const DetailedEnchere = () => {
   //#region states
   // TODO: display the augmentationList
@@ -43,12 +45,16 @@ const DetailedEnchere = () => {
 
   //gets enchere id from url
   let { id } = useParams();
-  //TODO take care of the socket
-//   const url = new URL('http://127.0.0.1:8000/.well-known/mercure');
-// url.searchParams.append('topic', 'https://127.0.0.1:8000/api/encheres/6');
-// const eventSource = new EventSource(url);
-//     eventSource.onmessage = e => console.log(e)
-
+  //socket code
+  
+  socket.on("connect",()=>{
+  console.log(`you're connected to socket.io from product`)
+  
+  socket.on("NEW_PRICE", (enchere, user)=>{
+    console.log('hi')
+    alert(`${user} has updated the price of ${enchere}`)
+    getCurrentPrice(enchere.initPrice,id)})
+})
 
   //gets the value given in the latest augmentation
   function getCurrentPrice(initPrice, myId) {
@@ -86,6 +92,7 @@ const DetailedEnchere = () => {
           ["nom d'utilisateur"]: data.user.displayName,
           localistation: data.user.adresse.ville,
         });
+        socket.emit('join-rooms', [response["data"]["@id"]])
         //get the article
         axios
           .get(`${apiRoutes.API}/articles/${response["data"]["article"]["id"]}`)
@@ -130,6 +137,7 @@ const DetailedEnchere = () => {
       .then((response) => {
         console.log(response["data"]["@id"], "created successfully!");
         getCurrentPrice(enchere.initPrice, id);
+        socket.emit("AUGMENT", enchere["@id"], user.displayName)
       })
       .catch((error) => console.log(error));
   }
@@ -151,13 +159,15 @@ const DetailedEnchere = () => {
   }
   //#endregion
 
+  
+  
+  
+  
   React.useEffect(() => {
     getEnchere();
   }, [augmentationList, id]);
   React.useEffect(() => {
-    console.log("getting the new value!!")
-    console.log(newAugment)
-    
+    console.log("getting the new value!!")    
     setCurrentPrice(newAugment.value);
   }, [newAugment]);
 

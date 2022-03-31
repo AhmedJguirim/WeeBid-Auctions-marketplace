@@ -27,6 +27,8 @@ import DetailedEnchereInverse from '../productsPage/DetailedEnchereInverse'
 import DetailedEnchere from '../productsPage/DetailedEnchere'
 
 
+
+
 const styles = {
   body:{
     backgroundColor: "primary.main"

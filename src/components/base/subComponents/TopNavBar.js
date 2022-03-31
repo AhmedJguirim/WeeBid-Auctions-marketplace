@@ -18,8 +18,11 @@ import { useSelector } from "react-redux";
 import { Link } from "react-router-dom";
 import { navRoutes } from "../../../config/routes";
 import SearchBar from "./SearchBar";
+import {io} from "socket.io-client"
 
-
+let socket = io("http://127.0.0.1:8081");
+socket.on("connect",()=>{
+console.log(`you're connected to socket.io`)})
 
 const TopNavBar = () => {
 
@@ -52,6 +55,7 @@ const TopNavBar = () => {
     },
   };
   const user = useSelector((state) => state.user);
+  const watchList = useSelector((state) => state.watchList)
   let variableLinks = {};
   if (user.id === undefined) {
     variableLinks = {
@@ -64,6 +68,7 @@ const TopNavBar = () => {
         path: navRoutes.REGISTER,
       },
     };
+
   }
   else {
     variableLinks = {
@@ -76,9 +81,23 @@ const TopNavBar = () => {
         path: navRoutes.USERPROFILE,
       },
     };
+
+    
+    
+
   }
- 
- 
+  
+
+
+
+  React.useEffect(()=>{    
+    
+      if (watchList[0] !== undefined){
+        socket.emit("join-rooms", watchList)
+      }}
+    
+  
+  ,[watchList])
   
   const constLinks = {
     0: {

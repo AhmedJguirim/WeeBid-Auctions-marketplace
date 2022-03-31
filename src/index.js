@@ -8,6 +8,8 @@ import { Provider } from 'react-redux';
 import "./styles/app.css";
 import { store } from './redux/store';
 
+
+
 const colorCollection = {
   main: {
     primary:'#FCF8FF',

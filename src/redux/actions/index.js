@@ -1,6 +1,5 @@
 import axios from 'axios'
 import { StatusCodes } from 'http-status-codes'
-import { useDispatch } from 'react-redux'
 import { apiRoutes } from '../../config/routes'
 
 export function getUserData() {
@@ -13,8 +12,10 @@ export function getUserData() {
   })
   .then(function (response) {
     const data = response.data
-    dispatch(checkUser(data))
-  })
+    dispatch(checkUser(data));
+    dispatch(fetchWatchList(data.id))
+    }
+  )
   .catch(function (error) {
     dispatch(checkUser({}))
     window.localStorage.clear()
@@ -29,12 +30,44 @@ export function getUserData() {
 
   }}
 
+  export function fetchWatchList(userId) {
+  
+    return dispatch=>{
+    axios.get(`${apiRoutes.API}/surveilles`,{
+    params:{
+      user:`/api/users/${userId}`
+    }
+    })
+    .then(function (response) {
+      const data = response["data"]["hydra:member"];
+      dispatch(getWatchList(data))
+      }
+    )
+    .catch(function (error) {
+
+      const { status } = error.response;
+        if (status === StatusCodes.INTERNAL_SERVER_ERROR) {
+          console.log("le serveur fait face a un probleme , veuillez patienter")
+        }
+    })
+  
+    }}
 
 export const checkUser = (user)=>{
 
     return {
         type: 'CHECKUSER',
         payload: user
+    }
+
+  }
+
+
+  export const getWatchList = (watchList)=>{
+
+    return {
+        type: 'GETWATCHLIST',
+        payload: watchList
     }
 
   }
