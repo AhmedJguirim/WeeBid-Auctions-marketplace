@@ -10,7 +10,7 @@ import {
   DialogTitle,
 } from "@mui/material";
 import { Box, minHeight } from "@mui/system";
-import React from "react";
+import React, { useRef } from "react";
 import PersonIcon from "@mui/icons-material/Person";
 import { ButtonStyles, lightContainer, ArticleImage, ArticleSubImage } from "../base/customComponents/general";
 import axios from "axios";
@@ -18,10 +18,13 @@ import { useParams } from "react-router-dom";
 import { apiRoutes } from "../../config/routes";
 import Api from "../../AxiosInstance";
 import { useSelector } from "react-redux";
-import {io} from "socket.io-client"
+import Socket from "../base/customComponents/Socket";
 
-let socket = io("http://127.0.0.1:8081");
+
 const DetailedEnchere = () => {
+
+  const watchList = useSelector((state) => state.watchList)
+
   //#region states
   // TODO: display the augmentationList
   const [augmentationList, setAugmentationList] = React.useState({});
@@ -42,22 +45,51 @@ const DetailedEnchere = () => {
   //#endregion
   //gets current user data from redux store
   const user = useSelector((state) => state.user);
-
-  //gets enchere id from url
+  const mounted = useRef(false);
   let { id } = useParams();
+
+  React.useEffect(() => {
+      mounted.current = true;
+
+      return () => {
+          mounted.current = false;
+          if(!watchList.includes(`/api/encheres/${id}`)){
+            Socket.emit("leave-room", `/api/encheres/${id}`)
+          }  
+      };
+  }, []);
+  //gets enchere id from url
+  
+
   //socket code
+
+
+    Socket.on("connect",()=>{
   
-  socket.on("connect",()=>{
-  console.log(`you're connected to socket.io from product`)
+      console.log(`you're connected to Socket.io from product`)
+        if(mounted.current === true){
+          Socket.on("NEW_PRICE", (myEnchere, user)=>{
+            getCurrentPrice(1,id)
+            alert(`${user} has updated the price of ${myEnchere}`)
+            })
+        }
+      })
+
+      React.useEffect(()=>{
+        console.log("current price updated")
+      },[currentPrice])
+ 
+ 
+
+    
+    
   
-  socket.on("NEW_PRICE", (enchere, user)=>{
-    console.log('hi')
-    alert(`${user} has updated the price of ${enchere}`)
-    getCurrentPrice(enchere.initPrice,id)})
-})
+
 
   //gets the value given in the latest augmentation
   function getCurrentPrice(initPrice, myId) {
+    console.log("i'm working with " +initPrice + myId)
+    console.log(enchere)
     axios
       .get(`${apiRoutes.API}/augmentationHighest`, {
         params: {
@@ -69,7 +101,8 @@ const DetailedEnchere = () => {
       .then((response) => {
         //sets the result (augmentation) in the state
         if (response["data"]["hydra:member"]["0"] != undefined) {
-          setNewAugment(response["data"]["hydra:member"]["0"]);
+          //TODO:this doesn't update the current price for some reason if we unmount and mount again
+          setCurrentPrice(response["data"]["hydra:member"]["0"].value);
         } else {
           setCurrentPrice(initPrice);
         }
@@ -92,7 +125,7 @@ const DetailedEnchere = () => {
           ["nom d'utilisateur"]: data.user.displayName,
           localistation: data.user.adresse.ville,
         });
-        socket.emit('join-rooms', [response["data"]["@id"]])
+        Socket.emit('join-rooms', [response["data"]["@id"]])
         //get the article
         axios
           .get(`${apiRoutes.API}/articles/${response["data"]["article"]["id"]}`)
@@ -137,7 +170,7 @@ const DetailedEnchere = () => {
       .then((response) => {
         console.log(response["data"]["@id"], "created successfully!");
         getCurrentPrice(enchere.initPrice, id);
-        socket.emit("AUGMENT", enchere["@id"], user.displayName)
+        Socket.emit("AUGMENT", enchere["@id"], user.displayName)
       })
       .catch((error) => console.log(error));
   }

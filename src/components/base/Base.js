@@ -8,7 +8,7 @@ import VentesListing from '../productsPage/VentesListing.js'
 import UserProfile from '../UserProfile';
 import EncheresHistory from '../userHistory/EncheresHistory'
 import {BrowserRouter as Router,  Route,Routes} from 'react-router-dom';
-import { useDispatch } from 'react-redux'
+import { useDispatch, useSelector } from 'react-redux'
 import { checkUser, getUserData } from '../../redux/actions'
 import CategoriesList from '../productsPage/CategoriesList'
 import EncheresParCategory from '../productsPage/EncheresParCategory'
@@ -25,6 +25,8 @@ import CreateArticle from '../forms/multiStepArticlev2'
 import MultiStepRegister from '../register/MultiStepRegisterv2'
 import DetailedEnchereInverse from '../productsPage/DetailedEnchereInverse'
 import DetailedEnchere from '../productsPage/DetailedEnchere'
+import Socket from './customComponents/Socket'
+
 
 
 
@@ -35,6 +37,18 @@ const styles = {
   }
 }
 const Base = () => {
+  const watchList = useSelector((state) => state.watchList)
+
+  React.useEffect(()=>{    
+    
+    if (watchList[0] !== undefined){
+      Socket.emit("join-rooms", watchList)
+    }}
+  
+
+,[watchList])
+
+
   const dispatch = useDispatch();  
     window.addEventListener('storage', () => {
       dispatch(getUserData())
@@ -43,6 +57,7 @@ const Base = () => {
       dispatch(getUserData())
       
     },[])
+    
   
   return (
     <Router>
@@ -53,7 +68,7 @@ const Base = () => {
           <Route path={navRoutes.MAKE_ARTICLE} element={<CreateArticle />}></Route>
           <Route path={navRoutes.LOGIN} element={<Login />}></Route>
           <Route path="/enchereHistory/:userId" element={<EncheresHistory />}></Route>
-          <Route path={`${navRoutes.ENCHERE}/:id`} element={<DetailedEnchere />}></Route>
+          <Route path={`${navRoutes.ENCHERE}/:id`}  element={<DetailedEnchere />}></Route>
           <Route path={navRoutes.REGISTER} element={<MultiStepRegister />}></Route>
           <Route path="/" element={<Homepage /> }></Route>
           <Route path={navRoutes.USERPROFILE} element={<UserProfile />}></Route>
