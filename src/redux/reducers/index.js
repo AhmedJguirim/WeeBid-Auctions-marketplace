@@ -1,8 +1,8 @@
 import userReducer from "./user";
 import { combineReducers } from "redux";
-import cartReducer from "./cart";
+import currentPrice from "./price";
 import watchListReducer from "./watchList";
 
-const myReducers = combineReducers({user :userReducer, cart : cartReducer, watchList:watchListReducer})
+const myReducers = combineReducers({user :userReducer, currentPrice : currentPrice, watchList:watchListReducer})
 
 export default myReducers;

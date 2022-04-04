@@ -42,7 +42,15 @@ const Base = () => {
   React.useEffect(()=>{    
     
     if (watchList[0] !== undefined){
-      Socket.emit("join-rooms", watchList)
+      let list = [];
+      watchList.map(elem=>{
+        if(elem.enchere!== undefined){
+          list.push(elem.enchere)
+        }else{
+          list.push(elem.enchereInverse)
+        }
+      })
+      Socket.emit("join-rooms", list)
     }}
   
 

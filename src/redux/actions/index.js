@@ -61,6 +61,12 @@ export const checkUser = (user)=>{
     }
 
   }
+  export const setPrice = (price)=>{
+    return {
+      type: "SETPRICE",
+      price: price
+    }
+  }
 
 
   export const getWatchList = (watchList)=>{

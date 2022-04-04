@@ -22,14 +22,7 @@ const Login = () => {
     setPassword(event.target.value);
   };
   //#endregion
-  // async function getUser() {
-  //   try {
-  //     const response = await API.get(`userdata`);
-  //     console.log(response);
-  //   } catch (error) {
-  //     console.error(error);
-  //   }
-  // }
+
 
   const onSubmit = (event) => {
     event.preventDefault();

@@ -9,7 +9,7 @@ import {
   DialogActions,
   DialogTitle,
 } from "@mui/material";
-import { Box, minHeight } from "@mui/system";
+import { Box} from "@mui/system";
 import React, { useRef } from "react";
 import PersonIcon from "@mui/icons-material/Person";
 import { ButtonStyles, lightContainer, ArticleImage, ArticleSubImage } from "../base/customComponents/general";
@@ -17,25 +17,27 @@ import axios from "axios";
 import { useParams } from "react-router-dom";
 import { apiRoutes } from "../../config/routes";
 import Api from "../../AxiosInstance";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import Socket from "../base/customComponents/Socket";
 
 
 const DetailedEnchere = () => {
 
+const dispatch = useDispatch();  
+  //GET DATA FROM STORE/PARAMS
   const watchList = useSelector((state) => state.watchList)
+  const thePrice = useSelector((state) => state.currentPrice)
+  const user = useSelector((state) => state.user);
+  let { id } = useParams();
 
   //#region states
-  // TODO: display the augmentationList
-  const [augmentationList, setAugmentationList] = React.useState({});
   const [enchere, setEnchere] = React.useState({});
   const [article, setArticle] = React.useState({});
   const [description, setDescription] = React.useState("");
   const [seller, setSeller] = React.useState({});
   const [images, setImages] = React.useState([]);
-  const [currentPrice, setCurrentPrice] = React.useState(0);
   const [augmentation, setAugmentation] = React.useState(0.1);
-  const [newAugment, setNewAugment] = React.useState({});
+  
   //#endregion
 
   //#region state handlers
@@ -43,53 +45,36 @@ const DetailedEnchere = () => {
     setAugmentation(parseFloat(event.target.value));
   };
   //#endregion
-  //gets current user data from redux store
-  const user = useSelector((state) => state.user);
+  //REMOVES SUBSCRIPTION TO SOCKET ROOM IF NOT WATCHED
   const mounted = useRef(false);
-  let { id } = useParams();
-
   React.useEffect(() => {
       mounted.current = true;
-
       return () => {
           mounted.current = false;
-          if(!watchList.includes(`/api/encheres/${id}`)){
+          if(watchList.filter(e=>e.enchere===`/api/encheres/${id}`).length=0){
             Socket.emit("leave-room", `/api/encheres/${id}`)
           }  
       };
   }, []);
-  //gets enchere id from url
-  
+
+
+
+
 
   //socket code
-
-
     Socket.on("connect",()=>{
-  
       console.log(`you're connected to Socket.io from product`)
         if(mounted.current === true){
           Socket.on("NEW_PRICE", (myEnchere, user)=>{
             getCurrentPrice(1,id)
             alert(`${user} has updated the price of ${myEnchere}`)
-            })
+            })   
         }
       })
-
-      React.useEffect(()=>{
-        console.log("current price updated")
-      },[currentPrice])
- 
- 
-
-    
-    
   
-
 
   //gets the value given in the latest augmentation
   function getCurrentPrice(initPrice, myId) {
-    console.log("i'm working with " +initPrice + myId)
-    console.log(enchere)
     axios
       .get(`${apiRoutes.API}/augmentationHighest`, {
         params: {
@@ -100,11 +85,11 @@ const DetailedEnchere = () => {
       })
       .then((response) => {
         //sets the result (augmentation) in the state
-        if (response["data"]["hydra:member"]["0"] != undefined) {
+        if (response["data"]["hydra:member"]["0"] !== undefined) {
           //TODO:this doesn't update the current price for some reason if we unmount and mount again
-          setCurrentPrice(response["data"]["hydra:member"]["0"].value);
+          dispatch({type:"SETPRICE",price:response["data"]["hydra:member"]["0"].value});
         } else {
-          setCurrentPrice(initPrice);
+          dispatch({type:"SETPRICE",price:initPrice});
         }
       })
       .catch((error) => console.log(error));
@@ -131,7 +116,6 @@ const DetailedEnchere = () => {
           .get(`${apiRoutes.API}/articles/${response["data"]["article"]["id"]}`)
           .then(function (response) {
             const data = response["data"];
-            // TODO: fix documents
             axios.get(`${apiRoutes.API}/documents`,
             {
               params: {
@@ -159,7 +143,7 @@ const DetailedEnchere = () => {
   }
   //#region augmentation zone
   function augmenter() {
-    const newPrice = currentPrice + augmentation;
+    const newPrice = thePrice + augmentation;
 
     Api.post("/augmentations", {
       user: `/api/users/${user.id}`,
@@ -174,42 +158,16 @@ const DetailedEnchere = () => {
       })
       .catch((error) => console.log(error));
   }
-//not currently used
-  function getAugmentations() {
-    axios
-      .get(`${apiRoutes.API}/augmentations`, {
-        params: {
-          page: 1,
-          enchere: `/api/encheres/${id}`,
-          "order[date]": "desc",
-        },
-      })
-      .then((response) => {
-        console.log(response["data"]["@id"], "retrieved successfully!");
-        setAugmentationList(response["data"]["hydra:member"]);
-      })
-      .catch((error) => console.log(error));
-  }
   //#endregion
 
-  
-  
-  
-  
-  React.useEffect(() => {
-    getEnchere();
-  }, [augmentationList, id]);
-  React.useEffect(() => {
-    console.log("getting the new value!!")    
-    setCurrentPrice(newAugment.value);
-  }, [newAugment]);
-
+  //MAKES IMAGES READY FOR USE
   const getImages = (rawImages)=>{
     let tempImages = []
     let path = "http://127.0.0.1:8000"
     rawImages.map((image)=>{
       const myImg = path.concat(image.contentUrl);
       tempImages.push(myImg)
+      console.log(myImg)
     });
     setImages(tempImages);
     console.log(tempImages) 
@@ -225,6 +183,10 @@ const DetailedEnchere = () => {
     setOpen(false);
   };
   //#endregion
+
+  React.useEffect(() => {
+    getEnchere();
+  }, [id, mounted]);
 
   return (
     <Grid container sx={{ mt: 10 }}>
@@ -291,7 +253,6 @@ const DetailedEnchere = () => {
             <ArticleImage src={images[0]} alt=""/>
           </Grid>
           <Grid container spacing={2}>
-            {/* TODO: map throught your documents here */}
             {images.map((image) => (
               <Grid
                 item
@@ -353,12 +314,12 @@ const DetailedEnchere = () => {
               </Grid>
               <Grid item xs={4}>
                 <Typography variant="h6" color="info.main">
-                  prix actuel: {currentPrice}TND
+                  prix actuel: {thePrice}TND
                 </Typography>
               </Grid>
               <Grid item xs={4}>
                 <Typography variant="h8">
-                  prix apres l'augmentation: {currentPrice + augmentation} TND
+                  prix apres l'augmentation: {thePrice + augmentation} TND
                 </Typography>
               </Grid>
               <Grid item xs={4}></Grid>
@@ -411,7 +372,16 @@ const DetailedEnchere = () => {
                       </Grid>
                     </Grid>
                   ))}
-                </Grid>
+                   {/* TODO: GIVE DESCRIPTION A SEPERATED SECTION */}
+                   <Grid container sx={{ mb: 2 }}>
+                      <Grid item xs={6}>
+                        <Typography variant="h6">description: </Typography>
+                      </Grid>
+                      <Grid item xs={6}>
+                        <Typography variant="h6">{description} </Typography>
+                      </Grid>
+                    </Grid>
+                </Grid> 
               </Grid>
             </Grid>
           </Box>

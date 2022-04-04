@@ -9,28 +9,38 @@ import {
   DialogActions,
   DialogTitle,
 } from "@mui/material";
-import { Box, minHeight } from "@mui/system";
-import React from "react";
+import { Box} from "@mui/system";
+import React, { useRef } from "react";
 import PersonIcon from "@mui/icons-material/Person";
-import { ButtonStyles, lightContainer } from "../base/customComponents/general";
+import { ArticleImage, ArticleSubImage, ButtonStyles, lightContainer } from "../base/customComponents/general";
 import axios from "axios";
 import { useParams } from "react-router-dom";
 import { apiRoutes } from "../../config/routes";
 import Api from "../../AxiosInstance";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
+import Socket from "../base/customComponents/Socket";
+import {fetchWatchList} from '../../redux/actions';
+
 
 const DetailedEnchereInverse = () => {
+
+  const dispatch = useDispatch();  
+  //GET DATA FROM STORE/PARAMS
+  const watchList = useSelector((state) => state.watchList)
+  const thePrice = useSelector((state) => state.currentPrice)
+  const user = useSelector((state) => state.user);
+  let { id } = useParams();
   //#region states
   // TODO: display the ReductionList
-  const [reductionList, setReductionList] = React.useState({});
+
   const [enchere, setEnchere] = React.useState({});
   const [article, setArticle] = React.useState({});
   const [description, setDescription] = React.useState("");
   const [seller, setSeller] = React.useState({});
-  const [images, setImages] = React.useState({});
-  const [currentPrice, setCurrentPrice] = React.useState(0);
+  const [images, setImages] = React.useState([]);
   const [reduction, setReduction] = React.useState(0.1);
-  const [newAugment, setNewAugment] = React.useState({});
+  const [followable, setFollowable] = React.useState(true);
+  const [watched, setWatched] = React.useState(false);
   //#endregion
 
   //#region state handlers
@@ -38,12 +48,28 @@ const DetailedEnchereInverse = () => {
     setReduction(parseFloat(event.target.value));
   };
   //#endregion
-  //gets current user data from redux store
-  const user = useSelector((state) => state.user);
+  //REMOVES SUBSCRIPTION TO SOCKET ROOM IF NOT WATCHED
+  const mounted = useRef(false);
+  React.useEffect(() => {
+      mounted.current = true;
+      return () => {
+          mounted.current = false;
+          if(watchList.filter(e=>e.enchereInverse===`/api/enchere_inverses/${id}`).length=0){
+            Socket.emit("leave-room", `/api/enchere_Inverses/${id}`)
+          }  
+      };
+  }, []);
 
-  //gets enchere id from url
-  let { id } = useParams();
-
+    //socket code
+    Socket.on("connect",()=>{
+      console.log(`you're connected to Socket.io from product`)
+        if(mounted.current === true){
+          Socket.on("NEW_PRICE", (myEnchere, user)=>{
+            getCurrentPrice(1,id)
+            alert(`${user} has updated the price of ${myEnchere}`)
+            })   
+        }
+      })
   //gets the value given in the latest reduction
   function getCurrentPrice(initPrice, myId) {
     axios
@@ -57,9 +83,10 @@ const DetailedEnchereInverse = () => {
       .then((response) => {
         //sets the result (reduction) in the state
         if (response["data"]["hydra:member"]["0"] != undefined) {
-          setNewAugment(response["data"]["hydra:member"]["0"]);
+          dispatch({type:"SETPRICE",price:response["data"]["hydra:member"]["0"].value});
         } else {
-          setCurrentPrice(initPrice);
+          console.log(initPrice)
+          dispatch({type:"SETPRICE",price: initPrice});
         }
       })
       .catch((error) => console.log(error));
@@ -80,26 +107,24 @@ const DetailedEnchereInverse = () => {
           ["nom d'utilisateur"]: data.user.displayName,
           localistation: data.user.adresse.ville,
         });
+        Socket.emit('join-rooms', [response["data"]["@id"]])
         //get the article
         axios
           .get(`${apiRoutes.API}/articles/${response["data"]["article"]["id"]}`)
           .then(function (response) {
             const data = response["data"];
-            // TODO: fix documents
+            axios.get(`${apiRoutes.API}/documents`,
+            {
+              params: {
+                page:1,
+                article: response["data"]["@id"],
+              },
+              headers:{
+                "Content-Type": "multipart/form-data",
+              }
+            }).then(response=>{getImages(response["data"]["hydra:member"])})
+              .catch(error=>console.log(error))
 
-            // axios.get(`${apiRoutes.API}/documents`,
-            // {
-            //   params: {
-            //     page:1,
-            //     article: response["data"]["@id"],
-            //   },
-            //   headers:{
-            //     "Content-Type": "multipart/form-data",
-            //   }
-
-            // }).then(response=>{setImages(response["data"]["hydra:member"])
-            // console.log(response["data"]["hydra:member"])})
-            //   .catch(error=>console.log(error))
             setArticle({
               nom: data.name,
               etat: data.state,
@@ -114,9 +139,27 @@ const DetailedEnchereInverse = () => {
       })
       .catch((error) => console.log(error));
   }
-  function augmenter() {
-    const newPrice = currentPrice - reduction;
+  
+const handleWatch = ()=>{
+  if(watched=== false && user!=={}){
+    Api.post("/surveilles",{
+      user: `/api/users/${user.id}`,
+      enchereInverse: `/api/enchere_inverses/${enchere.id}`
+    }).then(response=>{
+      console.log(response["data"]["@id"]+ " created")
+      dispatch(fetchWatchList(user.id))
+      setWatched(true)
+    }).catch(err=>console.log("oops something went wrong"))
+  }else if(watched === true){
 
+  }
+}
+
+  
+
+  //#region augmentation zone
+  function reduire() {
+    const newPrice = thePrice - reduction;
     Api.post("/reductions", {
       user: `/api/users/${user.id}`,
       enchereInverse: `/api/enchere_inverses/${id}`,
@@ -126,52 +169,22 @@ const DetailedEnchereInverse = () => {
       .then((response) => {
         console.log(response["data"]["@id"], "created successfully!");
         getCurrentPrice(enchere.initPrice, id);
+        Socket.emit("AUGMENT", enchere["@id"], user.displayName)
       })
       .catch((error) => console.log(error));
   }
+    //#endregion
 
-  function getReductions() {
-    axios
-      .get(`${apiRoutes.API}/reductions`, {
-        params: {
-          page: 1,
-          enchere: `/api/encheres/${id}`,
-          "order[date]": "desc",
-        },
-      })
-      .then((response) => {
-        console.log(response["data"]["@id"], "retrieved successfully!");
-        setReductionList(response["data"]["hydra:member"]);
-      })
-      .catch((error) => console.log(error));
-  }
-
-  React.useEffect(() => {
-    getEnchere();
-  }, [reductionList, id]);
-  React.useEffect(() => {
-    console.log("getting the new value!!")
-    console.log(newAugment)
-    
-    setCurrentPrice(newAugment.value);
-  }, [newAugment]);
-
-
-
-  // TODO:replace these with paths of documents
-  const myImg = require("../../media/images/demosToBeReplaced/pc1.jpg");
-  const myImgss = {
-    1: {
-      path: "../../media/images/demosToBeReplaced/pc2.jpg",
-    },
-    2: {
-      path: "../../media/images/demosToBeReplaced/pc3.jpg",
-    },
-    3: {
-      path: "../../media/images/demosToBeReplaced/pc4.jpg",
-    },
-  };
-
+  //MAKES IMAGES READY FOR USE
+const getImages = (rawImages)=>{
+  let tempImages = []
+  let path = "http://127.0.0.1:8000"
+  rawImages.map((image)=>{
+    const myImg = path.concat(image.contentUrl);
+    tempImages.push(myImg)
+  });
+  setImages(tempImages);
+}
   //#region concerning verification popup
   const [open, setOpen] = React.useState(false);
 
@@ -184,6 +197,9 @@ const DetailedEnchereInverse = () => {
   };
   //#endregion
 
+  React.useEffect(() => {
+    getEnchere();
+  }, [mounted, id]);
   return (
     <Grid container sx={{ mt: 10 }}>
       {/* could be used for anything */}
@@ -214,7 +230,7 @@ const DetailedEnchereInverse = () => {
           <Button
             sx={ButtonStyles}
             onClick={() => {
-              augmenter();
+              reduire();
               handleClose();
             }}
             autoFocus
@@ -243,21 +259,22 @@ const DetailedEnchereInverse = () => {
 
         {/* first section */}
         <Grid item xs={5.8}>
-          <Grid item></Grid>
+          <Grid item><Button onClick={handleWatch} sx={ButtonStyles}> acheter maintenant</Button></Grid>
           {/* documents */}
           <Grid item>
-            <img src={myImg} alt="" />
+            <ArticleImage src={images[0]} alt=""/>
           </Grid>
           <Grid container spacing={2}>
-            {/* TODO: map throught your documents here */}
-            {/* {Object.keys(myImgss).map((key, index) => (
+            {images.map((image) => (
               <Grid
                 item
                 xs={4}
-                key={index}
-                sx={{ height: 100, backgroundColor: "green" }}
-              ></Grid>
-            ))} */}
+                key={Math.random()}
+                sx={{ height: 100}}
+              >
+               <ArticleSubImage src={image} alt={image} />
+              </Grid>
+            ))}
           </Grid>
           {/* seller userdata subsection */}
           <Grid container spacing={2} sx={{ mt: 2 }}>
@@ -309,12 +326,12 @@ const DetailedEnchereInverse = () => {
               </Grid>
               <Grid item xs={4}>
                 <Typography variant="h6" color="info.main">
-                  prix actuel: {currentPrice}TND
+                  prix actuel: {thePrice}TND
                 </Typography>
               </Grid>
               <Grid item xs={4}>
                 <Typography variant="h8">
-                  prix apres la reduction: {currentPrice - reduction} TND
+                  prix apres l'augmentation: {thePrice + reduction} TND
                 </Typography>
               </Grid>
               <Grid item xs={4}></Grid>
@@ -367,6 +384,15 @@ const DetailedEnchereInverse = () => {
                       </Grid>
                     </Grid>
                   ))}
+                  {/* TODO: GIVE DESCRIPTION A SEPERATED SECTION */}
+                  <Grid container sx={{ mb: 2 }}>
+                      <Grid item xs={6}>
+                        <Typography variant="h6">description: </Typography>
+                      </Grid>
+                      <Grid item xs={6}>
+                        <Typography variant="h6">{description} </Typography>
+                      </Grid>
+                    </Grid>
                 </Grid>
               </Grid>
             </Grid>

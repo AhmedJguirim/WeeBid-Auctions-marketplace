@@ -10,9 +10,9 @@ const watchListReducer = (state= [] , action)=>{
             let watchList = [];
             rawData.map(elem=>{
                 if(elem.enchere!==null){
-                    watchList.push(elem.enchere["@id"])
+                    watchList.push({enchere:elem.enchere["@id"],surveille:elem["@id"]})
                 }else if(elem.enchereInverse!==null){
-                    watchList.push(elem.enchereInverse["@id"])
+                    watchList.push({enchereInverse:elem.enchereInverse["@id"],surveille:elem["@id"]})
                 }
                 
             })
