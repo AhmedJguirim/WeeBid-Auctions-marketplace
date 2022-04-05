@@ -31,7 +31,6 @@ const DetailedEnchereInverse = () => {
   const user = useSelector((state) => state.user);
   let { id } = useParams();
   //#region states
-  // TODO: display the ReductionList
 
   const [enchere, setEnchere] = React.useState({});
   const [article, setArticle] = React.useState({});
@@ -41,6 +40,7 @@ const DetailedEnchereInverse = () => {
   const [reduction, setReduction] = React.useState(0.1);
   const [followable, setFollowable] = React.useState(true);
   const [watched, setWatched] = React.useState(false);
+  const [watchButton, setWatchButton] = React.useState("surveiller");
   //#endregion
 
   //#region state handlers
@@ -54,21 +54,20 @@ const DetailedEnchereInverse = () => {
       mounted.current = true;
       return () => {
           mounted.current = false;
-          if(watchList.filter(e=>e.enchereInverse===`/api/enchere_inverses/${id}`).length=0){
-            Socket.emit("leave-room", `/api/enchere_Inverses/${id}`)
-          }  
+            Socket.emit("leave-room", `/api/enchere_inverses/${id}`)
       };
   }, []);
 
     //socket code
     Socket.on("connect",()=>{
       console.log(`you're connected to Socket.io from product`)
-        if(mounted.current === true){
-          Socket.on("NEW_PRICE", (myEnchere, user)=>{
-            getCurrentPrice(1,id)
-            alert(`${user} has updated the price of ${myEnchere}`)
+        
+          Socket.on("NEW_PRICE", (myEnchere, user, newPrice, initPrice)=>{
+            dispatch({type:"SETPRICE",newPrice});
+            getCurrentPrice(initPrice,id)
+            alert(`${user} has updated the price of ${myEnchere} to ${newPrice}`)
             })   
-        }
+        
       })
   //gets the value given in the latest reduction
   function getCurrentPrice(initPrice, myId) {
@@ -85,7 +84,6 @@ const DetailedEnchereInverse = () => {
         if (response["data"]["hydra:member"]["0"] != undefined) {
           dispatch({type:"SETPRICE",price:response["data"]["hydra:member"]["0"].value});
         } else {
-          console.log(initPrice)
           dispatch({type:"SETPRICE",price: initPrice});
         }
       })
@@ -104,10 +102,12 @@ const DetailedEnchereInverse = () => {
         getCurrentPrice(response["data"].initPrice, id);
         //sets seller details
         setSeller({
+          id:data.user.id,
           ["nom d'utilisateur"]: data.user.displayName,
           localistation: data.user.adresse.ville,
         });
-        Socket.emit('join-rooms', [response["data"]["@id"]])
+        Socket.emit('join-rooms', [response["data"]["@id"].concat("LOCAL")])
+        console.log([response["data"]["@id"].concat("LOCAL")])
         //get the article
         axios
           .get(`${apiRoutes.API}/articles/${response["data"]["article"]["id"]}`)
@@ -149,12 +149,15 @@ const handleWatch = ()=>{
       console.log(response["data"]["@id"]+ " created")
       dispatch(fetchWatchList(user.id))
       setWatched(true)
+      setWatchButton("unsurveiller")
+      
     }).catch(err=>console.log("oops something went wrong"))
   }else if(watched === true){
-
-  }
+    const surveille =watchList.filter(e=>e.enchereInverse===`/api/enchere_inverses/${id}`);
+    Api.delete(surveille.surveille).then(res=>console.log("successfully unwatched")).catch(err=>console.log("smtng went wrong"))
+    setWatchButton("surveiller")
 }
-
+}
   
 
   //#region augmentation zone
@@ -169,7 +172,7 @@ const handleWatch = ()=>{
       .then((response) => {
         console.log(response["data"]["@id"], "created successfully!");
         getCurrentPrice(enchere.initPrice, id);
-        Socket.emit("AUGMENT", enchere["@id"], user.displayName)
+        Socket.emit("REDUCT", enchere["@id"], user.displayName, newPrice, enchere.initPrice)
       })
       .catch((error) => console.log(error));
   }
@@ -199,7 +202,18 @@ const getImages = (rawImages)=>{
 
   React.useEffect(() => {
     getEnchere();
+
   }, [mounted, id]);
+  React.useEffect(() => {
+    if(user==={}||user.id === seller.id){
+      setFollowable(false)
+    }else{
+      setFollowable(true)
+    }
+    console.log(user,seller)
+  }, [seller,user]);
+
+
   return (
     <Grid container sx={{ mt: 10 }}>
       {/* could be used for anything */}
@@ -259,7 +273,8 @@ const getImages = (rawImages)=>{
 
         {/* first section */}
         <Grid item xs={5.8}>
-          <Grid item><Button onClick={handleWatch} sx={ButtonStyles}> acheter maintenant</Button></Grid>
+        {followable === true &&
+          <Grid item><Button onClick={handleWatch} sx={{...ButtonStyles, backgroundColor:"primary.main"}}> {watchButton} </Button></Grid>}
           {/* documents */}
           <Grid item>
             <ArticleImage src={images[0]} alt=""/>
@@ -286,16 +301,23 @@ const getImages = (rawImages)=>{
               </Typography>
               {/* seller data details */}
               <Grid item sx={{ mt: 2 }}>
-                {Object.keys(seller).map((key, index) => (
-                  <Grid container key={index} sx={{ mb: 2 }}>
+
+                  <Grid container sx={{ mb: 2 }}>
                     <Grid item xs={6}>
-                      <Typography variant="h6">{key}: </Typography>
+                      <Typography variant="h6">nom d'utilisateur: </Typography>
                     </Grid>
                     <Grid item xs={6}>
-                      <Typography variant="h6">{seller[key]} </Typography>
+                      <Typography variant="h6">{seller["nom d'utilisateur"]} </Typography>
                     </Grid>
                   </Grid>
-                ))}
+                  <Grid container sx={{ mb: 2 }}>
+                    <Grid item xs={6}>
+                      <Typography variant="h6">localisation: </Typography>
+                    </Grid>
+                    <Grid item xs={6}>
+                      <Typography variant="h6">{seller["localisation"]===undefined ? "":seller["localisation"]} </Typography>
+                    </Grid>
+                  </Grid>
               </Grid>
             </Grid>
           </Grid>
@@ -331,7 +353,7 @@ const getImages = (rawImages)=>{
               </Grid>
               <Grid item xs={4}>
                 <Typography variant="h8">
-                  prix apres l'augmentation: {thePrice + reduction} TND
+                  prix apres l'augmentation: {thePrice - reduction} TND
                 </Typography>
               </Grid>
               <Grid item xs={4}></Grid>

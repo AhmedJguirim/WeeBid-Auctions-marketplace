@@ -51,25 +51,20 @@ const dispatch = useDispatch();
       mounted.current = true;
       return () => {
           mounted.current = false;
-          if(watchList.filter(e=>e.enchere===`/api/encheres/${id}`).length=0){
             Socket.emit("leave-room", `/api/encheres/${id}`)
-          }  
       };
   }, []);
-
-
-
-
 
   //socket code
     Socket.on("connect",()=>{
       console.log(`you're connected to Socket.io from product`)
-        if(mounted.current === true){
-          Socket.on("NEW_PRICE", (myEnchere, user)=>{
-            getCurrentPrice(1,id)
-            alert(`${user} has updated the price of ${myEnchere}`)
+
+          Socket.on("NEW_PRICE", (myEnchere, user, newPrice, initPrice)=>{
+            dispatch({type:"SETPRICE",newPrice});
+            getCurrentPrice(initPrice,id)
+            alert(`${user} has updated the price of ${myEnchere} to ${newPrice}`)
             })   
-        }
+
       })
   
 
@@ -88,7 +83,7 @@ const dispatch = useDispatch();
         if (response["data"]["hydra:member"]["0"] !== undefined) {
           //TODO:this doesn't update the current price for some reason if we unmount and mount again
           dispatch({type:"SETPRICE",price:response["data"]["hydra:member"]["0"].value});
-        } else {
+        } else{
           dispatch({type:"SETPRICE",price:initPrice});
         }
       })
@@ -110,7 +105,8 @@ const dispatch = useDispatch();
           ["nom d'utilisateur"]: data.user.displayName,
           localistation: data.user.adresse.ville,
         });
-        Socket.emit('join-rooms', [response["data"]["@id"]])
+
+        Socket.emit('join-rooms', [response["data"]["@id"].concat("LOCAL")])
         //get the article
         axios
           .get(`${apiRoutes.API}/articles/${response["data"]["article"]["id"]}`)
@@ -154,7 +150,7 @@ const dispatch = useDispatch();
       .then((response) => {
         console.log(response["data"]["@id"], "created successfully!");
         getCurrentPrice(enchere.initPrice, id);
-        Socket.emit("AUGMENT", enchere["@id"], user.displayName)
+        Socket.emit("AUGMENT", enchere["@id"], user.displayName, newPrice, enchere.initPrice)
       })
       .catch((error) => console.log(error));
   }
