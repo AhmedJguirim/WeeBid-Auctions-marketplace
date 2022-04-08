@@ -8,6 +8,7 @@ import {
   ListItemText,
   ListItem,
   Box,
+  Typography,
 } from "@mui/material";
 import { DrawerHeader } from "../customComponents/general";
 import { ChevronLeft } from "@mui/icons-material";
@@ -26,7 +27,7 @@ const styles = {
   },
   item: {
     "&:hover": {
-      backgroundColor: "info.main",
+      backgroundColor: "secondary.main",
       color: "primary.main",
     },
   },
@@ -77,7 +78,9 @@ const MyDrawer = ({ open, setOpen }) => {
   return (
     <Drawer sx={styles.drawer} variant="persistent" anchor="left" open={open}>
       <DrawerHeader>
+      <Typography variant="h4">menu</Typography>
         <IconButton onClick={handleDrawerClose}>
+          
           <ChevronLeft />
         </IconButton>
       </DrawerHeader>

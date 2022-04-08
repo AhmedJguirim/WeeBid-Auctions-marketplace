@@ -75,7 +75,7 @@ export default function SearchBar({ type }) {
     // TODO: adjust the height of the input
     <Autocomplete
       id="seachBar"
-      sx={{ width: 300 , marginTop:0}}
+      sx={{ width: 300  }}
       filterOptions={(x) => x}
       open={open}
       onOpen={() => {
@@ -102,7 +102,6 @@ export default function SearchBar({ type }) {
       renderInput={(params) => (
         <TextField
           {...params}
-          sx={{mt:0}}
           label="cherchez"
           value={input}
           onChange={handleInput}

@@ -1,28 +1,23 @@
-import {
-  Card,
-  CardContent,
-  Container,
-  Grid,
-  Typography,
-} from "@mui/material";
+import { Card, CardContent, Container, Grid, Typography } from "@mui/material";
 import { Box } from "@mui/system";
 import React from "react";
 import image from "../../media/images/homepageTopImage.jpg";
 import axios from "axios";
 import HomePageList from "../generalComponents/ProductsListing";
 import { apiRoutes, navRoutes } from "../../config/routes";
-
-
-
-
-
+import StorefrontTwoToneIcon from "@mui/icons-material/StorefrontTwoTone";
+import LocalMallTwoToneIcon from "@mui/icons-material/LocalMallTwoTone";
+import RequestQuoteTwoToneIcon from "@mui/icons-material/RequestQuoteTwoTone";
+import logo from "../../media/images/dotItLogo.png"
 const styles = {
   subDiv: {
     maxWidth: "100%",
-    minHeight: 500,
-    backgroundImage: `url(${image})`,
-    backgroundSize: "cover",
-    backgroundRepeat: "no-repeat",
+    // uncomment for boring imaged
+    // backgroundImage: `url(${image})`,
+    // backgroundSize: "cover",
+    // backgroundRepeat: "no-repeat",
+    paddingTop: "5%",
+    backgroundColor: "secondary.main",
   },
   generalText: {
     textAlign: "center",
@@ -46,80 +41,179 @@ const styles = {
     width: "70%",
     margin: "auto",
   },
-  sectionBox:{
-    mt: "10%", textAlign: "center" ,
-  }
+  sectionBox: {
+    marginTop: "5%",
+    paddingTop: "5%",
+    textAlign: "center",
+  },
 };
 
 const Homepage = () => {
-  //#region get encheres inverses 
-const [encheresInverses, setEnchereInverses] = React.useState({});
+  //#region get encheres inverses
+  const [encheresInverses, setEnchereInverses] = React.useState({});
 
-  
-function getEnchereInverses() {
-  axios.get(`${apiRoutes.API}/enchere_inverses/getFour`, {
-    params: {
-      page: "1",
-    }
-  })
-  .then(function (response) {
-    setEnchereInverses(response["data"]["hydra:member"]);
-  }).catch(error=>console.log(error))
-}
-//#endregion
+  function getEnchereInverses() {
+    axios
+      .get(`${apiRoutes.API}/enchere_inverses/getFour`, {
+        params: {
+          page: "1",
+        },
+      })
+      .then(function (response) {
+        setEnchereInverses(response["data"]["hydra:member"]);
+      })
+      .catch((error) => console.log(error));
+  }
+  //#endregion
 
-//#region get encheres
-const [encheres, setEncheres] = React.useState({});
+  //#region get encheres
+  const [encheres, setEncheres] = React.useState({});
 
   var today = new Date();
 
-  var date = today.getFullYear()+'-'+(today.getMonth()+1)+'-'+today.getDate();
+  var date =
+    today.getFullYear() + "-" + (today.getMonth() + 1) + "-" + today.getDate();
   function getEncheres() {
-    axios.get(`${apiRoutes.API}/encheres/getFour`, {
-      params: {
-        page: "1",
-        "startDate[after]" : date
-      }
-    })
-    .then(function (response) {
-      setEncheres(response["data"]["hydra:member"]);
-    }).catch(error=>console.log(error))
+    axios
+      .get(`${apiRoutes.API}/encheres/getFour`, {
+        params: {
+          page: "1",
+          "startDate[after]": date,
+        },
+      })
+      .then(function (response) {
+        setEncheres(response["data"]["hydra:member"]);
+      })
+      .catch((error) => console.log(error));
   }
-//#endregion
+  //#endregion
 
-//TODO: get ventes
-React.useEffect(()=>{
-  
-  getEncheres()
-  getEnchereInverses()
-},[])
+  //TODO: get ventes
+  React.useEffect(() => {
+    getEncheres();
+    getEnchereInverses();
+  }, []);
 
   return (
     <Box sx={styles.mainDiv}>
       {/* section #1 */}
+      {/* TODO don't keep your style thrown everywhere */}
       <Box sx={styles.subDiv}>
         <Container sx={styles.textDiv}>
-          <Typography
-            variant="h2"
-            gutterBottom
-            sx={{ ...styles.generalText, fontWeight: "bolder" }}
-          >
-            bienvenu a notre marketplace
-          </Typography>
-          <Typography
-            variant="h5"
-            gutterBottom
-            sx={{ ...styles.generalText, mt: "30%" }}
-          >
-            ici vous pouvez trouver les produits rares et communs, et vous
-            pouvez aussi deposer votre produit dans un enchère pour un benefice
-            maximal, et on a beaucoup plus a offrir !
-          </Typography>
+          <Grid item xs={12}>
+            <Typography
+              color="secondary"
+              variant="h2"
+              gutterBottom
+              sx={{
+                ...styles.generalText,
+                fontWeight: "bolder",
+                color: "primary.main",
+              }}
+            >
+              bienvenu a notre marketplace
+            </Typography>
+            <Typography
+              color="secondary"
+              variant="h5"
+              gutterBottom
+              sx={{ ...styles.generalText, mt: "5%", color: "primary.main" }}
+            >
+              ici vous pouvez trouver les produits rares et communs, et vous
+              pouvez aussi deposer votre produit dans un enchère pour un
+              benefice maximal, et on a beaucoup plus a offrir !
+            </Typography>
+          </Grid>
+          <Box
+            sx={{ ...styles.sectionBox, backgroundColor: "secondary.main" }}
+          ></Box>
         </Container>
       </Box>
 
-      {/* section #2 */}
-      <Box sx={styles.sectionBox}>
+      {/* SECTION: 2 */}
+      <Grid
+        container
+        sx={{
+          width: "100%",
+          backgroundColor: "secondary.main",
+          justifyContent: "space-around",
+        }}
+      >
+        <Grid item xs={3} sx={{ minWidth: 300 }}>
+          <Typography
+            sx={{ textAlign: "center", fontSize: 200, color: "primary.main" }}
+          >
+            320
+          </Typography>
+          <Typography
+            variant="h4"
+            sx={{ textAlign: "center", color: "primary.main" }}
+          >
+            encheres
+          </Typography>
+          <br />
+          <br />
+        </Grid>
+        <Grid item xs={3} sx={{ minWidth: 300 }}>
+          <Typography
+            sx={{ textAlign: "center", fontSize: 200, color: "primary.main" }}
+          >
+            20
+          </Typography>
+          <Typography
+            variant="h4"
+            sx={{ textAlign: "center", color: "primary.main" }}
+          >
+            encheres inversés
+          </Typography>
+          <br />
+          <br />
+        </Grid>
+        <Grid item xs={3} sx={{ minWidth: 300 }}>
+          <Typography
+            sx={{ textAlign: "center", fontSize: 200, color: "primary.main" }}
+          >
+            161
+          </Typography>
+          <Typography
+            variant="h4"
+            sx={{ textAlign: "center", color: "primary.main" }}
+          >
+            membres
+          </Typography>
+          <br />
+          <br />
+        </Grid>
+      </Grid>
+      {/* SECTION 3 */}
+
+      <Box sx={{ backgroundColor: "primary.main" }}>
+        <Container sx={{...styles.sectionBox}}>
+        <Typography variant="h2" >QUI SOMMES NOUS</Typography>
+          <hr style={styles.servicesHr} />
+        </Container>
+        <Grid container sx={{mt:4, justifyContent:"space-around"}}>
+        <Grid item xs={6} >
+          <img src={logo} className="dotIt" alt="" />
+        </Grid>
+        <Grid item xs={6}>
+          <Typography>"DOT IT" est une entreprise tunisienne spécialisée dans l’ingénierie
+          logicielle et l’intégrationde solutions de gestion pour les
+          entreprises. Elle crée la mise en œuvre de méthodologies degestion de
+          projet et d’expertise à partir des normes de l’industrie logicielle
+          (ISO, CMMI, UP,RUP, XP, Méthodologies Agiles. . . ).Annoncé en tant
+          que membre du programme Microsoft Certified Partner, DOT IT travaille
+          enpartenariat avec BPA SOLUTIONS - société suisse développant des
+          applications commerciales.Elle a contribué à la réalisation de projets
+          majeurs et stratégiques pour de nombreux clientstels que Hacks House,
+          Royal Kenz Hotel, Itac Tunisie, Forest Tunisia, Comet, Carthage
+          Land,Ooredoo ...</Typography>
+          
+        </Grid>
+      </Grid>
+      </Box>
+      {/* section #4 */}
+      <Box sx={{...styles.sectionBox ,backgroundColor: "secondary.main" }}>
         <Container>
           <Typography variant="h2">NOS SERVICES</Typography>
           <hr style={styles.servicesHr} />
@@ -129,9 +223,12 @@ React.useEffect(()=>{
 
         <Grid container sx={styles.servicesGrid}>
           <Grid item xs={3}>
-            <Card sx={{ minWidth: 275 }}>
+            <Card sx={{ minWidth: 275, height: 185 }} variant="outlined">
               <CardContent>
-                <Typography variant="h5">enchères</Typography>
+                <StorefrontTwoToneIcon fontSize="large" color="primary" />
+                <Typography variant="h5" color="primary">
+                  enchères
+                </Typography>
                 <Typography>
                   enchérer competetivement pour acheter un produit
                 </Typography>
@@ -139,9 +236,12 @@ React.useEffect(()=>{
             </Card>
           </Grid>
           <Grid item xs={3}>
-            <Card sx={{ minWidth: 275 }}>
+            <Card sx={{ minWidth: 275, height: 185 }} variant="outlined">
               <CardContent>
-                <Typography variant="h5">enchères inversés</Typography>
+                <LocalMallTwoToneIcon fontSize="large" color="primary" />
+                <Typography variant="h5" color="primary">
+                  enchères inversés
+                </Typography>
                 <Typography>
                   enchérer competetivement pour vendre un produit
                 </Typography>
@@ -149,9 +249,12 @@ React.useEffect(()=>{
             </Card>
           </Grid>
           <Grid item xs={3}>
-            <Card sx={{ minWidth: 275 }}>
+            <Card sx={{ minWidth: 275, height: 185 }} variant="outlined">
               <CardContent>
-                <Typography variant="h5">demande de devis</Typography>
+                <RequestQuoteTwoToneIcon fontSize="large" color="primary" />
+                <Typography variant="h5" color="primary">
+                  demande de devis
+                </Typography>
                 <Typography>
                   demander d'un fournisseur une proposition sur un produit
                   specifique
@@ -162,19 +265,31 @@ React.useEffect(()=>{
         </Grid>
       </Box>
       {/* section #3 */}
-      <Box sx={{...styles.sectionBox, backgroundColor:"primary.main" }}>
+      <Box sx={{ ...styles.sectionBox, backgroundColor: "primary.main" }}>
         {/* put ventes here */}
         {/* <Typography variant="h4" color='secondary.main'>nos produits</Typography>
         <HomePageList ventes={ventes} elemsPerLine={8} /> */}
-        <Grid container >
+        <Grid container>
           <Grid item xs={5.5}>
-            <Typography variant="h4" color='secondary.main'>nos enchères</Typography>
-            <HomePageList ventes={encheres} type={navRoutes.ENCHERE} elemsPerLine={4} />
+            <Typography variant="h4" color="secondary.main">
+              nos enchères
+            </Typography>
+            <HomePageList
+              ventes={encheres}
+              type={navRoutes.ENCHERE}
+              elemsPerLine={4}
+            />
           </Grid>
           <Grid item xs={1}></Grid>
           <Grid item xs={5.5}>
-            <Typography variant="h4" color='secondary.main'>nos enchères inverses</Typography>
-            <HomePageList ventes={encheresInverses} type={navRoutes.ENCHEREINVERSE} elemsPerLine={4} />
+            <Typography variant="h4" color="secondary.main">
+              nos enchères inverses
+            </Typography>
+            <HomePageList
+              ventes={encheresInverses}
+              type={navRoutes.ENCHEREINVERSE}
+              elemsPerLine={4}
+            />
           </Grid>
         </Grid>
       </Box>

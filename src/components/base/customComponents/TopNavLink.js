@@ -17,7 +17,7 @@ export const CustomLink = styled(Link)(({ theme }) => ({
   fontFamily: `"Roboto","Helvetica","Arial",sans-serif`,
   "&:hover": {
     
-    color: theme.palette.info.main,
+    color: theme.palette.secondary.main,
     textDecoration: "underline",
     textUnderlineOffset : 7
   }

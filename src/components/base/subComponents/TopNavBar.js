@@ -19,8 +19,7 @@ import { Link } from "react-router-dom";
 import { navRoutes } from "../../../config/routes";
 import SearchBar from "./SearchBar";
 import Socket from "../customComponents/Socket";
-import {io} from "socket.io-client"
-
+import NotificationsNoneTwoToneIcon from '@mui/icons-material/NotificationsNoneTwoTone';
 
 
 
@@ -108,7 +107,7 @@ const TopNavBar = () => {
 
   return (
     <Box sx={styles.topBox}>
-      <TopAppBar position="static" >
+      <TopAppBar position="static" sx={{backgroundColor:"primary.main"}} >
         <Grid container >
           <TopNavGrid md={8} sm={11} item>
             <IconButton
@@ -132,8 +131,8 @@ const TopNavBar = () => {
             ))}
             <Box sx={{ minWidth: 120 }}>
               <FormControl  fullWidth>
-                <InputLabel sx={{mt:0}}>type</InputLabel>
-                <Select sx={{mt:0}} value={type} onChange={handleType}>
+                <InputLabel sx={{mt:0 ,color: "secondary.main"}}>type</InputLabel>
+                <Select sx={{mt:0, color:"secondary.main"}} value={type} onChange={handleType}>
                 {Object.keys(typesOptions).map((key, index) => (
                     <MenuItem value={typesOptions[key].value} key={index}>{typesOptions[key].text}</MenuItem>))}
                 </Select>
@@ -166,7 +165,7 @@ const TopNavBar = () => {
               aria-label="open drawer"
               sx={{ ml: "0.5%" }}
             >
-              <ShoppingCartIcon />
+              <NotificationsNoneTwoToneIcon />
             </IconButton>
           </TopNavGrid>
         </Grid>

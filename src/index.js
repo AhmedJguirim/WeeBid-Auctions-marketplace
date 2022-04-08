@@ -12,9 +12,12 @@ import { store } from './redux/store';
 
 const colorCollection = {
   main: {
-    primary:'#FCF8FF',
-    secondary: "#362B48",
-    info: "#5927E5"
+    primary:  "#fff",
+    secondary:"#563d7c",
+    success: "#28a745",
+    info: "rgba(255, 255, 255, 0.5)",
+    warning: "#ffc107",
+    danger: "#dc3545",
   },
   light:{
     primary:'#FCF8FF',
@@ -44,6 +47,12 @@ const theme = createTheme({
       main: colorCollection.main.info,
       dark: colorCollection.dark.info,
       light: colorCollection.light.info
+    },
+    warning:{
+      main:colorCollection.main.warning,
+    },
+    danger:{
+      main:colorCollection.main.danger,
     }
   },
   breakpoints:{
@@ -59,7 +68,7 @@ const theme = createTheme({
     MuiInputLabel:{
       styleOverrides:{
           root:
-          {marginTop: 20,
+          { color:colorCollection.main.secondary,
             "&.Mui-focused" :{
             color:colorCollection.main.secondary,
             backgroundColor:colorCollection.main.primary
@@ -69,13 +78,20 @@ const theme = createTheme({
       MuiInputBase:{
         styleOverrides:{
             root:
-              {marginTop: 20
-                ,"&.Mui-focused" :{
-              border:"1px solid #362B48"
+              {
+                "&.Mui-focused" :{
+              border:"1px solid #563d7c"
             }},
           },
-          
         },
+        MuiSvgIcon:{
+          styleOverrides:{
+            root:
+              {
+                color:colorCollection.main.secondary
+            },
+          }
+        }
     }
 });
 

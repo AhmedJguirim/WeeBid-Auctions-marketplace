@@ -9,24 +9,9 @@
     width: 100px;
 }
 
-/* .descriptionField{
-    height: 180px;
-    width: 100%;
-    margin-bottom: 10px;
-    padding: 14px;
-    border-color: #fff;
-    border-radius: 0;
-    color: #fff;
-    background: 0 0;
-    font-size: 14px;
-    transition: all .3s;
+.dotIt {
     display: block;
-    line-height: 1.25;
-    border: 1px solid rgba(0,0,0,.15);
-    overflow: auto;
-    resize: vertical;
-    margin: 0;
-    font-family: inherit;
-    touch-action: manipulation;
-    box-sizing: inherit;
-} */
+  margin-left: auto;
+  margin-right: auto;
+  width: 50%;
+}
