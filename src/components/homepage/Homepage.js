@@ -3,6 +3,7 @@ import { Box } from "@mui/system";
 import React from "react";
 import image from "../../media/images/homepageTopImage.jpg";
 import axios from "axios";
+
 import HomePageList from "../generalComponents/ProductsListing";
 import { apiRoutes, navRoutes } from "../../config/routes";
 import StorefrontTwoToneIcon from "@mui/icons-material/StorefrontTwoTone";
@@ -115,7 +116,7 @@ const Homepage = () => {
             </Typography>
             <Typography
               color="secondary"
-              variant="h5"
+              variant="h6"
               gutterBottom
               sx={{ ...styles.generalText, mt: "5%", color: "primary.main" }}
             >
@@ -215,7 +216,7 @@ const Homepage = () => {
       {/* section #4 */}
       <Box sx={{...styles.sectionBox ,backgroundColor: "secondary.main" }}>
         <Container>
-          <Typography variant="h2">NOS SERVICES</Typography>
+          <Typography variant="h2" color='primary.main'>NOS SERVICES</Typography>
           <hr style={styles.servicesHr} />
         </Container>
         <br />
@@ -225,8 +226,8 @@ const Homepage = () => {
           <Grid item xs={3}>
             <Card sx={{ minWidth: 275, height: 185 }} variant="outlined">
               <CardContent>
-                <StorefrontTwoToneIcon fontSize="large" color="primary" />
-                <Typography variant="h5" color="primary">
+                <StorefrontTwoToneIcon fontSize="large" />
+                <Typography variant="h5" color="secondary">
                   enchères
                 </Typography>
                 <Typography>
@@ -238,8 +239,8 @@ const Homepage = () => {
           <Grid item xs={3}>
             <Card sx={{ minWidth: 275, height: 185 }} variant="outlined">
               <CardContent>
-                <LocalMallTwoToneIcon fontSize="large" color="primary" />
-                <Typography variant="h5" color="primary">
+                <LocalMallTwoToneIcon fontSize="large" />
+                <Typography variant="h5" color="secondary">
                   enchères inversés
                 </Typography>
                 <Typography>
@@ -251,8 +252,8 @@ const Homepage = () => {
           <Grid item xs={3}>
             <Card sx={{ minWidth: 275, height: 185 }} variant="outlined">
               <CardContent>
-                <RequestQuoteTwoToneIcon fontSize="large" color="primary" />
-                <Typography variant="h5" color="primary">
+                <RequestQuoteTwoToneIcon fontSize="large"/>
+                <Typography variant="h5" color="secondary">
                   demande de devis
                 </Typography>
                 <Typography>
@@ -262,7 +263,9 @@ const Homepage = () => {
               </CardContent>
             </Card>
           </Grid>
+          
         </Grid>
+        <br /><br />
       </Box>
       {/* section #3 */}
       <Box sx={{ ...styles.sectionBox, backgroundColor: "primary.main" }}>
@@ -271,7 +274,7 @@ const Homepage = () => {
         <HomePageList ventes={ventes} elemsPerLine={8} /> */}
         <Grid container>
           <Grid item xs={5.5}>
-            <Typography variant="h4" color="secondary.main">
+            <Typography variant="h4">
               nos enchères
             </Typography>
             <HomePageList
@@ -282,7 +285,7 @@ const Homepage = () => {
           </Grid>
           <Grid item xs={1}></Grid>
           <Grid item xs={5.5}>
-            <Typography variant="h4" color="secondary.main">
+            <Typography variant="h4">
               nos enchères inverses
             </Typography>
             <HomePageList

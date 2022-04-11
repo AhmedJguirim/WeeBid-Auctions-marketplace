@@ -61,7 +61,9 @@ const DetailedEnchereInverse = () => {
     //socket code
     Socket.on("connect",()=>{
       console.log(`you're connected to Socket.io from product`)
-        
+      Socket.on("NOTIFICATION", (notification) => {
+        console.log(notification)
+      });
           Socket.on("NEW_PRICE", (myEnchere, user, newPrice, initPrice)=>{
             dispatch({type:"SETPRICE",newPrice});
             getCurrentPrice(initPrice,id)
@@ -107,7 +109,7 @@ const DetailedEnchereInverse = () => {
           localistation: data.user.adresse.ville,
         });
         Socket.emit('join-rooms', [response["data"]["@id"].concat("LOCAL")])
-        console.log([response["data"]["@id"].concat("LOCAL")])
+
         //get the article
         axios
           .get(`${apiRoutes.API}/articles/${response["data"]["article"]["id"]}`)
@@ -124,7 +126,6 @@ const DetailedEnchereInverse = () => {
               }
             }).then(response=>{getImages(response["data"]["hydra:member"])})
               .catch(error=>console.log(error))
-
             setArticle({
               nom: data.name,
               etat: data.state,
@@ -158,8 +159,6 @@ const handleWatch = ()=>{
     setWatchButton("surveiller")
 }
 }
-  
-
   //#region augmentation zone
   function reduire() {
     const newPrice = thePrice - reduction;
@@ -172,7 +171,7 @@ const handleWatch = ()=>{
       .then((response) => {
         console.log(response["data"]["@id"], "created successfully!");
         getCurrentPrice(enchere.initPrice, id);
-        Socket.emit("REDUCT", enchere["@id"], user.displayName, newPrice, enchere.initPrice)
+        Socket.emit("AUGMENT", enchere["@id"], user.displayName, newPrice, enchere.initPrice)
       })
       .catch((error) => console.log(error));
   }
@@ -210,7 +209,6 @@ const getImages = (rawImages)=>{
     }else{
       setFollowable(true)
     }
-    console.log(user,seller)
   }, [seller,user]);
 
 

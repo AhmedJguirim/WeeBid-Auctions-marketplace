@@ -1,6 +1,6 @@
 import DateAdapter from "@mui/lab/AdapterDateFns";
 import Api from "../../AxiosInstance";
-import { ButtonStyles, formBox } from "../base/customComponents/general";
+import { ButtonStyles, formBox , FormTextField} from "../base/customComponents/general";
 import {
   DateTimePicker,
   DesktopDatePicker,
@@ -41,7 +41,7 @@ const steps = [
   "enregistrer l'offre",
   "fixer les dates",
 ];
-
+var someDate = new Date();
 const stateOptions = ["utilisé", "neuf"];
 
 
@@ -50,8 +50,12 @@ export default function CreateArticle() {
     const validate = (values) => {
         const errors = {};
         const currentDate = new Date();
+        let customErrors = {};
         //fabricationDate/localisation/brand/description/codebar are optional
         //name validation
+        
+        console.log(values.date)
+
         if (!values.name) {
           errors.name = "champ obligatoir";
         } else if (values.name.length > 15) {
@@ -105,54 +109,71 @@ export default function CreateArticle() {
             "le prix immediat doit être superieur au prix initial";
         }
 
-        let customErrors = {}
+
         //fabrication date validation
-        if (!date) {
-            customErrors.date = "champ obligatoir";
-          } else if (date > currentDate) {
-            customErrors.date = "la date de fabrication ne peut pas etre superieur a la date actuelle";
+        if (!values.date) {
+            errors.date = "champ obligatoir";
+          } else if (values.date > currentDate) {
+            errors.date = "la date de fabrication ne peut pas etre superieur a la date actuelle";
           }
           else{
-            delete customErrors.date
+            delete errors.date
           }
 
           //start date validation
-          if (!startDate) {
-            customErrors.startDate = "champ obligatoir";
-          } else if (startDate < currentDate) {
-            customErrors.startDate = "la date de debut ne peut pas etre inferieur a la date actuelle";
+          if (!values.startDate) {
+            errors.startDate = "champ obligatoir";
+          } else if (values.startDate < currentDate) {
+            errors.startDate = "la date de debut ne peut pas etre inferieur a la date actuelle";
           }else{
-            delete customErrors.startDate
+            delete errors.startDate
           }
 
           //end date validation
-          if (!endDate) {
-            customErrors.endDate = "champ obligatoir";
-          } else if (endDate > currentDate) {
-            customErrors.endDate = "la date de fin ne peut pas etre inferieur a la date actuelle";
-          }else if (endDate > startDate) {
-            customErrors.endDate = "la date de debut ne peut pas etre inferieur a la date de debut";
+          if (!values.endDate) {
+            errors.endDate = "champ obligatoir";
+          } else if (values.endDate < currentDate) {
+            errors.endDate = "la date de fin ne peut pas etre inferieur a la date actuelle";
+          }else if (values.endDate < values.startDate) {
+            errors.endDate = "la date de debut ne peut pas etre inferieur a la date de debut";
           }else{
-            delete customErrors.startDate
+            delete values.startDate
           }
 
           //article state validation
         
-          if (!state) {
-            customErrors.state = "champ obligatoir";
-          } else if (!stateOptions.includes(state)) {
-            customErrors.state = "l'état ne peut qu'etre : 'utilisé' ou 'neuf'";
-          }else{
-            delete customErrors.startDate 
-          }
+          // if (!state) {
+          //   customErrors.state = "champ obligatoir";
+          // } else{
+          //   delete customErrors.startDate 
+          // }
 
 
       setCustomValidation(customErrors)
-      if(Object.keys(errors).length === 0 && Object.keys(customErrors).length === 0){
+      if(Object.keys(errors).length === 0){
           setContainsError(false)
-
-          
       }
+      if(errors.name === undefined && errors.localisation=== undefined && errors.brand=== undefined && errors.description=== undefined 
+        && customErrors.state=== undefined && customErrors.date=== undefined){
+        setStepOne(true)      
+      }else{
+        setStepOne(false)
+      }
+      if(errors.quantity === undefined && errors.initPrice=== undefined && errors.immediatePrice=== undefined && category !==""){
+        setStepTwo(true)      
+        
+      }else{
+        setStepTwo(false)
+        
+      }
+      if(errors.endDate == undefined && errors.startDate== undefined ){
+        setStepThree(true)      
+        console.log(errors)
+      }else{
+        setStepThree(false)
+        console.log(errors)
+      }
+
         return errors;
       };
 
@@ -174,14 +195,17 @@ export default function CreateArticle() {
 
   //#region form data state
   const [type, setType] = React.useState("encheres");
-  const [state, setState] = React.useState("");
+  const [state, setState] = React.useState("utilisé");
   const [containsError , setContainsError] = React.useState(true)
   const [images, setImages] = React.useState([]);
-  const [startDate, setStartDate] = React.useState(new Date());
-  const [endDate, setEndDate] = React.useState(new Date());
-  const [date, setDate] = React.useState(new Date());
+  // const [startDate, setStartDate] = React.useState(new Date());
+  // const [endDate, setEndDate] = React.useState(new Date());
+  // const [date, setDate] = React.useState(new Date());
   const [customVadlidation, setCustomValidation] = React.useState({})
 
+  const [stepOne, setStepOne] = React.useState(false);
+  const [stepTwo, setStepTwo] = React.useState(false);
+  const [stepThree, setStepThree] = React.useState(false);
 const handleState = (event) => {
     setState(event.target.value);
   };
@@ -201,6 +225,9 @@ const handleType = (event) => {
       quantity: 1,
       initPrice: 1,
       immediatePrice: 2,
+      date: Date.now(),
+      startDate: Date.now(),
+      endDate: Date.now(),
     },
     validate,
   });
@@ -240,6 +267,9 @@ const handleType = (event) => {
 
   //calling the api to post
   const submitHandler = (event ) => {
+    const endDate= new Date(formik.values.endDate)
+    const date= new Date(formik.values.date)
+    const startDate= new Date(formik.values.startDate)
     event.preventDefault();
     Api.post("/articles", {
       name: formik.values.name,
@@ -332,7 +362,7 @@ const handleType = (event) => {
                   </Typography>
                   <Grid item xs={12}>
                   {formik.errors.name ? <div>{formik.errors.name}</div> : null}
-                    <TextField
+                    <FormTextField
                       fullWidth
                       required
                       id="name"
@@ -343,7 +373,7 @@ const handleType = (event) => {
                   </Grid>
                   <Grid item xs={12}>
                   {formik.errors.brand ? <div>{formik.errors.brand}</div> : null}
-                    <TextField
+                    <FormTextField
                       fullWidth
                       id="brand"
                       label="marque"
@@ -353,7 +383,7 @@ const handleType = (event) => {
                   </Grid>
                   <Grid item xs={12}>
                   {formik.errors.localisation ? <div>{formik.errors.localisation}</div> : null}
-                    <TextField
+                    <FormTextField
                       fullWidth
                       required
                       id="localisation"
@@ -365,7 +395,7 @@ const handleType = (event) => {
 
                   <Grid item xs={12}>
                   {formik.errors.codebar ? <div>{formik.errors.codebar}</div> : null}
-                    <TextField
+                    <FormTextField
                       id="codebar"
                       label="code a barre"
                       value={formik.values.codebar}
@@ -373,21 +403,24 @@ const handleType = (event) => {
                     />
                   </Grid>
                   <Grid item xs={12}>
-                  {customVadlidation.date ? <div>{customVadlidation.date}</div> : null}
+                  {formik.errors.date ? <div>{formik.errors.date}</div> : null}
                     {/* TODO: date stays as default , fix it */}
                     <LocalizationProvider dateAdapter={DateAdapter}>
                       <DesktopDatePicker
                         label="date de fabrication"
                         inputFormat="MM/dd/yyyy"
-                        value={date}
-                        onChange={setDate}
-                        renderInput={(params) => <TextField {...params} />}
+                        value={formik.values.date}
+                        name="date"
+                        onChange={(value) => {
+                          formik.setFieldValue('date', Date.parse(value));
+                          }}
+                        renderInput={(params) => <FormTextField {...params} />}
                       />
                     </LocalizationProvider>
                   </Grid>
                   <Grid item xs={12}>
                   {customVadlidation.state ? <div>{customVadlidation.state}</div> : null}
-                    <FormControl fullWidth>
+                    <FormControl sx={{marginTop:"8px"}} fullWidth>
                       <InputLabel id="demo-simple-select-label">
                         état
                       </InputLabel>
@@ -471,6 +504,27 @@ const handleType = (event) => {
                       </MenuItem>
                     ))}
                   </Grid>
+                  <React.Fragment>
+                    <Box sx={{ display: "flex", flexDirection: "row", pt: 2 }}>
+                      <Button
+                        color="inherit"
+                        disabled={activeStep === 0}
+                        onClick={handleBack}
+                        sx={{ ...ButtonStyles, mr: 1 }}
+                      >
+                        Back
+                      </Button>
+                      <Box sx={{ flex: "1 1 auto" }} />
+
+                      {activeStep === steps.length ? (
+                          <></>
+                      ) : (
+                        <Button sx={ButtonStyles} disabled={!stepOne} onClick={handleNext}>
+                          next
+                        </Button>
+                      )}
+                    </Box>
+                  </React.Fragment>
                 </div>
               )}
               {/* TODO: make an optional step for documents */}
@@ -503,7 +557,7 @@ const handleType = (event) => {
                   </FormControl>
                   <Grid item xs={12}>
                   {formik.errors.quantity ? <div>{formik.errors.quantity}</div> : null}
-                    <TextField
+                    <FormTextField
                       fullWidth
                       required
                       type="number"
@@ -515,7 +569,7 @@ const handleType = (event) => {
                   </Grid>
                   <Grid item xs={12}>
                   {formik.errors.immediatePrice ? <div>{formik.errors.immediatePrice}</div> : null}
-                    <TextField
+                    <FormTextField
                       fullWidth
                       required
                       type="number"
@@ -528,7 +582,7 @@ const handleType = (event) => {
 
                   <Grid item xs={12}>
                   {formik.errors.initPrice ? <div>{formik.errors.initPrice}</div> : null}
-                    <TextField
+                    <FormTextField
                       required
                       fullWidth
                       type="number"
@@ -558,6 +612,27 @@ const handleType = (event) => {
                       </Select>
                     </FormControl>
                   </Grid>
+                  <React.Fragment>
+                    <Box sx={{ display: "flex", flexDirection: "row", pt: 2 }}>
+                      <Button
+                        color="inherit"
+                        disabled={activeStep === 0}
+                        onClick={handleBack}
+                        sx={{ ...ButtonStyles, mr: 1 }}
+                      >
+                        Back
+                      </Button>
+                      <Box sx={{ flex: "1 1 auto" }} />
+
+                      {activeStep === steps.length ? (
+                          <></>
+                      ) : (
+                        <Button sx={ButtonStyles} disabled={!stepTwo} onClick={handleNext}>
+                          next
+                        </Button>
+                      )}
+                    </Box>
+                  </React.Fragment>
                 </div>
               )}
               {activeStep === 2 && (
@@ -570,10 +645,13 @@ const handleType = (event) => {
                     <LocalizationProvider dateAdapter={DateAdapter}>
                       <DateTimePicker
                         label="date de debut"
+                        name="startDate"
                         inputFormat="MM/dd/yyyy"
-                        value={startDate}
-                        onChange={setStartDate}
-                        renderInput={(params) => <TextField {...params} />}
+                        value={formik.values.startDate}
+                        onChange={(value) => {
+                          formik.setFieldValue('startDate', Date.parse(value));
+                          }}
+                        renderInput={(params) => <FormTextField {...params} />}
                       />
                     </LocalizationProvider>
                   </Grid>
@@ -583,16 +661,40 @@ const handleType = (event) => {
                       <DateTimePicker
                         label="date de fin"
                         inputFormat="MM/dd/yyyy"
-                        value={endDate}
-                        onChange={setEndDate}
-                        renderInput={(params) => <TextField {...params} />}
+                        name="endDate"
+                        value={formik.values.endDate}
+                        onChange={(value) => {
+                          formik.setFieldValue('endDate',Date.parse(value));
+                          }}
+                        renderInput={(params) => <FormTextField {...params} />}
                       />
                     </LocalizationProvider>
                   </Grid>
+                  <React.Fragment>
+                    <Box sx={{ display: "flex", flexDirection: "row", pt: 2 }}>
+                      <Button
+                        color="inherit"
+                        disabled={activeStep === 0}
+                        onClick={handleBack}
+                        sx={{ ...ButtonStyles, mr: 1 }}
+                      >
+                        Back
+                      </Button>
+                      <Box sx={{ flex: "1 1 auto" }} />
+
+                      {activeStep === steps.length ? (
+                          <></>
+                      ) : (
+                        <Button sx={ButtonStyles} disabled={!stepThree} onClick={handleNext}>
+                          next
+                        </Button>
+                      )}
+                    </Box>
+                  </React.Fragment>
                 </div>
               )}
               <Grid item xs={12}>
-                {activeStep === steps.length ? (
+                {activeStep === steps.length && (
                   <React.Fragment>
                     <Typography sx={{ mt: 2, mb: 1 }}>
                       All steps completed - you&apos;re finished {activeStep}{" "}
@@ -626,28 +728,8 @@ const handleType = (event) => {
 
                 
                   </React.Fragment>
-                ) : (
-                  <React.Fragment>
-                    <Box sx={{ display: "flex", flexDirection: "row", pt: 2 }}>
-                      <Button
-                        color="inherit"
-                        disabled={activeStep === 0}
-                        onClick={handleBack}
-                        sx={{ ...ButtonStyles, mr: 1 }}
-                      >
-                        Back
-                      </Button>
-                      <Box sx={{ flex: "1 1 auto" }} />
 
-                      {activeStep === steps.length ? (
-                          <></>
-                      ) : (
-                        <Button sx={ButtonStyles} onClick={handleNext}>
-                          next
-                        </Button>
-                      )}
-                    </Box>
-                  </React.Fragment>
+                  
                 )}
               </Grid>
             </Grid>

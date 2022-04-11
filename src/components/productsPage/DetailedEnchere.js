@@ -9,10 +9,15 @@ import {
   DialogActions,
   DialogTitle,
 } from "@mui/material";
-import { Box} from "@mui/system";
+import { Box } from "@mui/system";
 import React, { useRef } from "react";
 import PersonIcon from "@mui/icons-material/Person";
-import { ButtonStyles, lightContainer, ArticleImage, ArticleSubImage } from "../base/customComponents/general";
+import {
+  ButtonStyles,
+  lightContainer,
+  ArticleImage,
+  ArticleSubImage,
+} from "../base/customComponents/general";
 import axios from "axios";
 import { useParams } from "react-router-dom";
 import { apiRoutes } from "../../config/routes";
@@ -20,13 +25,11 @@ import Api from "../../AxiosInstance";
 import { useDispatch, useSelector } from "react-redux";
 import Socket from "../base/customComponents/Socket";
 
-
 const DetailedEnchere = () => {
-
-const dispatch = useDispatch();  
+  const dispatch = useDispatch();
   //GET DATA FROM STORE/PARAMS
-  const watchList = useSelector((state) => state.watchList)
-  const thePrice = useSelector((state) => state.currentPrice)
+  // const watchList = useSelector((state) => state.watchList);
+  const thePrice = useSelector((state) => state.currentPrice);
   const user = useSelector((state) => state.user);
   let { id } = useParams();
 
@@ -37,7 +40,7 @@ const dispatch = useDispatch();
   const [seller, setSeller] = React.useState({});
   const [images, setImages] = React.useState([]);
   const [augmentation, setAugmentation] = React.useState(0.1);
-  
+
   //#endregion
 
   //#region state handlers
@@ -48,25 +51,25 @@ const dispatch = useDispatch();
   //REMOVES SUBSCRIPTION TO SOCKET ROOM IF NOT WATCHED
   const mounted = useRef(false);
   React.useEffect(() => {
-      mounted.current = true;
-      return () => {
-          mounted.current = false;
-            Socket.emit("leave-room", `/api/encheres/${id}`)
-      };
+    mounted.current = true;
+    return () => {
+      mounted.current = false;
+      Socket.emit("leave-room", `/api/encheres/${id}`);
+    };
   }, []);
 
   //socket code
-    Socket.on("connect",()=>{
-      console.log(`you're connected to Socket.io from product`)
-
-          Socket.on("NEW_PRICE", (myEnchere, user, newPrice, initPrice)=>{
-            dispatch({type:"SETPRICE",newPrice});
-            getCurrentPrice(initPrice,id)
-            alert(`${user} has updated the price of ${myEnchere} to ${newPrice}`)
-            })   
-
-      })
-  
+  Socket.on("connect", () => {
+    console.log(`you're connected to Socket.io from product`);
+    Socket.on("NOTIFICATION", (notification) => {
+      console.log(notification)
+    });
+    Socket.on("NEW_PRICE", (myEnchere, user, newPrice, initPrice) => {
+      dispatch({ type: "SETPRICE", newPrice });
+      getCurrentPrice(initPrice, id);
+      alert(`${user} has updated the price of ${myEnchere} to ${newPrice}`);
+    });
+  });
 
   //gets the value given in the latest augmentation
   function getCurrentPrice(initPrice, myId) {
@@ -75,16 +78,19 @@ const dispatch = useDispatch();
         params: {
           page: 1,
           enchere: `/api/encheres/${myId}`,
-          "order[date]" : "desc"
+          "order[date]": "desc",
         },
       })
       .then((response) => {
         //sets the result (augmentation) in the state
         if (response["data"]["hydra:member"]["0"] !== undefined) {
           //TODO:this doesn't update the current price for some reason if we unmount and mount again
-          dispatch({type:"SETPRICE",price:response["data"]["hydra:member"]["0"].value});
-        } else{
-          dispatch({type:"SETPRICE",price:initPrice});
+          dispatch({
+            type: "SETPRICE",
+            price: response["data"]["hydra:member"]["0"].value,
+          });
+        } else {
+          dispatch({ type: "SETPRICE", price: initPrice });
         }
       })
       .catch((error) => console.log(error));
@@ -106,23 +112,26 @@ const dispatch = useDispatch();
           localistation: data.user.adresse.ville,
         });
 
-        Socket.emit('join-rooms', [response["data"]["@id"].concat("LOCAL")])
+        Socket.emit("join-rooms", [response["data"]["@id"].concat("LOCAL")]);
         //get the article
         axios
           .get(`${apiRoutes.API}/articles/${response["data"]["article"]["id"]}`)
           .then(function (response) {
             const data = response["data"];
-            axios.get(`${apiRoutes.API}/documents`,
-            {
-              params: {
-                page:1,
-                article: response["data"]["@id"],
-              },
-              headers:{
-                "Content-Type": "multipart/form-data",
-              }
-            }).then(response=>{getImages(response["data"]["hydra:member"])})
-              .catch(error=>console.log(error))
+            axios
+              .get(`${apiRoutes.API}/documents`, {
+                params: {
+                  page: 1,
+                  article: response["data"]["@id"],
+                },
+                headers: {
+                  "Content-Type": "multipart/form-data",
+                },
+              })
+              .then((response) => {
+                getImages(response["data"]["hydra:member"]);
+              })
+              .catch((error) => console.log(error));
             setArticle({
               nom: data.name,
               etat: data.state,
@@ -150,24 +159,30 @@ const dispatch = useDispatch();
       .then((response) => {
         console.log(response["data"]["@id"], "created successfully!");
         getCurrentPrice(enchere.initPrice, id);
-        Socket.emit("AUGMENT", enchere["@id"], user.displayName, newPrice, enchere.initPrice)
+        Socket.emit(
+          "AUGMENT",
+          enchere["@id"],
+          user.displayName,
+          newPrice,
+          enchere.initPrice
+        );
       })
       .catch((error) => console.log(error));
   }
   //#endregion
 
   //MAKES IMAGES READY FOR USE
-  const getImages = (rawImages)=>{
-    let tempImages = []
-    let path = "http://127.0.0.1:8000"
-    rawImages.map((image)=>{
+  const getImages = (rawImages) => {
+    let tempImages = [];
+    let path = "http://127.0.0.1:8000";
+    rawImages.map((image) => {
       const myImg = path.concat(image.contentUrl);
-      tempImages.push(myImg)
-      console.log(myImg)
+      tempImages.push(myImg);
+      console.log(myImg);
     });
     setImages(tempImages);
-    console.log(tempImages) 
-  }
+    console.log(tempImages);
+  };
   //#region concerning verification popup
   const [open, setOpen] = React.useState(false);
 
@@ -246,17 +261,12 @@ const dispatch = useDispatch();
           <Grid item></Grid>
           {/* documents */}
           <Grid item>
-            <ArticleImage src={images[0]} alt=""/>
+            <ArticleImage src={images[0]} alt="" />
           </Grid>
           <Grid container spacing={2}>
             {images.map((image) => (
-              <Grid
-                item
-                xs={4}
-                key={Math.random()}
-                sx={{ height: 100}}
-              >
-               <ArticleSubImage src={image} alt={image} />
+              <Grid item xs={4} key={Math.random()} sx={{ height: 100 }}>
+                <ArticleSubImage src={image} alt={image} />
               </Grid>
             ))}
           </Grid>
@@ -368,16 +378,16 @@ const dispatch = useDispatch();
                       </Grid>
                     </Grid>
                   ))}
-                   {/* TODO: GIVE DESCRIPTION A SEPERATED SECTION */}
-                   <Grid container sx={{ mb: 2 }}>
-                      <Grid item xs={6}>
-                        <Typography variant="h6">description: </Typography>
-                      </Grid>
-                      <Grid item xs={6}>
-                        <Typography variant="h6">{description} </Typography>
-                      </Grid>
+                  {/* TODO: GIVE DESCRIPTION A SEPERATED SECTION */}
+                  <Grid container sx={{ mb: 2 }}>
+                    <Grid item xs={6}>
+                      <Typography variant="h6">description: </Typography>
                     </Grid>
-                </Grid> 
+                    <Grid item xs={6}>
+                      <Typography variant="h6">{description} </Typography>
+                    </Grid>
+                  </Grid>
+                </Grid>
               </Grid>
             </Grid>
           </Box>

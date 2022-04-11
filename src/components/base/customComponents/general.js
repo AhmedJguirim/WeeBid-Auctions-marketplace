@@ -44,15 +44,10 @@ export const DrawerHeader = styled('div')(({ theme }) => ({
   // export const errorDiv = styled('div')(({theme})=>{
   //   color: theme.palette.mode.
   // })
-  
+
 
 export const FormTextField = styled(TextField)(({theme})=>({
-  '&.Mui-focus': {
-    border: "1px solid black"
-  },
-  '&.Mui-active': {
-    border: "1px solid black"
-  },
+  marginTop:8
 }))
 export const ButtonStyles = {
   color: "secondary.main",
