@@ -161,7 +161,7 @@ const handleWatch = ()=>{
 }
   //#region augmentation zone
   function reduire() {
-    const newPrice = thePrice - reduction;
+    const newPrice = Math.round((thePrice - reduction) * 100) / 100;
     Api.post("/reductions", {
       user: `/api/users/${user.id}`,
       enchereInverse: `/api/enchere_inverses/${id}`,
@@ -351,7 +351,7 @@ const getImages = (rawImages)=>{
               </Grid>
               <Grid item xs={4}>
                 <Typography variant="h8">
-                  prix apres l'augmentation: {thePrice - reduction} TND
+                  prix apres l'augmentation: {Math.round((thePrice - reduction) * 100) / 100} TND
                 </Typography>
               </Grid>
               <Grid item xs={4}></Grid>

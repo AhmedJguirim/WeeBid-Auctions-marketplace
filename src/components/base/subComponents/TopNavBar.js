@@ -20,15 +20,17 @@ import { navRoutes } from "../../../config/routes";
 import SearchBar from "./SearchBar";
 import Socket from "../customComponents/Socket";
 import NotificationsNoneTwoToneIcon from '@mui/icons-material/NotificationsNoneTwoTone';
+import axios from "axios";
 
 
 
 const TopNavBar = () => {
 
-  Socket.on("connect",()=>{
-    console.log(`you're connected to socket.io`)})
+  // Socket.on("connect",()=>{
+  //   console.log(`you're connected to socket.io`)})
   //#region type of search (default "enchere" to avoid unnecessary headache))
   const [type, setType] = React.useState("/encheres");
+  const [notifications, setNotifications] = React.useState([]);
   const typesOptions  = {
     0 : {
       value:"/encheres",
@@ -66,11 +68,12 @@ const TopNavBar = () => {
       1: {
         text: "inscription",
         path: navRoutes.REGISTER,
-      },
+      }
     };
 
   }
   else {
+    
     variableLinks = {
       0: {
         text: "se deconnecter",
@@ -105,6 +108,19 @@ const TopNavBar = () => {
 
   //#endregion
 
+  React.useEffect(()=>{
+    if (user.id !== undefined) {
+    axios.get("http://127.0.0.1:8000/api/notifications",{
+      params:{
+        page:1,
+        user: `/api/users/${user.id}`,
+        "order[date]": "desc"
+      }
+    }).then(res=>{
+      console.log(res["data"]["hydra:member"]);
+      setNotifications(res["data"]["hydra:member"])
+    })}
+  },[user])
   return (
     <Box sx={styles.topBox}>
       <TopAppBar position="static" sx={{backgroundColor:"primary.main"}} >

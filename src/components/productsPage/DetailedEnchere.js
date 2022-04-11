@@ -148,7 +148,7 @@ const DetailedEnchere = () => {
   }
   //#region augmentation zone
   function augmenter() {
-    const newPrice = thePrice + augmentation;
+    const newPrice = Math.round((thePrice + augmentation) * 100) / 100;
 
     Api.post("/augmentations", {
       user: `/api/users/${user.id}`,
