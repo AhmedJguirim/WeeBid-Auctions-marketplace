@@ -30,7 +30,6 @@ const TopNavBar = () => {
   //   console.log(`you're connected to socket.io`)})
   //#region type of search (default "enchere" to avoid unnecessary headache))
   const [type, setType] = React.useState("/encheres");
-  const [notifications, setNotifications] = React.useState([]);
   const typesOptions  = {
     0 : {
       value:"/encheres",
@@ -39,6 +38,10 @@ const TopNavBar = () => {
     1 : {
       value:"/enchere_inverses",
       text: "encheres inversés"
+    },
+    2 : {
+      value:"/users",
+      text: "users"
     },
     //TODO: ajouter ventes et utilisateurs 
   }
@@ -108,19 +111,6 @@ const TopNavBar = () => {
 
   //#endregion
 
-  React.useEffect(()=>{
-    if (user.id !== undefined) {
-    axios.get("http://127.0.0.1:8000/api/notifications",{
-      params:{
-        page:1,
-        user: `/api/users/${user.id}`,
-        "order[date]": "desc"
-      }
-    }).then(res=>{
-      console.log(res["data"]["hydra:member"]);
-      setNotifications(res["data"]["hydra:member"])
-    })}
-  },[user])
   return (
     <Box sx={styles.topBox}>
       <TopAppBar position="static" sx={{backgroundColor:"primary.main"}} >

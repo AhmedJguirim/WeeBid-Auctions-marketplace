@@ -1,7 +1,3 @@
-const getWatchList = ()=>{
-    //TODO: get all watched products
-    return null
-}
 
 const watchListReducer = (state= [] , action)=>{
     switch(action.type){
@@ -14,7 +10,6 @@ const watchListReducer = (state= [] , action)=>{
                 }else if(elem.enchereInverse!==null){
                     watchList.push({enchereInverse:elem.enchereInverse["@id"],surveille:elem["@id"]})
                 }
-                
             })
             if(watchList){
                 return watchList;

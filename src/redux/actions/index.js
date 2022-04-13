@@ -2,6 +2,13 @@ import axios from 'axios'
 import { StatusCodes } from 'http-status-codes'
 import { apiRoutes } from '../../config/routes'
 
+
+export const setPrice = (price)=>{
+  return {
+    type: "SETPRICE",
+    price: price
+  }
+}
 export function getUserData() {
   
   return dispatch=>{
@@ -14,6 +21,7 @@ export function getUserData() {
     const data = response.data
     dispatch(checkUser(data));
     dispatch(fetchWatchList(data.id))
+    dispatch(fetchNotifications(data.id))
     }
   )
   .catch(function (error) {
@@ -29,6 +37,14 @@ export function getUserData() {
   })
 
   }}
+  export const checkUser = (user)=>{
+
+    return {
+        type: 'CHECKUSER',
+        payload: user
+    }
+
+  }
 
   export function fetchWatchList(userId) {
   
@@ -44,7 +60,7 @@ export function getUserData() {
       }
     )
     .catch(function (error) {
-
+      console.log(error)
       const { status } = error.response;
         if (status === StatusCodes.INTERNAL_SERVER_ERROR) {
           console.log("le serveur fait face a un probleme , veuillez patienter")
@@ -52,28 +68,42 @@ export function getUserData() {
     })
   
     }}
+    export const getWatchList = (watchList)=>{
 
-export const checkUser = (user)=>{
-
-    return {
-        type: 'CHECKUSER',
-        payload: user
+      return {
+          type: 'GETWATCHLIST',
+          payload: watchList
+      }
+  
     }
 
-  }
-  export const setPrice = (price)=>{
+    export function fetchNotifications(userId) {
+  
+      return dispatch=>{
+      axios.get(`${apiRoutes.API}/notifications`,{
+      params:{
+        user:`/api/users/${userId}`
+      }
+      })
+      .then(function (response) {
+        const data = response["data"]["hydra:member"];
+        dispatch(getNotifications(data))
+        }
+      )
+      .catch(function (error) {
+        const { status } = error.response;
+          if (status === StatusCodes.INTERNAL_SERVER_ERROR) {
+            console.log("le serveur fait face a un probleme , veuillez patienter")
+          }
+      })
+    
+      }}
+
+  export const getNotifications = (notifications)=>{
+
     return {
-      type: "SETPRICE",
-      price: price
-    }
-  }
-
-
-  export const getWatchList = (watchList)=>{
-
-    return {
-        type: 'GETWATCHLIST',
-        payload: watchList
+        type: 'GETNOTIFICATIONS',
+        payload: notifications
     }
 
   }

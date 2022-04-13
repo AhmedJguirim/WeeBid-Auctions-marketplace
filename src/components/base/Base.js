@@ -26,6 +26,7 @@ import MultiStepRegister from '../register/MultiStepRegisterv2'
 import DetailedEnchereInverse from '../productsPage/DetailedEnchereInverse'
 import DetailedEnchere from '../productsPage/DetailedEnchere'
 import Socket from './customComponents/Socket'
+import ConsultUser from '../ConsultUser'
 
 
 
@@ -73,6 +74,8 @@ const Base = () => {
         <TopNavBar />
         <Routes>
           {/* TODO: declare the routes in config/route.js */}
+          
+          <Route path={`${navRoutes.CONSULTUSER}/:id`} element={<ConsultUser />}></Route>
           <Route path={navRoutes.MAKE_ARTICLE} element={<CreateArticle />}></Route>
           <Route path={navRoutes.LOGIN} element={<Login />}></Route>
           <Route path="/enchereHistory/:userId" element={<EncheresHistory />}></Route>

@@ -22,12 +22,7 @@ import { useSelector } from "react-redux";
 const UserProfile = () => {
   const myUser = useSelector((state) => state.user);
   //#region form data state
-  const [date, setDate] = React.useState(new Date());
-  const [name, setName] = React.useState("");
-  const [telephone, setTelephone] = React.useState("");
-  const [email, setEmail] = React.useState("");
-  const [password, setPassword] = React.useState("");
-  const [displayName, setDisplayName] = React.useState("");
+
   const [isEditing, setIsEditing] = React.useState("");
   const [modification, setModification] = React.useState("");
   //#endregion
@@ -45,21 +40,7 @@ const UserProfile = () => {
   //#endregion
   //#region state manipulation mathods
 
-  const handleName = (event) => {
-    setName(event.target.value);
-  };
-  const handleTelephone = (event) => {
-    setTelephone(event.target.value);
-  };
-  const handleEmail = (event) => {
-    setEmail(event.target.value);
-  };
-  const handlePassword = (event) => {
-    setPassword(event.target.value);
-  };
-  const handleDisplayName = (event) => {
-    setDisplayName(event.target.value);
-  };
+
   const handleModification = (event) => {
     setModification(event.target.value);
   };

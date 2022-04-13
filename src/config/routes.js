@@ -4,6 +4,7 @@ export const navRoutes = {
     REGISTER: '/register',
     LOGOUT: '/logout',
     USERPROFILE: '/userProfile',
+    CONSULTUSER: '/user',
 
     //sales listing related
     CATEGORIES: "/categories",

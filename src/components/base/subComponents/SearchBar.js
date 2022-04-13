@@ -28,23 +28,42 @@ export default function SearchBar({ type }) {
       //Save the cancel token for the current request
       cancelToken = axios.CancelToken.source();
 
-      
-      try {
-        const response = await axios.get(
-          `${apiRoutes.API}${type}/search`, {
-            params: {
-              page: "1",
-              "article.name": input,
-            },
-            cancelToken: cancelToken.token,
-          }
-        );
-        console.log("requested");
-        preparation(response["data"]["hydra:member"]);
-      } catch (error) {
-        console.log(error);
+      if(type==="/users"){
+        try {
+          const response = await axios.get(
+            `${apiRoutes.API}/users/search`, {
+              params: {
+                page: "1",
+                displayName: input,
+              },
+              cancelToken: cancelToken.token,
+            }
+          );
+          console.log("requested");
+          preparation(response["data"]["hydra:member"]);
+        } catch (error) {
+          console.log(error);
+        }
       }
-    };
+      else{
+        try {
+          const response = await axios.get(
+            `${apiRoutes.API}${type}/search`, {
+              params: {
+                page: "1",
+                "article.name": input,
+              },
+              cancelToken: cancelToken.token,
+            }
+          );
+          console.log("requested");
+          preparation(response["data"]["hydra:member"]);
+        } catch (error) {
+          console.log(error);
+        }
+      };
+      }
+      
 
 
   function preparation(data) {
@@ -57,11 +76,17 @@ export default function SearchBar({ type }) {
           link: `${navRoutes.ENCHEREINVERSE}/${value.id}`,
           name: value.article.name,
         });
-      else {
+      else if(type === "/encheres"){
         searchResult.push({
           id: value.id,
           link: `${navRoutes.ENCHERE}/${value.id}`,
           name: value.article.name,
+        });
+      }else{
+        searchResult.push({
+          id: value.id,
+          link: `${navRoutes.CONSULTUSER}/${value.id}`,
+          name: value.displayName,
         });
       }
       
