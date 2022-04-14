@@ -82,7 +82,8 @@ export function getUserData() {
       return dispatch=>{
       axios.get(`${apiRoutes.API}/notifications`,{
       params:{
-        user:`/api/users/${userId}`
+        user:`/api/users/${userId}`,
+        "order[date]": "desc"
       }
       })
       .then(function (response) {
@@ -98,7 +99,12 @@ export function getUserData() {
       })
     
       }}
-
+      export function newNotifications(data) {
+  
+        return dispatch=>{
+        dispatch(addNotifications(data))
+      
+        }}
   export const getNotifications = (notifications)=>{
 
     return {
@@ -108,3 +114,11 @@ export function getUserData() {
 
   }
 
+  export const addNotifications = (notifications)=>{
+
+    return {
+        type: 'ADDNOTIFICATIONS',
+        payload: notifications
+    }
+
+  }

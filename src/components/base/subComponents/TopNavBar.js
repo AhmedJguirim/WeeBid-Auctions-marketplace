@@ -1,7 +1,6 @@
 import * as React from "react";
 import MenuIcon from "@mui/icons-material/Menu";
 import logoPath from "../../../media/images/logo.png";
-import ShoppingCartIcon from "@mui/icons-material/ShoppingCart";
 import TopNavLink from "../customComponents/TopNavLink";
 import { TopNavGrid, TopAppBar } from "../customComponents/general";
 import {
@@ -18,9 +17,10 @@ import { useSelector } from "react-redux";
 import { Link } from "react-router-dom";
 import { navRoutes } from "../../../config/routes";
 import SearchBar from "./SearchBar";
-import Socket from "../customComponents/Socket";
+
 import NotificationsNoneTwoToneIcon from '@mui/icons-material/NotificationsNoneTwoTone';
-import axios from "axios";
+import NotificationsMenu from "../customComponents/NotificationsMenu";
+
 
 
 
@@ -164,15 +164,15 @@ const TopNavBar = () => {
                 path={variableLinks[key].path}
               ></TopNavLink>
             ))}
-
-            <IconButton
+            <NotificationsMenu />
+            {/* <IconButton
               size="large"
               edge="end"
               aria-label="open drawer"
               sx={{ ml: "0.5%" }}
             >
               <NotificationsNoneTwoToneIcon />
-            </IconButton>
+            </IconButton> */}
           </TopNavGrid>
         </Grid>
       </TopAppBar>
