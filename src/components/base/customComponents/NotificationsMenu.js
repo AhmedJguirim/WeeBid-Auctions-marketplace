@@ -7,7 +7,7 @@ import { useDispatch, useSelector } from "react-redux";
 import Socket from "./Socket";
 import { newNotifications } from "../../../redux/actions";
 import { useNavigate } from "react-router-dom";
-import TopNavLink from "./TopNavLink";
+
 
 
 function TransitionUp(props) {
@@ -55,7 +55,6 @@ export default function NotificationsMenu() {
     days = days < 1 ? "" : days + "d,";
     hours = (hours-2) < 1 ? "" : (hours-2) + "h,";
     minutes = minutes < 1 ? "" : minutes + "m";
-    seconds = seconds < 1 ? "" : seconds;
     if(days<1 && hours <1 &&minutes < 1){
       return "just now"
     }
@@ -95,7 +94,7 @@ export default function NotificationsMenu() {
       >
         {Object.keys(notifications).map((key, index) => (
           <MenuItem value={notifications[key].id} key={index} >
-            <Card variant="outlined" onClick={()=>navigate(`/${notifications[key].type}/${notifications[key].route}`)}>
+            <Card variant="outlined" onClick={()=>navigate(`${notifications[key].route}`)}>
               <CardContent>
                 <Typography variant="h6" color="secondary">
                   {notifications[key].title}

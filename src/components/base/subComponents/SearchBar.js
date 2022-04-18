@@ -97,7 +97,6 @@ export default function SearchBar({ type }) {
   }
 
   return (
-    // TODO: adjust the height of the input
     <Autocomplete
       id="seachBar"
       sx={{ width: 300  }}

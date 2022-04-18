@@ -164,7 +164,7 @@ const DetailedEnchere = () => {
           enchere["@id"],
           user.displayName,
           newPrice,
-          enchere.initPrice
+          1
         );
       })
       .catch((error) => console.log(error));

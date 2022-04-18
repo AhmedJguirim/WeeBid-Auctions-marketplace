@@ -15,12 +15,17 @@ import {
   import { apiRoutes } from "../config/routes";
 import axios from "axios";
 import { useParams } from "react-router-dom";
+import Api from '../AxiosInstance';
+import { useSelector } from "react-redux";
+import Socket from './base/customComponents/Socket'
+
   
   const ConsultUser = () => {
-    
+    const myUser = useSelector((state) => state.user);
     let { id } = useParams();
     //#region form data state
-    const [demande, setDemande] = React.useState("");
+    const [quantity, setQuantity] = React.useState(1);
+    const [description, setDescription] = React.useState("");
     //#endregion
   
     //#region dialog manipulation
@@ -36,8 +41,11 @@ import { useParams } from "react-router-dom";
     //#endregion
     //#region state manipulation mathods
 
-    const handleDemande = (event) => {
-      setDemande(event.target.value);
+    const handleQuantity = (event) => {
+      setQuantity(event.target.value);
+    };
+    const handleDescription = (event) => {
+      setDescription(event.target.value);
     };
     //#endregion
   
@@ -61,6 +69,23 @@ import { useParams } from "react-router-dom";
       }
     }
     //TODO add custom passowrd put
+    const handleSubmit = (event)=>{
+      event.preventDefault();
+      Api.post(`${apiRoutes.API}/demande_devis`,{
+        
+          descriptionArticle: description,
+          quantity: parseInt(quantity),
+          transmitter: `/api/users/${myUser.id}`,
+          transmittedTo: `/api/users/${id}`
+        
+      }).then(res=>{console.log(`demande ${res["data"]["@id"]} transmitted`)
+    handleClose()
+    console.log(res["data"])
+  Socket.emit("DEMANDE", res["data"], id)
+  }
+    ).catch(err=>console.log(err))
+      
+    }
   
     React.useEffect(() => {
         getUser();
@@ -75,15 +100,26 @@ import { useParams } from "react-router-dom";
         >
           <DialogTitle id="alert-dialog-title">demander de {user.displayName} </DialogTitle>
           <DialogContent>
-            <Box component="form" onSubmit={()=>console.log("submit demande")}>
+            <Box component="form" onSubmit={handleSubmit}>
               <TextField
                 fullWidth
                 required
-                id="demande"
-                label="demande"
-                value={demande}
-                onChange={()=>console.log("TODO: demande de devis")}
+                type="number"
+                id="quantity"
+                label="quantity"
+                value={quantity}
+                onChange={handleQuantity}
               />
+              <textarea
+                      name="description"
+                      id="description"
+                      value={description}
+                      onChange={handleDescription}
+                      className="descriptionField"
+                      cols="30"
+                      rows="10"
+                      placeholder="description"
+                    ></textarea>
               <Button type="submit" sx={ButtonStyles}>submit</Button>
               <Button
               sx={ButtonStyles}
@@ -103,6 +139,9 @@ import { useParams } from "react-router-dom";
           </Grid>
           <Grid item xs={3.5} sx={{ textAlign: "left" }}>
             <Typography variant="h2">{user.displayName}</Typography>{" "}
+          </Grid>
+          <Grid item xs={3.5} sx={{ textAlign: "right" }}>
+            <Button onClick={handleClickOpen}>demande de devis</Button>
           </Grid>
         </Grid>
         <Grid item xs={9} sx={{ mt: 5 }}>

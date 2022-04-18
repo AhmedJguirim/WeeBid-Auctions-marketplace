@@ -17,7 +17,7 @@ export const navRoutes = {
     PERCATEGORY: "/category",
     PERUSER: "/user",
     WATCHLIST: "/watchList",
-
+    DEMANDE:"/demande_devis",
 
     //posting things
     MAKE_ARTICLE: "/makeArticle",

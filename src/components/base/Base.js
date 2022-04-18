@@ -27,6 +27,7 @@ import DetailedEnchereInverse from '../productsPage/DetailedEnchereInverse'
 import DetailedEnchere from '../productsPage/DetailedEnchere'
 import Socket from './customComponents/Socket'
 import ConsultUser from '../ConsultUser'
+import Demande from '../demande/Demande'
 
 
 
@@ -39,7 +40,7 @@ const styles = {
 }
 const Base = () => {
   const watchList = useSelector((state) => state.watchList)
-
+  const user = useSelector((state) => state.user)
   React.useEffect(()=>{    
     
     if (watchList[0] !== undefined){
@@ -52,6 +53,7 @@ const Base = () => {
         }
       })
       Socket.emit("join-rooms", list)
+      Socket.emit("join-rooms", user.id + "USER")
     }}
   
 
@@ -74,7 +76,7 @@ const Base = () => {
         <TopNavBar />
         <Routes>
           {/* TODO: declare the routes in config/route.js */}
-          
+          <Route path={`${navRoutes.DEMANDE}/:id`} element={<Demande />}></Route>
           <Route path={`${navRoutes.CONSULTUSER}/:id`} element={<ConsultUser />}></Route>
           <Route path={navRoutes.MAKE_ARTICLE} element={<CreateArticle />}></Route>
           <Route path={navRoutes.LOGIN} element={<Login />}></Route>
