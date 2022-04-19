@@ -156,6 +156,7 @@ const handleWatch = ()=>{
   }else if(watched === true){
     const surveille =watchList.filter(e=>e.enchereInverse===`/api/enchere_inverses/${id}`);
     Api.delete(surveille.surveille).then(res=>console.log("successfully unwatched")).catch(err=>console.log("smtng went wrong"))
+    setWatched(false)
     setWatchButton("surveiller")
 }
 }

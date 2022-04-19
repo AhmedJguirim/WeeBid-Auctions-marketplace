@@ -13,10 +13,6 @@ import logo from "../../media/images/dotItLogo.png"
 const styles = {
   subDiv: {
     maxWidth: "100%",
-    // uncomment for boring imaged
-    // backgroundImage: `url(${image})`,
-    // backgroundSize: "cover",
-    // backgroundRepeat: "no-repeat",
     paddingTop: "5%",
     backgroundColor: "secondary.main",
   },
@@ -50,14 +46,19 @@ const styles = {
 };
 
 const Homepage = () => {
+
   //#region get encheres inverses
   const [encheresInverses, setEnchereInverses] = React.useState({});
+var today = new Date();
 
+  var date =
+    today.getFullYear() + "-" + (today.getMonth() + 1) + "-" + today.getDate();
   function getEnchereInverses() {
     axios
       .get(`${apiRoutes.API}/enchere_inverses/getFour`, {
         params: {
           page: "1",
+          "endDate[after]": date,
         },
       })
       .then(function (response) {
@@ -70,16 +71,13 @@ const Homepage = () => {
   //#region get encheres
   const [encheres, setEncheres] = React.useState({});
 
-  var today = new Date();
-
-  var date =
-    today.getFullYear() + "-" + (today.getMonth() + 1) + "-" + today.getDate();
+  
   function getEncheres() {
     axios
       .get(`${apiRoutes.API}/encheres/getFour`, {
         params: {
           page: "1",
-          "startDate[after]": date,
+          "endDate[after]": date,
         },
       })
       .then(function (response) {

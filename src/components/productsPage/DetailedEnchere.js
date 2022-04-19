@@ -24,22 +24,28 @@ import { apiRoutes } from "../../config/routes";
 import Api from "../../AxiosInstance";
 import { useDispatch, useSelector } from "react-redux";
 import Socket from "../base/customComponents/Socket";
+import { fetchWatchList } from "../../redux/actions";
+import { ConstructionOutlined } from "@mui/icons-material";
 
 const DetailedEnchere = () => {
   const dispatch = useDispatch();
   //GET DATA FROM STORE/PARAMS
-  // const watchList = useSelector((state) => state.watchList);
+  const watchList = useSelector((state) => state.watchList);
   const thePrice = useSelector((state) => state.currentPrice);
   const user = useSelector((state) => state.user);
   let { id } = useParams();
 
   //#region states
   const [enchere, setEnchere] = React.useState({});
+  const [isOwner, setIsOwner] = React.useState(false);
   const [article, setArticle] = React.useState({});
   const [description, setDescription] = React.useState("");
+  const [followable, setFollowable] = React.useState(true);
   const [seller, setSeller] = React.useState({});
   const [images, setImages] = React.useState([]);
+  const [watched, setWatched] = React.useState(false);
   const [augmentation, setAugmentation] = React.useState(0.1);
+  const [watchButton, setWatchButton] = React.useState("surveiller");
 
   //#endregion
 
@@ -84,7 +90,6 @@ const DetailedEnchere = () => {
       .then((response) => {
         //sets the result (augmentation) in the state
         if (response["data"]["hydra:member"]["0"] !== undefined) {
-          //TODO:this doesn't update the current price for some reason if we unmount and mount again
           dispatch({
             type: "SETPRICE",
             price: response["data"]["hydra:member"]["0"].value,
@@ -108,6 +113,7 @@ const DetailedEnchere = () => {
         getCurrentPrice(response["data"].initPrice, id);
         //sets seller details
         setSeller({
+          id:data.user.id,
           ["nom d'utilisateur"]: data.user.displayName,
           localistation: data.user.adresse.ville,
         });
@@ -145,6 +151,26 @@ const DetailedEnchere = () => {
           .catch((error) => console.log(error));
       })
       .catch((error) => console.log(error));
+  }
+
+  const handleWatch = ()=>{
+    if(watched=== false && user!=={}){
+      Api.post("/surveilles",{
+        user: `/api/users/${user.id}`,
+        enchere: `/api/encheres/${enchere.id}`
+      }).then(response=>{
+        console.log(response["data"]["@id"]+ " created")
+        dispatch(fetchWatchList(user.id))
+        setWatched(true)
+        setWatchButton("unsurveiller")
+        
+      }).catch(err=>console.log("oops something went wrong"))
+    }else if(watched === true){
+      const surveille =watchList.filter(e=>e.enchereInverse===`/api/enchere/${id}`);
+      Api.delete(surveille.surveille).then(res=>console.log("successfully unwatched")).catch(err=>console.log("smtng went wrong"))
+      setWatched(false)
+      setWatchButton("surveiller")
+  }
   }
   //#region augmentation zone
   function augmenter() {
@@ -195,9 +221,45 @@ const DetailedEnchere = () => {
   };
   //#endregion
 
+  //#region handle fermeture
+  const handleFermeture = ()=>{
+    //TODO: the case of no one augmenting
+    axios
+      .get(`${apiRoutes.API}/augmentationHighest`, {
+        params: {
+          page: 1,
+          enchere: `/api/encheres/${id}`,
+          "order[date]": "desc",
+        },
+      }).then(res=>{
+        Api.post(`${apiRoutes.API}/fermetures`,{
+        user:res["data"]["hydra:member"]["0"].user,
+        date: new Date().getTime(),
+        isSold: true,
+        finalPrice:res["data"]["hydra:member"]["0"].value,
+        enchere: `/api/encheres/${id}`
+      }).then(res=>console.log("fermeture created , please redirect user"))})
+    
+  }
+  //#endregion
+
   React.useEffect(() => {
     getEnchere();
   }, [id, mounted]);
+  React.useEffect(() => {
+    if(user==={}||user.id === seller.id){
+      setFollowable(false)
+    }else{
+      setFollowable(true)
+    }
+    if(user.id === seller.id){
+      setIsOwner(true)
+      console.log(isOwner)
+    }else{
+      setIsOwner(false)
+      console.log(isOwner)
+    }
+  }, [seller,user]);
 
   return (
     <Grid container sx={{ mt: 10 }}>
@@ -258,7 +320,10 @@ const DetailedEnchere = () => {
 
         {/* first section */}
         <Grid item xs={5.8}>
-          <Grid item></Grid>
+        {followable === true &&
+          <Grid item><Button onClick={handleWatch} sx={{...ButtonStyles, backgroundColor:"primary.main"}}> {watchButton} </Button></Grid>}
+        {isOwner === true &&
+          <Grid item><Button onClick={handleFermeture} sx={{...ButtonStyles, backgroundColor:"primary.main"}}> fermer </Button></Grid>}
           {/* documents */}
           <Grid item>
             <ArticleImage src={images[0]} alt="" />

@@ -2,6 +2,7 @@ import { Card, CardContent, Grid, Typography } from '@mui/material'
 import React from 'react'
 import { Link } from 'react-router-dom';
 import demoListImage from "../../media/images/demoListImage.png";
+import Countdown from '../base/customComponents/Countdown';
 
 
 
@@ -41,9 +42,9 @@ const ProductsListing = ({ventes ,elemsPerLine , type}) => {
                   <Typography sx={styles.productsTypography}>
                     {ventes[key].currentPrice} TND
                   </Typography>
-                  <Typography sx={styles.productsTypography}>
-                    {ventes[key].startDate.substring(0,10)}
-                  </Typography>
+                  
+                    <Countdown date={ventes[key].startDate} />
+
                 
               </CardContent>
             </Card>
