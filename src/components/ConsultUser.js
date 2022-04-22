@@ -68,7 +68,6 @@ import Socket from './base/customComponents/Socket'
         console.error(error);
       }
     }
-    //TODO add custom passowrd put
     const handleSubmit = (event)=>{
       event.preventDefault();
       Api.post(`${apiRoutes.API}/demande_devis`,{

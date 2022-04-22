@@ -40,7 +40,8 @@ const CategoriesList = () => {
     >
       {Object.keys(categories).map((key, index) => (
         <Grid item xs={4} key={index}>
-          <Card>
+          {/* TODO:make a relation between document and category 1to1 */}
+          <Card variant="outlined">
             <CardContent>
               <Typography variant="h4">{categories[key].name}</Typography>
               <br /><br />

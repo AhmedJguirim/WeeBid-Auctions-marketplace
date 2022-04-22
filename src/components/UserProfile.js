@@ -12,7 +12,7 @@ import {
 } from "@mui/material";
 import React from "react";
 import EditIcon from "@mui/icons-material/Edit";
-import { darkContainer } from "./base/customComponents/general";
+import { lightContainer } from "./base/customComponents/general";
 import API from "../AxiosInstance";
 import { Box } from "@mui/system";
 import { ButtonStyles } from "./base/customComponents/general";
@@ -55,7 +55,7 @@ const UserProfile = () => {
       console.log(data);
       setUser({
         name: data.name,
-        username: data.displayName,
+        displayName: data.displayName,
         email: data.email,
         password: "******",
         telephone: data.telephone,
@@ -72,7 +72,14 @@ event.preventDefault();
     console.log("under construction");
     let data = {}
     data[isEditing] = modification
-    API.put(`${apiRoutes.API}/users/${myUser.id}`,data).then(res=>getUser()).catch(err=>console.log(err))
+
+    console.log(data)
+    if(isEditing==="password"){
+      API.put(`${apiRoutes.API}/putPassword/${myUser.id}`,data).then(res=>getUser()).catch(err=>console.log(err))
+    }else{
+      API.put(`${apiRoutes.API}/users/${myUser.id}`,data).then(res=>getUser()).catch(err=>console.log(err))
+    }
+
     handleClose()
   };
   React.useEffect(() => {
@@ -80,7 +87,7 @@ event.preventDefault();
   }, []);
 
   return (
-    <Grid container sx={darkContainer}>
+    <Grid container sx={lightContainer}>
       <Dialog
         open={open}
         onClose={handleClose}
@@ -130,7 +137,7 @@ event.preventDefault();
               {" "}
               <Typography variant="h4">{user[key]}</Typography>
             </Grid>
-            <Grid item xs={1}>
+            <Grid item >
               <IconButton
                 onClick={() => {
                   handleClickOpen();
@@ -138,7 +145,7 @@ event.preventDefault();
                 }}
                 id={key}
               >
-                <EditIcon color="primary" size="large" />{" "}
+                <EditIcon color="secondary" size="large" />{" "}
               </IconButton>
             </Grid>
           </Grid>

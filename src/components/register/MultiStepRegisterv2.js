@@ -14,7 +14,7 @@ import {
   CssBaseline,
   Button,
 } from "@mui/material";
-import { apiRoutes} from "../../config/routes";
+import { apiRoutes, navRoutes} from "../../config/routes";
 import Stepper from "@mui/material/Stepper";
 import Step from "@mui/material/Step";
 import StepLabel from "@mui/material/StepLabel";
@@ -41,7 +41,7 @@ export default function MultiStepRegister() {
   const handleBack = () => {
     setActiveStep((prevActiveStep) => prevActiveStep - 1);
 
-  };
+  };  
 
   //#endregion
   //#region form part
@@ -134,14 +134,50 @@ export default function MultiStepRegister() {
       })
       .then(function (response) {
         localStorage.setItem("token", response.data.token);
-        // localStorage.setItem("refresh", response.data.refresh_token);
-        navigate("/");
+        
+        // document.location.href = navRoutes.LOGIN;
+        // navigate("/");
       })
       .catch(function (error) {
-        console.log(error);
+
+        console.log(error.message);
       });
   };
 
+  const loginWithError = () => {
+    axios
+      .post(`${apiRoutes.API}/login_check`, {
+        username: formik.values.email,
+        password: formik.values.password,
+      })
+      .then(function (response) {
+        localStorage.setItem("token", response.data.token);
+        axios.get(`${apiRoutes.API}/userdata`,{
+          headers:{
+            Authorization : `Bearer ${response.data.token}`
+          }
+        }).then(res=>{
+          console.log(res)
+          axios.post(`${apiRoutes.API}/adresses`, {
+            pays: formik.values.pays,
+            ville: formik.values.ville,
+            rue: formik.values.rue,
+            zipcode: formik.values.zipcode,
+            user: res["data"]["@id"]
+          }).then(response=>{
+            console.log(response["data"]["@id"], "created successfully!")
+          login();
+        })
+          .catch(error=>console.log(error));
+        })
+        // document.location.href = navRoutes.LOGIN;
+        // navigate("/");
+      })
+      .catch(function (error) {
+
+        console.log(error.message);
+      });
+  };
   //#region registration POST request on submit
   const onSubmit = (event) => {
     event.preventDefault();
@@ -158,7 +194,6 @@ export default function MultiStepRegister() {
         birthDate: date,
       })
       .then(function (response) {
-        console.log(response);
         axios.post(`${apiRoutes.API}/adresses`, {
           pays: formik.values.pays,
           ville: formik.values.ville,
@@ -173,8 +208,12 @@ export default function MultiStepRegister() {
         
       })
       .catch(function (error) {
-        console.log(error);
-        login();
+        if (error.response) {
+          if(error.response.data["hydra:description"] =="not an error"){
+              loginWithError();
+            }        
+          }
+        
       });
   };
   //#endregion
