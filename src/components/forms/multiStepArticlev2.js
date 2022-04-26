@@ -50,12 +50,9 @@ export default function CreateArticle() {
     const validate = (values) => {
         const errors = {};
         const currentDate = new Date();
-        let customErrors = {};
         //fabricationDate/localisation/brand/description/codebar are optional
-        //name validation
         
-        console.log(values.date)
-
+        //name validation
         if (!values.name) {
           errors.name = "champ obligatoir";
         } else if (values.name.length > 15) {
@@ -140,21 +137,11 @@ export default function CreateArticle() {
             delete values.startDate
           }
 
-          //article state validation
-        
-          // if (!state) {
-          //   customErrors.state = "champ obligatoir";
-          // } else{
-          //   delete customErrors.startDate 
-          // }
-
-
-      setCustomValidation(customErrors)
       if(Object.keys(errors).length === 0){
           setContainsError(false)
       }
       if(errors.name === undefined && errors.localisation=== undefined && errors.brand=== undefined && errors.description=== undefined 
-        && customErrors.state=== undefined && customErrors.date=== undefined){
+        && errors.state=== undefined && errors.date=== undefined){
         setStepOne(true)      
       }else{
         setStepOne(false)
@@ -164,14 +151,12 @@ export default function CreateArticle() {
         
       }else{
         setStepTwo(false)
-        
       }
+      
       if(errors.endDate == undefined && errors.startDate== undefined ){
         setStepThree(true)      
-        console.log(errors)
       }else{
         setStepThree(false)
-        console.log(errors)
       }
 
         return errors;
@@ -183,6 +168,7 @@ export default function CreateArticle() {
 
   const handleNext = () => {
     setActiveStep((prevActiveStep) => prevActiveStep + 1);
+ 
   };
 
   const handleBack = () => {
@@ -198,10 +184,6 @@ export default function CreateArticle() {
   const [state, setState] = React.useState("utilisé");
   const [containsError , setContainsError] = React.useState(true)
   const [images, setImages] = React.useState([]);
-  // const [startDate, setStartDate] = React.useState(new Date());
-  // const [endDate, setEndDate] = React.useState(new Date());
-  // const [date, setDate] = React.useState(new Date());
-  const [customVadlidation, setCustomValidation] = React.useState({})
 
   const [stepOne, setStepOne] = React.useState(false);
   const [stepTwo, setStepTwo] = React.useState(false);
@@ -217,7 +199,6 @@ const handleType = (event) => {
     initialValues: {
       type: "encheres",
       name: "",
-      state: "",
       localisation: "",
       codebar: "",
       brand: "",
@@ -419,7 +400,7 @@ const handleType = (event) => {
                     </LocalizationProvider>
                   </Grid>
                   <Grid item xs={12}>
-                  {customVadlidation.state ? <div>{customVadlidation.state}</div> : null}
+                  {formik.errors.state ? <div>{formik.errors.state}</div> : null}
                     <FormControl sx={{marginTop:"8px"}} fullWidth>
                       <InputLabel id="demo-simple-select-label">
                         état
@@ -641,7 +622,7 @@ const handleType = (event) => {
                     {steps[2]}
                   </Typography>
                   <Grid item xs={12}>
-                  {customVadlidation.startDate ? <div>{customVadlidation.startDate}</div> : null}
+                  {formik.errors.startDate ? <div>{formik.errors.startDate}</div> : null}
                     <LocalizationProvider dateAdapter={DateAdapter}>
                       <DateTimePicker
                         label="date de debut"
@@ -656,7 +637,7 @@ const handleType = (event) => {
                     </LocalizationProvider>
                   </Grid>
                   <Grid item xs={12}>
-                  {customVadlidation.endDate ? <div>{customVadlidation.endDate}</div> : null}
+                  {formik.errors.endDate ? <div>{formik.errors.endDate}</div> : null}
                     <LocalizationProvider dateAdapter={DateAdapter}>
                       <DateTimePicker
                         label="date de fin"
@@ -700,11 +681,7 @@ const handleType = (event) => {
                       All steps completed - you&apos;re finished {activeStep}{" "}
                       {steps.length}
                       </Typography>
-                      {Object.keys(customVadlidation).map((key, index) => (
-                          <MenuItem key={index}>
-                            {customVadlidation[key]}
-                          </MenuItem>
-                        ))}
+                      
                         {Object.keys(formik.errors).map((key, index) => (
                           <MenuItem key={index}>
                             {formik.errors[key]}

@@ -1,26 +1,31 @@
 import { Card, CardContent, Container, Grid, Typography } from "@mui/material";
 import { Box } from "@mui/system";
 import React from "react";
-import image from "../../media/images/homepageTopImage.jpg";
+import image from "../../media/images/auction.jpg";
 import axios from "axios";
-
 import HomePageList from "../generalComponents/ProductsListing";
 import { apiRoutes, navRoutes } from "../../config/routes";
 import StorefrontTwoToneIcon from "@mui/icons-material/StorefrontTwoTone";
 import LocalMallTwoToneIcon from "@mui/icons-material/LocalMallTwoTone";
 import RequestQuoteTwoToneIcon from "@mui/icons-material/RequestQuoteTwoTone";
 import logo from "../../media/images/dotItLogo.png"
+
+
 const styles = {
   subDiv: {
     maxWidth: "100%",
     paddingTop: "5%",
     backgroundColor: "secondary.main",
+    backgroundImage: `url(${image})`,
+    backgroundSize: "cover",
+    backgroundRepeat: "no-repeat",
   },
   generalText: {
     textAlign: "center",
   },
   textDiv: {
     width: "60%",
+    
   },
   servicesHr: {
     margin: "auto",
@@ -37,11 +42,13 @@ const styles = {
     justifyContent: "space-between",
     width: "70%",
     margin: "auto",
+    backgroundColor:  "#f4ebf5"
   },
   sectionBox: {
     marginTop: "5%",
     paddingTop: "5%",
     textAlign: "center",
+    
   },
 };
 
@@ -123,18 +130,12 @@ var today = new Date();
               benefice maximal, et on a beaucoup plus a offrir !
             </Typography>
           </Grid>
-          <Box
-            sx={{ ...styles.sectionBox, backgroundColor: "secondary.main" }}
-          ></Box>
         </Container>
-      </Box>
-
-      {/* SECTION: 2 */}
-      <Grid
+        {/* SECTION: 2 */}
+        <Grid
         container
         sx={{
           width: "100%",
-          backgroundColor: "secondary.main",
           justifyContent: "space-around",
         }}
       >
@@ -184,37 +185,42 @@ var today = new Date();
           <br />
         </Grid>
       </Grid>
-      {/* SECTION 3 */}
-
-      <Box sx={{ backgroundColor: "primary.main" }}>
-        <Container sx={{...styles.sectionBox}}>
-        <Typography variant="h2" >QUI SOMMES NOUS</Typography>
-          <hr style={styles.servicesHr} />
-        </Container>
-        <Grid container sx={{mt:4, justifyContent:"space-around"}}>
-        <Grid item xs={6} >
-          <img src={logo} className="dotIt" alt="" />
-        </Grid>
-        <Grid item xs={6}>
-          <Typography>"DOT IT" est une entreprise tunisienne spécialisée dans l’ingénierie
-          logicielle et l’intégrationde solutions de gestion pour les
-          entreprises. Elle crée la mise en œuvre de méthodologies degestion de
-          projet et d’expertise à partir des normes de l’industrie logicielle
-          (ISO, CMMI, UP,RUP, XP, Méthodologies Agiles. . . ).Annoncé en tant
-          que membre du programme Microsoft Certified Partner, DOT IT travaille
-          enpartenariat avec BPA SOLUTIONS - société suisse développant des
-          applications commerciales.Elle a contribué à la réalisation de projets
-          majeurs et stratégiques pour de nombreux clientstels que Hacks House,
-          Royal Kenz Hotel, Itac Tunisie, Forest Tunisia, Comet, Carthage
-          Land,Ooredoo ...</Typography>
-          
-        </Grid>
-      </Grid>
       </Box>
+
+ {/* section #3 */}
+ <Box sx={{ ...styles.sectionBox, backgroundColor: "primary.main" }}>
+        {/* put ventes here */}
+        {/* <Typography variant="h4" color='secondary.main'>nos produits</Typography>
+        <HomePageList ventes={ventes} elemsPerLine={8} /> */}
+        <Grid container>
+          <Grid item xs={5.5}>
+            <Typography variant="h4">
+              nos enchères
+            </Typography>
+            <HomePageList
+              ventes={encheres}
+              type={navRoutes.ENCHERE}
+              elemsPerLine={4}
+            />
+          </Grid>
+          <Grid item xs={1}></Grid>
+          <Grid item xs={5.5}>
+            <Typography variant="h4">
+              nos enchères inverses
+            </Typography>
+            <HomePageList
+              ventes={encheresInverses}
+              type={navRoutes.ENCHEREINVERSE}
+              elemsPerLine={4}
+            />
+          </Grid>
+        </Grid>
+      </Box>
+      
       {/* section #4 */}
-      <Box sx={{...styles.sectionBox ,backgroundColor: "secondary.main" }}>
+      <Box sx={{...styles.sectionBox ,backgroundColor: "#f4ebf5" }}>
         <Container>
-          <Typography variant="h2" color='primary.main'>NOS SERVICES</Typography>
+          <Typography variant="h2">NOS SERVICES</Typography>
           <hr style={styles.servicesHr} />
         </Container>
         <br />
@@ -265,34 +271,32 @@ var today = new Date();
         </Grid>
         <br /><br />
       </Box>
-      {/* section #3 */}
-      <Box sx={{ ...styles.sectionBox, backgroundColor: "primary.main" }}>
-        {/* put ventes here */}
-        {/* <Typography variant="h4" color='secondary.main'>nos produits</Typography>
-        <HomePageList ventes={ventes} elemsPerLine={8} /> */}
-        <Grid container>
-          <Grid item xs={5.5}>
-            <Typography variant="h4">
-              nos enchères
-            </Typography>
-            <HomePageList
-              ventes={encheres}
-              type={navRoutes.ENCHERE}
-              elemsPerLine={4}
-            />
-          </Grid>
-          <Grid item xs={1}></Grid>
-          <Grid item xs={5.5}>
-            <Typography variant="h4">
-              nos enchères inverses
-            </Typography>
-            <HomePageList
-              ventes={encheresInverses}
-              type={navRoutes.ENCHEREINVERSE}
-              elemsPerLine={4}
-            />
-          </Grid>
+     {/* SECTION 3 */}
+
+     <Box sx={{ backgroundColor: "primary.main" }}>
+        <Container sx={{...styles.sectionBox}}>
+        <Typography variant="h2" >QUI SOMMES NOUS</Typography>
+          <hr style={styles.servicesHr} />
+        </Container>
+        <Grid container sx={{mt:4, justifyContent:"space-around"}}>
+        <Grid item xs={6} >
+          <img src={logo} className="dotIt" alt="" />
         </Grid>
+        <Grid item xs={6}>
+          <Typography>"DOT IT" est une entreprise tunisienne spécialisée dans l’ingénierie
+          logicielle et l’intégrationde solutions de gestion pour les
+          entreprises. Elle crée la mise en œuvre de méthodologies degestion de
+          projet et d’expertise à partir des normes de l’industrie logicielle
+          (ISO, CMMI, UP,RUP, XP, Méthodologies Agiles. . . ).Annoncé en tant
+          que membre du programme Microsoft Certified Partner, DOT IT travaille
+          enpartenariat avec BPA SOLUTIONS - société suisse développant des
+          applications commerciales.Elle a contribué à la réalisation de projets
+          majeurs et stratégiques pour de nombreux clientstels que Hacks House,
+          Royal Kenz Hotel, Itac Tunisie, Forest Tunisia, Comet, Carthage
+          Land,Ooredoo ...</Typography>
+          
+        </Grid>
+      </Grid>
       </Box>
     </Box>
   );

@@ -55,6 +55,9 @@ export const ButtonStyles = {
     color: "primary.main",
   },
 };
+export const pinkish= {
+  backgroundColor: "#f4ebf5"
+}
 export const darkContainer = {
   padding: 4,
   borderRadius: 10,

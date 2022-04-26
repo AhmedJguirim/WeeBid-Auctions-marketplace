@@ -1,9 +1,6 @@
 import DateAdapter from "@mui/lab/AdapterDateFns";
-import { ButtonStyles, formBox } from "../base/customComponents/general";
-import {
-  DesktopDatePicker,
-  LocalizationProvider,
-} from "@mui/lab";
+import { ButtonStyles, formBox, FormTextField } from "../base/customComponents/general";
+import { DesktopDatePicker, LocalizationProvider } from "@mui/lab";
 import * as React from "react";
 import {
   Container,
@@ -14,25 +11,25 @@ import {
   CssBaseline,
   Button,
 } from "@mui/material";
-import { apiRoutes, navRoutes} from "../../config/routes";
+import { apiRoutes, navRoutes } from "../../config/routes";
 import Stepper from "@mui/material/Stepper";
 import Step from "@mui/material/Step";
 import StepLabel from "@mui/material/StepLabel";
-  import axios from "axios";
+import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import { useFormik } from "formik";
+import { pinkish } from "../base/customComponents/general";
 
-const steps = [
-  
-  "données de connection",
-  "données générales",
-  "votre adresse",
-];
+
+const steps = ["données de connection" ,"votre adresse"];
 
 export default function MultiStepRegister() {
-  const navigate= new useNavigate()
+  const navigate = new useNavigate();
   //#region stepper part
   const [activeStep, setActiveStep] = React.useState(0);
+  const [containsError , setContainsError] = React.useState(true)
+  const [stepOne, setStepOne] = React.useState(false);
+  const [stepTwo, setStepTwo] = React.useState(false);
 
   const handleNext = () => {
     setActiveStep((prevActiveStep) => prevActiveStep + 1);
@@ -40,69 +37,97 @@ export default function MultiStepRegister() {
 
   const handleBack = () => {
     setActiveStep((prevActiveStep) => prevActiveStep - 1);
-
-  };  
+  };
 
   //#endregion
   //#region form part
   //#region form data state
 
   //#region states
-  const [date, setDate] = React.useState(new Date());
-  const validate = values => {
+  const validate = (values) => {
     const errors = {};
+    const currentDate = new Date();
     if (!values.name) {
-      errors.name = 'ce champ est obligatoir';
+      errors.name = "ce champ est obligatoir";
     } else if (values.name.length > 20) {
-      errors.name = 'le nom doit avoir 20 characteres au maximum';
+      errors.name = "le nom doit avoir 20 characteres au maximum";
     }
-    
+
     if (!values.email) {
-      errors.email = 'ce champ est obligatoir';
-    } else if (!/^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}$/i.test(values.email)) {
-      errors.email = 'Invalid email address';
+      errors.email = "ce champ est obligatoir";
+    } else if (
+      !/^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}$/i.test(values.email)
+    ) {
+      errors.email = "Invalid email address";
     }
     if (!values.displayName) {
-      errors.displayName = 'ce champ est obligatoir';
+      errors.displayName = "ce champ est obligatoir";
     } else if (values.displayName.length > 10) {
-      errors.displayName = "le nom d'utilisateur doit avoir 20 characteres au maximum";
-    }else if (values.displayName.length <4) {
-      errors.displayName = "le nom d'utilisateur doit avoir 4 characteres au minimum";
+      errors.displayName =
+        "le nom d'utilisateur doit avoir 20 characteres au maximum";
+    } else if (values.displayName.length < 4) {
+      errors.displayName =
+        "le nom d'utilisateur doit avoir 4 characteres au minimum";
     }
 
     if (!values.telephone) {
-      errors.telephone = 'ce champ est obligatoir';
+      errors.telephone = "ce champ est obligatoir";
     } else if (!/^[0-9]{8}$/i.test(values.telephone)) {
-      errors.telephone = "le numero de telephone doit contenir exactement 8 chiffres";
+      errors.telephone =
+        "le numero de telephone doit contenir exactement 8 chiffres";
     }
     if (!values.zipcode) {
-      errors.zipcode = 'ce champ est obligatoir';
+      errors.zipcode = "ce champ est obligatoir";
     } else if (!/^[0-9]{4}$/i.test(values.zipcode)) {
       errors.zipcode = "le code zip doit contenir exactement 4 chiffres";
     }
     if (!values.ville) {
-      errors.ville = 'ce champ est obligatoir';
+      errors.ville = "ce champ est obligatoir";
     } else if (values.ville.length > 10) {
       errors.ville = "le nom de ville doit avoir 10 characteres au maximum";
     }
 
     if (!values.pays) {
-      errors.pays = 'ce champ est obligatoir';
+      errors.pays = "ce champ est obligatoir";
     } else if (values.pays.length > 10) {
       errors.pays = "le nom de pays doit avoir 10 characteres au maximum";
     }
 
     if (!values.rue) {
-      errors.rue = 'ce champ est obligatoir';
+      errors.rue = "ce champ est obligatoir";
     } else if (values.rue.length > 10) {
       errors.rue = "le nom de rue doit avoir 10 characteres au maximum";
     }
 
     if (!values.password) {
-      errors.password = 'ce champ est obligatoir';
+      errors.password = "ce champ est obligatoir";
     } else if (values.password.length < 4) {
       errors.password = "le mot de passe doit avoir 6 characteres au minimum";
     }
+    if (!values.date) {
+      errors.date = "champ obligatoir";
+    } else if (values.date > currentDate) {
+      errors.date = "la date de naissance ne peut pas etre superieur a la date actuelle";
+    }
+    else{
+      delete errors.date
+    }
+
+    if(Object.keys(errors).length === 0){
+      setContainsError(false)
+  }
+  if(errors.name === undefined && errors.displayName=== undefined && errors.email=== undefined && errors.telephone=== undefined 
+    && errors.password=== undefined && errors.date=== undefined){
+    setStepOne(true)      
+  }else{
+    setStepOne(false)
+  }
+  if(errors.ville === undefined && errors.rue=== undefined && errors.pays=== undefined && errors.zipcode ===undefined){
+    setStepTwo(true)      
+    
+  }else{
+    setStepTwo(false)
+  }
   
     return errors;
   };
@@ -118,10 +143,10 @@ export default function MultiStepRegister() {
       ville: "",
       rue: "",
       zipcode: "",
+      date: Date.now(),
     },
     validate,
   });
-
 
   //#endregion
 
@@ -134,12 +159,11 @@ export default function MultiStepRegister() {
       })
       .then(function (response) {
         localStorage.setItem("token", response.data.token);
-        
-        // document.location.href = navRoutes.LOGIN;
+
+        document.location.href = navRoutes.LOGIN;
         // navigate("/");
       })
       .catch(function (error) {
-
         console.log(error.message);
       });
   };
@@ -152,29 +176,32 @@ export default function MultiStepRegister() {
       })
       .then(function (response) {
         localStorage.setItem("token", response.data.token);
-        axios.get(`${apiRoutes.API}/userdata`,{
-          headers:{
-            Authorization : `Bearer ${response.data.token}`
-          }
-        }).then(res=>{
-          console.log(res)
-          axios.post(`${apiRoutes.API}/adresses`, {
-            pays: formik.values.pays,
-            ville: formik.values.ville,
-            rue: formik.values.rue,
-            zipcode: formik.values.zipcode,
-            user: res["data"]["@id"]
-          }).then(response=>{
-            console.log(response["data"]["@id"], "created successfully!")
-          login();
-        })
-          .catch(error=>console.log(error));
-        })
-        // document.location.href = navRoutes.LOGIN;
+        axios
+          .get(`${apiRoutes.API}/userdata`, {
+            headers: {
+              Authorization: `Bearer ${response.data.token}`,
+            },
+          })
+          .then((res) => {
+            console.log(res);
+            axios
+              .post(`${apiRoutes.API}/adresses`, {
+                pays: formik.values.pays,
+                ville: formik.values.ville,
+                rue: formik.values.rue,
+                zipcode: formik.values.zipcode,
+                user: res["data"]["@id"],
+              })
+              .then((response) => {
+                console.log(response["data"]["@id"], "created successfully!");
+                login();
+              })
+              .catch((error) => console.log(error));
+          });
+        document.location.href = navRoutes.LOGIN;
         // navigate("/");
       })
       .catch(function (error) {
-
         console.log(error.message);
       });
   };
@@ -182,6 +209,7 @@ export default function MultiStepRegister() {
   const onSubmit = (event) => {
     event.preventDefault();
     //TODO: fix error
+    const date = new Date(formik.values.date);
     axios
       .post(`${apiRoutes.API}/register`, {
         name: formik.values.name,
@@ -194,31 +222,29 @@ export default function MultiStepRegister() {
         birthDate: date,
       })
       .then(function (response) {
-        axios.post(`${apiRoutes.API}/adresses`, {
-          pays: formik.values.pays,
-          ville: formik.values.ville,
-          rue: formik.values.rue,
-          zipcode: formik.values.zipcode,
-          user: response["data"]["@id"]
-        }).then(response=>{
-          console.log(response["data"]["@id"], "created successfully!")
-        login();
-      })
-        .catch(error=>console.log(error));
-        
+        axios
+          .post(`${apiRoutes.API}/adresses`, {
+            pays: formik.values.pays,
+            ville: formik.values.ville,
+            rue: formik.values.rue,
+            zipcode: formik.values.zipcode,
+            user: response["data"]["@id"],
+          })
+          .then((response) => {
+            console.log(response["data"]["@id"], "created successfully!");
+            login();
+          })
+          .catch((error) => console.log(error));
       })
       .catch(function (error) {
         if (error.response) {
-          if(error.response.data["hydra:description"] =="not an error"){
-              loginWithError();
-            }        
+          if (error.response.data["hydra:description"] == "not an error") {
+            loginWithError();
           }
-        
+        }
       });
   };
   //#endregion
-
-  
 
   const styles = {
     form: {
@@ -227,179 +253,247 @@ export default function MultiStepRegister() {
       display: "flex",
       flexDirection: "column",
     },
+    container: {
+      width: "60%",
+      display: "blocks",
+      mr: "auto",
+      ml: "auto",
+      border: "1px solid black",
+      padding: 10,
+      padding: "40px",
+      minWidth: "540px",
+      borderRadius: "10px",
+      textAlign: "left",
+      transition: "all 0.4s ease",
+      backgroundColor:"primary.main",
+    },
+    text: {
+      mt: 1,
+    },
   };
   //#endregion
   return (
-    <Box sx={{ width: "60%" , display:"blocks", mr:"auto", ml:"auto" }}>
+    <Box sx={pinkish}>
+      <br /><br />
+    <Box sx={styles.container}>
+      
       <Stepper activeStep={activeStep}>
         {steps.map((label, index) => {
           const stepProps = {};
           const labelProps = {};
           return (
-            <Step key={label} {...stepProps}>
+            <Step key={label} {...stepProps} >
               <StepLabel {...labelProps}>{label}</StepLabel>
             </Step>
           );
         })}
       </Stepper>
+
       <Container component="main" maxWidth="xs">
         <CssBaseline />
-        <Box sx={formBox}>
-          
-          <Box component="form" onSubmit={onSubmit} sx={{ mt: 3 }}>
+
+          <Box component="form" onSubmit={onSubmit} sx={{...formBox, mt: 3 }}>
             <Grid container spacing={2}>
               {activeStep === 0 && (
                 <div className="step1">
-                    <Typography variant="h2" sx={{mb:2}}>{steps[0]}</Typography>
-                    <Grid item>
-                    {formik.errors.name ? <div>{formik.errors.name}</div> : null}
-              <TextField
-                required
-                id="name"
-                label="Nom complet"
-                value={formik.values.name}
-                onChange={formik.handleChange}
-              />
-            </Grid>
-            <Grid item>
-            {formik.errors.displayName ? <div>{formik.errors.displayName}</div> : null}
-              <TextField
-                required
-                id="displayName"
-                label="Nom d'utilisateur"
-                value={formik.values.displayName}
-                onChange={formik.handleChange}
-              />
-            </Grid>
-            <Grid item>
-            {formik.errors.email ? <div>{formik.errors.email}</div> : null}
-              <TextField
-                required
-                id="email"
-                label="Adresse Email"
-                value={formik.values.email}
-                onChange={formik.handleChange}
-              />
-            </Grid>
-            <Grid item>
-            {formik.errors.password ? <div>{formik.errors.password}</div> : null}
-              <TextField
-                required
-                id="password"
-                label="mot de passe"
-                type="password"
-                value={formik.values.password}
-                onChange={formik.handleChange}
-              />
-            </Grid>
-            <Grid item>
-            {formik.errors.telephone ? <div>{formik.errors.telephone}</div> : null}
-              <TextField
-                required
-                id="telephone"
-                label="numero de téléphone"
-                value={formik.values.telephone}
-                onChange={formik.handleChange}
-              />
-            </Grid>
-            <Grid item>
-              <LocalizationProvider dateAdapter={DateAdapter}>
-                <DesktopDatePicker
-                  label="date de naissance"
-                  inputFormat="MM/dd/yyyy"
-                  value={date}
-                  onChange={setDate}
-                  renderInput={(params) => <TextField {...params} />}
-                />
-              </LocalizationProvider>
-            </Grid>
+                  <Typography variant="h2" sx={{ mb: 2 }}>
+                    {steps[0]}
+                  </Typography>
+                  <Grid item>
+                    {formik.errors.name ? (
+                      <div>{formik.errors.name}</div>
+                    ) : null}
+                    <TextField
+                      required
+                      id="name"
+                      label="Nom complet"
+                      value={formik.values.name}
+                      onChange={formik.handleChange}
+                      x={styles.text}
+                    />
+                  </Grid>
+                  <Grid item>
+                    {formik.errors.displayName ? (
+                      <div>{formik.errors.displayName}</div>
+                    ) : null}
+                    <TextField
+                      required
+                      id="displayName"
+                      label="Nom d'utilisateur"
+                      value={formik.values.displayName}
+                      onChange={formik.handleChange}
+                      sx={styles.text}
+                    />
+                  </Grid>
+                  <Grid item>
+                    {formik.errors.email ? (
+                      <div>{formik.errors.email}</div>
+                    ) : null}
+                    <TextField
+                      required
+                      id="email"
+                      label="Adresse Email"
+                      value={formik.values.email}
+                      onChange={formik.handleChange}
+                      sx={styles.text}
+                    />
+                  </Grid>
+                  <Grid item>
+                    {formik.errors.password ? (
+                      <div>{formik.errors.password}</div>
+                    ) : null}
+                    <TextField
+                      required
+                      id="password"
+                      label="mot de passe"
+                      type="password"
+                      value={formik.values.password}
+                      onChange={formik.handleChange}
+                      sx={styles.text}
+                    />
+                  </Grid>
+                  <Grid item>
+                    {formik.errors.telephone ? (
+                      <div>{formik.errors.telephone}</div>
+                    ) : null}
+                    <TextField
+                      required
+                      id="telephone"
+                      label="numero de téléphone"
+                      value={formik.values.telephone}
+                      onChange={formik.handleChange}
+                      sx={styles.text}
+                    />
+                  </Grid>
+                  <Grid item sx={{mt:1}}>
+                  <LocalizationProvider dateAdapter={DateAdapter}>
+                      <DesktopDatePicker
+                        label="date de naissance"
+                        inputFormat="MM/dd/yyyy"
+                        value={formik.values.date}
+                        name="date"
+                        onChange={(value) => {
+                          formik.setFieldValue('date', Date.parse(value));
+                          }}
+                        renderInput={(params) => <FormTextField {...params} />}
+                      />
+                    </LocalizationProvider>
+                  </Grid>
+                  <React.Fragment>
+                    <Box sx={{ display: "flex", flexDirection: "row", pt: 2 }}>
+                      <Button
+                        color="inherit"
+                        disabled={activeStep === 0}
+                        onClick={handleBack}
+                        sx={{ ...ButtonStyles, mr: 1 }}
+                      >
+                        Back
+                      </Button>
+                      <Box sx={{ flex: "1 1 auto" }} />
+
+                      {activeStep === steps.length ? (
+                          <></>
+                      ) : (
+                        <Button sx={ButtonStyles} disabled={!stepOne} onClick={handleNext}>
+                          next
+                        </Button>
+                      )}
+                    </Box>
+                  </React.Fragment>
                 </div>
               )}
               {/* TODO: make an optional step for documents */}
               {activeStep === 1 && (
-                  
                 <div className="step2">
-                    <Grid item>
-                    {formik.errors.pays ? <div>{formik.errors.pays}</div> : null}
-            <Typography variant="h4">adresse:</Typography>
-              <TextField
-                required
-                id="pays"
-                label="Pays"
-                value={formik.values.pays}
-                onChange={formik.handleChange}
-              />
-            </Grid>
-            <Grid item>
-            {formik.errors.ville ? <div>{formik.errors.ville}</div> : null}
-              <TextField
-                required
-                id="ville"
-                label="ville"
-                value={formik.values.ville}
-                onChange={formik.handleChange}
-              />
-            </Grid>
-            <Grid item>
-            {formik.errors.rue ? <div>{formik.errors.rue}</div> : null}
-              <TextField
-                required
-                id="rue"
-                label="rue"
-                value={formik.values.rue}
-                onChange={formik.handleChange}
-              />
-            </Grid>
-            <Grid item>
-            {formik.errors.zipcode ? <div>{formik.errors.zipcode}</div> : null}
-              <TextField
-                required
-                id="zipcode"
-                label="code zip"
-                value={formik.values.zipcode}
-                onChange={formik.handleChange}
-              />              
-            </Grid>
+                  <Grid item>
+                    {formik.errors.pays ? (
+                      <div>{formik.errors.pays}</div>
+                    ) : null}
+                    <Typography variant="h4">adresse:</Typography>
+                    <TextField
+                      required
+                      id="pays"
+                      label="Pays"
+                      value={formik.values.pays}
+                      onChange={formik.handleChange}
+                      sx={styles.text}
+                    />
+                  </Grid>
+                  <Grid item>
+                    {formik.errors.ville ? (
+                      <div>{formik.errors.ville}</div>
+                    ) : null}
+                    <TextField
+                      required
+                      id="ville"
+                      label="ville"
+                      value={formik.values.ville}
+                      onChange={formik.handleChange}
+                      sx={styles.text}
+                    />
+                  </Grid>
+                  <Grid item>
+                    {formik.errors.rue ? <div>{formik.errors.rue}</div> : null}
+                    <TextField
+                      required
+                      id="rue"
+                      label="rue"
+                      value={formik.values.rue}
+                      onChange={formik.handleChange}
+                      sx={styles.text}
+                    />
+                  </Grid>
+                  <Grid item>
+                    {formik.errors.zipcode ? (
+                      <div>{formik.errors.zipcode}</div>
+                    ) : null}
+                    <TextField
+                      required
+                      id="zipcode"
+                      label="code zip"
+                      value={formik.values.zipcode}
+                      onChange={formik.handleChange}
+                      sx={styles.text}
+                    />
+                  </Grid>
+                  <React.Fragment>
+                    <Box sx={{ display: "flex", flexDirection: "row", pt: 2 }}>
+                      <Button
+                        color="inherit"
+                        disabled={activeStep === 0}
+                        onClick={handleBack}
+                        sx={{ ...ButtonStyles, mr: 1 }}
+                      >
+                        Back
+                      </Button>
+                      <Box sx={{ flex: "1 1 auto" }} />
+
+                      {activeStep === steps.length ? (
+                          <></>
+                      ) : (
+                        <Button sx={ButtonStyles} disabled={!stepTwo} type="submit">
+                          next
+                        </Button>
+                      )}
+                    </Box>
+                  </React.Fragment>
                 </div>
               )}
               <Grid item xs={12}>
-              {activeStep === steps.length ? (
-                <React.Fragment>
-                  <Typography sx={{ mt: 2, mb: 1 }}>
-                    All steps completed - you&apos;re finished {activeStep} {steps.length}
-                  </Typography>
-                </React.Fragment>
-              ) : (
-                <React.Fragment>
-                  
-                  <Box sx={{ display: "flex", flexDirection: "row", pt: 2 }}>
-                    <Button
-                      color="inherit"
-                      disabled={activeStep === 0}
-                      onClick={handleBack}
-                      sx={{ ...ButtonStyles , mr: 1 }}
-                    >
-                      Back
-                    </Button>
-                    <Box sx={{ flex: "1 1 auto" }} />
-
-
-                    {activeStep === steps.length - 1 ? <Button sx={ButtonStyles} type="submit">
-                        soumettre
-                      
-                    </Button> : 
-                    <Button sx={ButtonStyles} onClick={handleNext}>
-                    next
-                  
-                </Button>}
-                  </Box>
-                </React.Fragment>
-              )}
+                {activeStep === steps.length &&
+                  (<React.Fragment>
+                    <Typography sx={{ mt: 2, mb: 1 }}>
+                      All steps completed - you&apos;re finished {activeStep}{" "}
+                      {steps.length}
+                    </Typography>
+                  </React.Fragment>)
+                }
               </Grid>
             </Grid>
           </Box>
-        </Box>
       </Container>
+    </Box>
+    <br /><br />
     </Box>
   );
 }
