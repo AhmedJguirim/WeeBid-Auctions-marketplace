@@ -1,6 +1,6 @@
 import * as React from "react";
 import MenuIcon from "@mui/icons-material/Menu";
-import logoPath from "../../../media/images/logo.png";
+import logoPath from "../../../media/images/dotItLogo.png";
 import TopNavLink from "../customComponents/TopNavLink";
 import { TopNavGrid, TopAppBar } from "../customComponents/general";
 import {

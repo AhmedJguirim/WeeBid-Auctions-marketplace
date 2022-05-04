@@ -1,4 +1,4 @@
-import { Grid, Typography } from '@mui/material';
+import { Grid, Pagination, Typography } from '@mui/material';
 import React from 'react'
 import ProductsListing from '../generalComponents/ProductsListing';
 import axios from 'axios';
@@ -9,12 +9,28 @@ const EncheresInverseParCategory = () => {
   const {categoryId} = useParams();
   const [enchereInverses, setEnchereInverses] = React.useState({});
   const [categoryName, setCategoryName] = React.useState("");
-  
+  const [page, setPage] = React.useState(1);
+  const [pagesNumber, setPageNumber] = React.useState(1);
+
+  function getPagesNumber(){
+    axios.get(`${apiRoutes.API}/enchere_inverses/pages`,{
+      params:{
+        "endDate[after]":new Date().getTime()
+      }
+    }).then(res=>{
+      if(res["data"]["hydra:member"].length/12<1){
+        setPageNumber(1)
+      }else{
+        setPageNumber(Math.ceil(res["data"]["hydra:member"].length/12))
+      }
+    })
+  }
   function getEnchereInverses() {
     axios.get(`${apiRoutes.API}/enchere_inverses`, {
       params: {
-        page: "1",
-        category: categoryId
+        page: page,
+        category: categoryId,
+        "endDate[after]":new Date().getTime()
       }
     })
     .then(function (response) {
@@ -25,16 +41,26 @@ const EncheresInverseParCategory = () => {
   const getCategoryName = ()=>{
     axios.get(`${apiRoutes.API}/categories/${categoryId}`).then(response=>{setCategoryName(response["data"].name)}).catch(error=>{return error})
   }
+  const handlePagination = (event, value)=>{
+    setPage(value)
+
+  }
+  //TODO get current page here
+
   React.useEffect(()=>{
     getEnchereInverses()
     getCategoryName()
   },[])
+  React.useEffect(()=>{
+    getEnchereInverses()
+  },[page])
 
       return (
         <Grid container>
             <Typography variant='h3'>nos encheres inversées de {categoryName}</Typography>
             <ProductsListing elemsPerLine={6} type={navRoutes.ENCHEREINVERSE} ventes={enchereInverses}>
             </ProductsListing>
+            <Pagination count={10} onChange={handlePagination} color="secondary" />
         </Grid>
       )
 }

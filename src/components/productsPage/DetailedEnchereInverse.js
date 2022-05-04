@@ -8,11 +8,12 @@ import {
   Dialog,
   DialogActions,
   DialogTitle,
+  Container,
 } from "@mui/material";
 import { Box} from "@mui/system";
 import React, { useRef } from "react";
 import PersonIcon from "@mui/icons-material/Person";
-import { ArticleImage, ArticleSubImage, ButtonStyles, lightContainer } from "../base/customComponents/general";
+import { ArticleImage, ArticleSubImage, ButtonStyles, lightContainer, pinkish } from "../base/customComponents/general";
 import axios from "axios";
 import { useParams } from "react-router-dom";
 import { apiRoutes } from "../../config/routes";
@@ -20,7 +21,8 @@ import Api from "../../AxiosInstance";
 import { useDispatch, useSelector } from "react-redux";
 import Socket from "../base/customComponents/Socket";
 import {fetchWatchList} from '../../redux/actions';
-
+import placeHolder from "../../media/images/imagelessAuction.png"
+import Countdown from "../base/customComponents/Countdown";
 
 const DetailedEnchereInverse = () => {
 
@@ -41,6 +43,9 @@ const DetailedEnchereInverse = () => {
   const [followable, setFollowable] = React.useState(true);
   const [watched, setWatched] = React.useState(false);
   const [watchButton, setWatchButton] = React.useState("surveiller");
+  const [live, setLive] = React.useState(false);
+  const [expired, setExpired] = React.useState(false);
+
   //#endregion
 
   //#region state handlers
@@ -99,6 +104,19 @@ const DetailedEnchereInverse = () => {
       .then(function (response) {
         const data = response["data"];
         console.log(response["data"]["@id"], "retrieved successfully!");
+        if(new Date(response["data"].endDate).getTime() < new Date().getTime()){
+          setLive(false);
+          setExpired(true);
+
+        }else if(new Date(response["data"].startDate).getTime() < new Date().getTime()){
+          setLive(true);
+          setExpired(false);
+
+        }else{
+          setLive(false);
+          setExpired(false);
+
+        }
         setEnchere(data);
         //gets the current reduction from the latest reduction
         getCurrentPrice(response["data"].initPrice, id);
@@ -163,7 +181,7 @@ const handleWatch = ()=>{
   //#region augmentation zone
   function reduire() {
     const newPrice = Math.round((thePrice - reduction) * 100) / 100;
-    Api.post("/reductions", {
+    Api.post("/reduire", {
       user: `/api/users/${user.id}`,
       enchereInverse: `/api/enchere_inverses/${id}`,
       value: newPrice,
@@ -205,7 +223,7 @@ const getImages = (rawImages)=>{
 
   }, [mounted, id]);
   React.useEffect(() => {
-    if(user==={}||user.id === seller.id){
+    if(user==={}||user.id === seller.id||expired===true){
       setFollowable(false)
     }else{
       setFollowable(true)
@@ -214,7 +232,7 @@ const getImages = (rawImages)=>{
 
 
   return (
-    <Grid container sx={{ mt: 10 }}>
+    <Grid container sx={{...pinkish, mt:5}}>
       {/* could be used for anything */}
       {/* this is just a verification popUp */}
       <Dialog
@@ -256,14 +274,13 @@ const getImages = (rawImages)=>{
 
       <Grid
         container
-        sx={{
-          backgroundColor: "secondary.main",
-          padding: 5,
-          color: "secondary.main",
-          borderRadius: 10,
-        }}
+        sx={pinkish}
         spacing={2}
       >
+        <Container sx={{mb:5}}>
+        {live===true &&(<Typography variant="h3" sx={{textAlign:"center", mt:5}}>live</Typography>)}
+      <Countdown variant="h4" endDate={enchere.endDate} startDate={enchere.startDate}/>
+      </Container>
         <Grid item xs={12}>
           <Typography variant="h3" color="primary.main">
             {article.name}
@@ -272,13 +289,16 @@ const getImages = (rawImages)=>{
 
         {/* first section */}
         <Grid item xs={5.8}>
+        
+        <Grid item ml={4}>
         {followable === true &&
           <Grid item><Button onClick={handleWatch} sx={{...ButtonStyles, backgroundColor:"primary.main"}}> {watchButton} </Button></Grid>}
+          </Grid>
           {/* documents */}
           <Grid item>
             <ArticleImage src={images[0]} alt=""/>
           </Grid>
-          <Grid container spacing={2}>
+          <Grid container sx={{ml:3}} spacing={2}>
             {images.map((image) => (
               <Grid
                 item
@@ -289,6 +309,7 @@ const getImages = (rawImages)=>{
                <ArticleSubImage src={image} alt={image} />
               </Grid>
             ))}
+             {images[0]===undefined && <ArticleImage src={placeHolder} alt="" />}
           </Grid>
           {/* seller userdata subsection */}
           <Grid container spacing={2} sx={{ mt: 2 }}>
@@ -324,29 +345,17 @@ const getImages = (rawImages)=>{
         <Grid item xs={0.4}></Grid>
         {/* second section */}
         <Grid item xs={5.8} sx={{ color: "secondary.main" }}>
+        <Typography sx={{ml:5}} variant="h3" color={"black"}>
+            {article.nom}
+          </Typography>
+        {live===true ? (<Box sx={lightContainer}>
           {/* selling section */}
-          <Box sx={lightContainer}>
-            <Grid container spacing={2}>
-              <Grid item xs={4}>
-                <Typography variant="h6">prix immediat:</Typography>{" "}
-              </Grid>
-              <Grid item xs={4}>
-                <Typography variant="h6" color="info.main">
-                  {enchere.immediatePrice}TND
-                </Typography>
-              </Grid>
-              <Grid item xs={4}>
-                <Button sx={ButtonStyles}> acheter maintenant</Button>
-              </Grid>
-            </Grid>
-            <hr style={{ width: "60%" }} />
-
             <Grid container spacing={2}>
               <Grid item xs={4}>
                 <Typography variant="h6">encherir:</Typography>{" "}
               </Grid>
               <Grid item xs={4}>
-                <Typography variant="h6" color="info.main">
+                <Typography variant="h6">
                   prix actuel: {thePrice}TND
                 </Typography>
               </Grid>
@@ -374,7 +383,7 @@ const getImages = (rawImages)=>{
                 </Button>
               </Grid>
             </Grid>
-          </Box>
+          </Box>):(<></>)}
           {/* sale details section*/}
           <Box>
             <Grid container spacing={2} sx={{ mt: 2 }}>
@@ -382,12 +391,7 @@ const getImages = (rawImages)=>{
               <Grid
                 item
                 xs={12}
-                sx={{
-                  backgroundColor: "primary.main",
-                  borderRadius: 10,
-                  padding: 4,
-                  mt: 5,
-                }}
+                sx={lightContainer}
               >
                 <Typography variant="h3">
                   <PersonIcon fontSize="large" sx={{ mr: 2 }} />

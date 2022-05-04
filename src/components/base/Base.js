@@ -28,6 +28,7 @@ import DetailedEnchere from '../productsPage/DetailedEnchere'
 import Socket from './customComponents/Socket'
 import ConsultUser from '../ConsultUser'
 import Demande from '../demande/Demande'
+import NotFound from './customComponents/NotFound'
 
 
 
@@ -97,6 +98,9 @@ const Base = () => {
           <Route path={`${navRoutes.ENCHERES}${navRoutes.PERUSER}/:id`}element={<EncheresParUser />}></Route>
           <Route path={`${navRoutes.ENCHERESINVERSES}${navRoutes.PERUSER}/:id`}element={<EncheresInversesParUser />}></Route>
           <Route path={navRoutes.WATCHLIST}element={<WatchList />}></Route>
+
+
+          <Route path="*" element={<NotFound />}></Route>
 
           
         </Routes>

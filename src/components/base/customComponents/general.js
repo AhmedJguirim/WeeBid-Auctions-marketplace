@@ -34,7 +34,8 @@ export const DrawerHeader = styled("div")(({ theme }) => ({
 }));
 
 export const ArticleImage = styled("img")(({ theme }) => ({
-  maxWidth: 300,
+  margin:"10px 40px 40px 40px",
+  width:"80%"
 }));
 export const ArticleSubImage = styled("img")(({ theme }) => ({
   maxWidth: 100,
@@ -51,7 +52,7 @@ export const ButtonStyles = {
   color: "secondary.main",
   border: "1px solid black",
   "&:hover": {
-    backgroundColor: "info.main",
+    backgroundColor: "secondary.main",
     color: "primary.main",
   },
 };
@@ -75,8 +76,15 @@ export const formBox = {
 export const lightContainer = {
   backgroundColor: "primary.main",
   color: "secondary.main",
-  borderRadius: 10,
   padding: 4,
-  mt: 5,
+  margin:5,
 };
+export const expriredContainer = {
+  backgroundColor: "secondary.main",
+  color: "primary.main",
+  padding: 4,
+  margin:4,
+  width:"100%",
+  textAlign:"center"
+}
 

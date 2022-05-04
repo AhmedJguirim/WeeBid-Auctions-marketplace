@@ -43,7 +43,7 @@ const ProductsListing = ({ventes ,elemsPerLine , type}) => {
                     {ventes[key].currentPrice} TND
                   </Typography>
                   
-                    <Countdown date={ventes[key].startDate} />
+                    <Countdown endDate={ventes[key].endDate} startDate={ventes[key].startDate} />
 
                 
               </CardContent>

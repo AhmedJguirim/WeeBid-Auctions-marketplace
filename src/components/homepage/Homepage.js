@@ -56,6 +56,7 @@ const Homepage = () => {
 
   //#region get encheres inverses
   const [encheresInverses, setEnchereInverses] = React.useState({});
+  const [count, setCount] = React.useState({})
 var today = new Date();
 
   var date =
@@ -73,8 +74,17 @@ var today = new Date();
       })
       .catch((error) => console.log(error));
   }
+
   //#endregion
 
+  function getCount() {
+    axios
+      .get(`${apiRoutes.API}/count`)
+      .then(function (response) {
+        setCount({'enchere': response["data"]["hydra:member"][0],'enchereInverse': response["data"]["hydra:member"][1],'user': response["data"]["hydra:member"][2]})
+      })
+      .catch((error) => console.log(error));
+  }
   //#region get encheres
   const [encheres, setEncheres] = React.useState({});
 
@@ -98,6 +108,7 @@ var today = new Date();
   React.useEffect(() => {
     getEncheres();
     getEnchereInverses();
+    getCount();
   }, []);
 
   return (
@@ -143,7 +154,7 @@ var today = new Date();
           <Typography
             sx={{ textAlign: "center", fontSize: 200, color: "primary.main" }}
           >
-            320
+            {count.enchere}
           </Typography>
           <Typography
             variant="h4"
@@ -158,7 +169,7 @@ var today = new Date();
           <Typography
             sx={{ textAlign: "center", fontSize: 200, color: "primary.main" }}
           >
-            20
+            {count.enchereInverse}
           </Typography>
           <Typography
             variant="h4"
@@ -173,7 +184,7 @@ var today = new Date();
           <Typography
             sx={{ textAlign: "center", fontSize: 200, color: "primary.main" }}
           >
-            161
+            {count.user}
           </Typography>
           <Typography
             variant="h4"

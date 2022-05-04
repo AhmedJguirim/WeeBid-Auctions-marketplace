@@ -8,6 +8,7 @@ import {
   Dialog,
   DialogActions,
   DialogTitle,
+  Container,
 } from "@mui/material";
 import { Box } from "@mui/system";
 import React, { useRef } from "react";
@@ -17,6 +18,7 @@ import {
   lightContainer,
   ArticleImage,
   ArticleSubImage,
+  pinkish,
 } from "../base/customComponents/general";
 import axios from "axios";
 import { useParams } from "react-router-dom";
@@ -25,7 +27,9 @@ import Api from "../../AxiosInstance";
 import { useDispatch, useSelector } from "react-redux";
 import Socket from "../base/customComponents/Socket";
 import { fetchWatchList } from "../../redux/actions";
-import { ConstructionOutlined } from "@mui/icons-material";
+import placeHolder from "../../media/images/imagelessAuction.png"
+import Countdown from "../base/customComponents/Countdown";
+
 
 const DetailedEnchere = () => {
   const dispatch = useDispatch();
@@ -46,6 +50,9 @@ const DetailedEnchere = () => {
   const [watched, setWatched] = React.useState(false);
   const [augmentation, setAugmentation] = React.useState(0.1);
   const [watchButton, setWatchButton] = React.useState("surveiller");
+  const [live, setLive] = React.useState(false);
+  const [expired, setExpired] = React.useState(false);
+
 
   //#endregion
 
@@ -108,6 +115,19 @@ const DetailedEnchere = () => {
       .then(function (response) {
         const data = response["data"];
         console.log(response["data"]["@id"], "retrieved successfully!");
+        if(new Date(response["data"].endDate).getTime() < new Date().getTime()){
+          setLive(false);
+          setExpired(true);
+
+        }else if(new Date(response["data"].startDate).getTime() < new Date().getTime()){
+          setLive(true);
+          setExpired(false);
+
+        }else{
+          setLive(false);
+          setExpired(false);
+
+        }
         setEnchere(data);
         //gets the current augmentation from the latest augmentation
         getCurrentPrice(response["data"].initPrice, id);
@@ -176,7 +196,7 @@ const DetailedEnchere = () => {
   function augmenter() {
     const newPrice = Math.round((thePrice + augmentation) * 100) / 100;
 
-    Api.post("/augmentations", {
+    Api.post("/augmenter", {
       user: `/api/users/${user.id}`,
       enchere: `/api/encheres/${id}`,
       value: newPrice,
@@ -247,7 +267,7 @@ const DetailedEnchere = () => {
     getEnchere();
   }, [id, mounted]);
   React.useEffect(() => {
-    if(user==={}||user.id === seller.id){
+    if(user==={}||user.id === seller.id||expired===true){
       setFollowable(false)
     }else{
       setFollowable(true)
@@ -262,7 +282,7 @@ const DetailedEnchere = () => {
   }, [seller,user]);
 
   return (
-    <Grid container sx={{ mt: 10 }}>
+    <Grid container sx={{...pinkish, mt:5}}>
       {/* could be used for anything */}
       {/* this is just a verification popUp */}
       <Dialog
@@ -304,36 +324,38 @@ const DetailedEnchere = () => {
 
       <Grid
         container
-        sx={{
-          backgroundColor: "secondary.main",
-          padding: 5,
-          color: "secondary.main",
-          borderRadius: 10,
-        }}
+        sx={
+        pinkish
+      }
         spacing={2}
-      >
-        <Grid item xs={12}>
-          <Typography variant="h3" color="primary.main">
-            {article.name}
-          </Typography>
-        </Grid>
+      ><Container sx={{mb:3}}>
+        {live===true &&(<Typography sx={{textAlign:"center", mt:2}} variant="h3">live</Typography>)}
+      <Countdown variant="h4" endDate={enchere.endDate} startDate={enchere.startDate}/>
+      </Container>
+        
 
         {/* first section */}
-        <Grid item xs={5.8}>
+        <Grid item xs={5.8} >
+        <Grid item ml={4}>
         {followable === true &&
           <Grid item><Button onClick={handleWatch} sx={{...ButtonStyles, backgroundColor:"primary.main"}}> {watchButton} </Button></Grid>}
         {isOwner === true &&
           <Grid item><Button onClick={handleFermeture} sx={{...ButtonStyles, backgroundColor:"primary.main"}}> fermer </Button></Grid>}
+          </Grid>
           {/* documents */}
+
+          
+
           <Grid item>
             <ArticleImage src={images[0]} alt="" />
           </Grid>
-          <Grid container spacing={2}>
+          <Grid container sx={{ml:3}} spacing={2}>
             {images.map((image) => (
               <Grid item xs={4} key={Math.random()} sx={{ height: 100 }}>
                 <ArticleSubImage src={image} alt={image} />
               </Grid>
             ))}
+            {images[0]===undefined && <ArticleImage src={placeHolder} alt="" />}
           </Grid>
           {/* seller userdata subsection */}
           <Grid container spacing={2} sx={{ mt: 2 }}>
@@ -345,46 +367,44 @@ const DetailedEnchere = () => {
               </Typography>
               {/* seller data details */}
               <Grid item sx={{ mt: 2 }}>
-                {Object.keys(seller).map((key, index) => (
-                  <Grid container key={index} sx={{ mb: 2 }}>
+
+                  <Grid container sx={{ mb: 2 }}>
                     <Grid item xs={6}>
-                      <Typography variant="h6">{key}: </Typography>
+                      <Typography variant="h6">nom d'utilisateur: </Typography>
                     </Grid>
                     <Grid item xs={6}>
-                      <Typography variant="h6">{seller[key]} </Typography>
+                      <Typography variant="h6">{seller["nom d'utilisateur"]} </Typography>
                     </Grid>
                   </Grid>
-                ))}
+                  <Grid container sx={{ mb: 2 }}>
+                    <Grid item xs={6}>
+                      <Typography variant="h6">localisation: </Typography>
+                    </Grid>
+                    <Grid item xs={6}>
+                      <Typography variant="h6">{seller["localisation"]===undefined ? "":seller["localisation"]} </Typography>
+                    </Grid>
+                  </Grid>
               </Grid>
             </Grid>
           </Grid>
         </Grid>
+        
         <Grid item xs={0.4}></Grid>
         {/* second section */}
+        
         <Grid item xs={5.8} sx={{ color: "secondary.main" }}>
-          {/* selling section */}
-          <Box sx={lightContainer}>
-            <Grid container spacing={2}>
-              <Grid item xs={4}>
-                <Typography variant="h6">prix immediat:</Typography>{" "}
-              </Grid>
-              <Grid item xs={4}>
-                <Typography variant="h6" color="info.main">
-                  {enchere.immediatePrice}TND
-                </Typography>
-              </Grid>
-              <Grid item xs={4}>
-                <Button sx={ButtonStyles}> acheter maintenant</Button>
-              </Grid>
-            </Grid>
-            <hr style={{ width: "60%" }} />
 
-            <Grid container spacing={2}>
+        <Typography sx={{ml:5}} variant="h3" color={"black"}>
+            {article.nom}
+          </Typography>
+
+        {live===true ? (<Box sx={lightContainer}>
+          <Grid container spacing={2}>
               <Grid item xs={4}>
                 <Typography variant="h6">encherir:</Typography>{" "}
               </Grid>
               <Grid item xs={4}>
-                <Typography variant="h6" color="info.main">
+                <Typography variant="h6">
                   prix actuel: {thePrice}TND
                 </Typography>
               </Grid>
@@ -412,7 +432,9 @@ const DetailedEnchere = () => {
                 </Button>
               </Grid>
             </Grid>
-          </Box>
+          </Box>):(<></>)}
+          {/* selling section */}
+          
           {/* sale details section*/}
           <Box>
             <Grid container spacing={2} sx={{ mt: 2 }}>
@@ -420,12 +442,7 @@ const DetailedEnchere = () => {
               <Grid
                 item
                 xs={12}
-                sx={{
-                  backgroundColor: "primary.main",
-                  borderRadius: 10,
-                  padding: 4,
-                  mt: 5,
-                }}
+                sx={lightContainer}
               >
                 <Typography variant="h3">
                   <PersonIcon fontSize="large" sx={{ mr: 2 }} />

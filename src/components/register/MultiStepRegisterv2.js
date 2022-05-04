@@ -277,7 +277,7 @@ export default function MultiStepRegister() {
       <br /><br />
     <Box sx={styles.container}>
       
-      <Stepper activeStep={activeStep}>
+      <Stepper sx={{width:"50%"}} activeStep={activeStep}>
         {steps.map((label, index) => {
           const stepProps = {};
           const labelProps = {};

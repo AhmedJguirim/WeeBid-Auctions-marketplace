@@ -65,7 +65,6 @@ const UserProfile = () => {
       console.error(error);
     }
   }
-  //TODO add custom passowrd put
 
   const submitHandler = (event) => {
 event.preventDefault();
