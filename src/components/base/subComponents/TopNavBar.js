@@ -43,7 +43,6 @@ const TopNavBar = () => {
       value:"/users",
       text: "users"
     },
-    //TODO: ajouter ventes et utilisateurs 
   }
   const handleType = (event) => {
     setType(event.target.value);

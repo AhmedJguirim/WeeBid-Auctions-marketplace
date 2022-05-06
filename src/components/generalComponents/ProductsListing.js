@@ -27,9 +27,12 @@ const ProductsListing = ({ventes ,elemsPerLine , type}) => {
     <Grid container sx={{...styles.productsGrid, textAlign: "center"}} spacing={3}>
           {Object.keys(ventes).map((key, index) => (
             <Grid item xs={12/elemsPerLine} key={key}>
-            <Card key={index} >
+            <Card key={index}  >
               <CardContent>
-                <img src={demoListImage} className="cardImage" />
+                {ventes[key].article.documents[0]?(<img src={`http://127.0.0.1:8000${ventes[key].article.documents[0].contentUrl}`} className="cardImage" />)
+              :  (<img src={demoListImage} className="cardImage" />)
+              }
+                
                 <br />
                   <Link style={styles.productLink} to={`${type}/${ventes[key].id}`} >{ventes[key].article.name}</Link>
                   <Typography sx={styles.productsTypography}>

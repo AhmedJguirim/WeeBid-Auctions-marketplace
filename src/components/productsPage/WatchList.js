@@ -1,4 +1,4 @@
-import { Grid, Typography } from '@mui/material';
+import { Divider, Grid, Typography } from '@mui/material';
 import React from 'react'
 import ProductsListing from '../generalComponents/ProductsListing';
 import axios from 'axios';
@@ -53,14 +53,18 @@ const user = useSelector((state) => state.user);
 
       return (
         <Grid container>
-            <Typography variant='h3'>votre liste de surveilles</Typography>
-            <Grid item xs={12}>
+            <Grid item xs={12}><br /><Typography variant='h3'>votre liste de surveilles</Typography></Grid>
+            <Grid item xs={5.5}>
+            <br /><br />
             <Typography variant='h5'>encheres Surveillés</Typography>
-            <ProductsListing elemsPerLine={6} type={navRoutes.ENCHERE} ventes={encheres}></ProductsListing>
+            <ProductsListing elemsPerLine={3} type={navRoutes.ENCHERE} ventes={encheres}></ProductsListing>
             </Grid>
-            <Grid item xs={12}>
-            <Typography variant='h5'>encheresInverses Surveillés</Typography>
-            <ProductsListing elemsPerLine={6} type={navRoutes.ENCHEREINVERSE} ventes={encheresInverses}></ProductsListing>
+            <Grid xs={1}></Grid>
+            
+            <Grid item xs={5.5}>
+            <br /><br />
+            <Typography variant='h5'>encheres Inversées Surveillés</Typography>
+            <ProductsListing elemsPerLine={3} type={navRoutes.ENCHEREINVERSE} ventes={encheresInverses}></ProductsListing>
             </Grid>
         </Grid>
       )

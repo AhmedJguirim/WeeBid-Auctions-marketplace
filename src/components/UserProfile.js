@@ -9,6 +9,8 @@ import {
   DialogActions,
   Dialog,
   Button,
+  Card,
+  CardContent,
 } from "@mui/material";
 import React from "react";
 import EditIcon from "@mui/icons-material/Edit";
@@ -18,11 +20,12 @@ import { Box } from "@mui/system";
 import { ButtonStyles } from "./base/customComponents/general";
 import { apiRoutes } from "../config/routes";
 import { useSelector } from "react-redux";
+import { pinkish } from "./base/customComponents/general";
 
 const UserProfile = () => {
   const myUser = useSelector((state) => state.user);
   //#region form data state
-
+  const [avatar, setAvatar] = React.useState("");
   const [isEditing, setIsEditing] = React.useState("");
   const [modification, setModification] = React.useState("");
   //#endregion
@@ -61,6 +64,10 @@ const UserProfile = () => {
         telephone: data.telephone,
         birthDate: data.birthDate.slice(0, 10),
       });
+      let path = "http://127.0.0.1:8000/user/";
+      const myImg = path.concat(data.image);
+      setAvatar(myImg)
+      console.log(`http://127.0.0.1:8000/${data.image}`)
     } catch (error) {
       console.error(error);
     }
@@ -86,7 +93,7 @@ event.preventDefault();
   }, []);
 
   return (
-    <Grid container sx={lightContainer}>
+    <Grid container sx={pinkish}>
       <Dialog
         open={open}
         onClose={handleClose}
@@ -117,15 +124,25 @@ event.preventDefault();
         </DialogContent>
       </Dialog>
       {/* title */}
-      <Grid container>
+      <Grid container >
+      <Grid xs={12}><Typography variant="h2">buttons for functionalities and things TODO //////////////////////////////////////</Typography>{" "}<br /><br /></Grid>
+        <Grid item xs={3} sx={{ textAlign: "left"}}>
+        <Card >
+              <CardContent>
+                <Box >
+              <Avatar sx={{ width: "100%", height: "100%" }} alt="avatar" src={avatar}/>
+              </Box>
+               <Box sx={{ textAlign: "center"}}><Typography variant="h2">{user.displayName}</Typography>{" "}</Box>
+                
+              </CardContent></Card>
+        </Grid>
+              
+      
         <Grid item xs={1}>
-          <Avatar>AH</Avatar>
+          
         </Grid>
-        <Grid item xs={3.5} sx={{ textAlign: "left" }}>
-          <Typography variant="h2">{user.displayName}</Typography>{" "}
-        </Grid>
-      </Grid>
-      <Grid item xs={9} sx={{ mt: 5 }}>
+      
+      <Grid item xs={7} sx={{ mt: 5 }}>
         {Object.keys(user).map((key, index) => (
           <Grid container key={index}>
             <Grid item xs={6}>
@@ -149,7 +166,9 @@ event.preventDefault();
             </Grid>
           </Grid>
         ))}
+        <Grid xs={12}><Typography variant="h2">LISTINGS OF auctions TODOOOO ////</Typography>{" "}<br /><br /></Grid>
       </Grid>
+    </Grid>
     </Grid>
   );
 };

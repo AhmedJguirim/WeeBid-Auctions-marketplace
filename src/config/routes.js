@@ -18,7 +18,9 @@ export const navRoutes = {
     PERUSER: "/user",
     WATCHLIST: "/watchList",
     DEMANDE:"/demande_devis",
-
+    ENCHERESEARCH:"/enchereSearch",
+    ENCHEREINVERSESEARCH:"/enchereInverseSearch",
+    USERSEARCH:"/userSearch",
     //posting things
     MAKE_ARTICLE: "/makeArticle",
 

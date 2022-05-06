@@ -14,7 +14,8 @@ const EncheresParCategory = () => {
     axios.get(`${apiRoutes.API}/encheres`, {
       params: {
         page: "1",
-        category: `${categoryId}`
+        category: `${categoryId}`,
+        "endDate[after]": new Date(),
       }
     })
     .then(function (response) {

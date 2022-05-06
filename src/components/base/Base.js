@@ -14,6 +14,7 @@ import CategoriesList from '../productsPage/CategoriesList'
 import EncheresParCategory from '../productsPage/EncheresParCategory'
 import EncheresInverseParCategory from '../productsPage/EncheresInverseParCategory'
 import EncheresListing from '../productsPage/EncheresListing'
+import EnchereSearchPage from '../productsPage/EnchereSearchPage'
 import EncheresInvListing from '../productsPage/EncheresInvListing'
 import Logout from '../login/logout'
 import { navRoutes } from '../../config/routes'
@@ -29,6 +30,8 @@ import Socket from './customComponents/Socket'
 import ConsultUser from '../ConsultUser'
 import Demande from '../demande/Demande'
 import NotFound from './customComponents/NotFound'
+import EnchereInverseSearchPage from '../productsPage/EnchereInverseSearchPage'
+import UserSearchPage from '../productsPage/UserSearchPage'
 
 
 
@@ -98,7 +101,10 @@ const Base = () => {
           <Route path={`${navRoutes.ENCHERES}${navRoutes.PERUSER}/:id`}element={<EncheresParUser />}></Route>
           <Route path={`${navRoutes.ENCHERESINVERSES}${navRoutes.PERUSER}/:id`}element={<EncheresInversesParUser />}></Route>
           <Route path={navRoutes.WATCHLIST}element={<WatchList />}></Route>
-
+          <Route path={`${navRoutes.ENCHERESEARCH}/:search`} element={<EnchereSearchPage />}></Route>
+          <Route path={`${navRoutes.ENCHEREINVERSESEARCH}/:search`} element={<EnchereInverseSearchPage />}></Route>
+          {/* TODO: users search missing */}
+          <Route path={`${navRoutes.USERSEARCH}/:search`} element={<UserSearchPage />}></Route>
 
           <Route path="*" element={<NotFound />}></Route>
 

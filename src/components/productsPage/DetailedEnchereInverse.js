@@ -76,6 +76,8 @@ const DetailedEnchereInverse = () => {
             })   
         
       })
+      //TODO: upload avatar
+    
   //gets the value given in the latest reduction
   function getCurrentPrice(initPrice, myId) {
     axios

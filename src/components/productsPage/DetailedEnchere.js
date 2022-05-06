@@ -140,6 +140,7 @@ const DetailedEnchere = () => {
 
         Socket.emit("join-rooms", [response["data"]["@id"].concat("LOCAL")]);
         //get the article
+        //TODO: docs could be fetched with article , play with groups
         axios
           .get(`${apiRoutes.API}/articles/${response["data"]["article"]["id"]}`)
           .then(function (response) {

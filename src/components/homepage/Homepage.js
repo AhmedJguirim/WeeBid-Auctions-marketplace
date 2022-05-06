@@ -9,7 +9,8 @@ import StorefrontTwoToneIcon from "@mui/icons-material/StorefrontTwoTone";
 import LocalMallTwoToneIcon from "@mui/icons-material/LocalMallTwoTone";
 import RequestQuoteTwoToneIcon from "@mui/icons-material/RequestQuoteTwoTone";
 import logo from "../../media/images/dotItLogo.png"
-
+import { pinkish } from "../base/customComponents/general";
+import { CategoryLink } from "../base/customComponents/TopNavLink";
 
 const styles = {
   subDiv: {
@@ -63,7 +64,7 @@ var today = new Date();
     today.getFullYear() + "-" + (today.getMonth() + 1) + "-" + today.getDate();
   function getEnchereInverses() {
     axios
-      .get(`${apiRoutes.API}/enchere_inverses/getFour`, {
+      .get(`${apiRoutes.API}/enchere_inverses/getEight`, {
         params: {
           page: "1",
           "endDate[after]": date,
@@ -71,6 +72,7 @@ var today = new Date();
       })
       .then(function (response) {
         setEnchereInverses(response["data"]["hydra:member"]);
+        console.log(response["data"]["hydra:member"]);
       })
       .catch((error) => console.log(error));
   }
@@ -91,7 +93,7 @@ var today = new Date();
   
   function getEncheres() {
     axios
-      .get(`${apiRoutes.API}/encheres/getFour`, {
+      .get(`${apiRoutes.API}/encheres/getEight`, {
         params: {
           page: "1",
           "endDate[after]": date,
@@ -99,6 +101,7 @@ var today = new Date();
       })
       .then(function (response) {
         setEncheres(response["data"]["hydra:member"]);
+        console.log(response["data"]["hydra:member"])
       })
       .catch((error) => console.log(error));
   }
@@ -199,31 +202,58 @@ var today = new Date();
       </Box>
 
  {/* section #3 */}
- <Box sx={{ ...styles.sectionBox, backgroundColor: "primary.main" }}>
-        {/* put ventes here */}
-        {/* <Typography variant="h4" color='secondary.main'>nos produits</Typography>
-        <HomePageList ventes={ventes} elemsPerLine={8} /> */}
+ <Box sx={{marginTop: "5%", ml:"2%", backgroundColor: "primary.main"}}>
+
         <Grid container>
-          <Grid item xs={5.5}>
+          <Grid item xs={12}>
+          <Grid container>
+            <Grid item xs={7}>
             <Typography variant="h4">
               nos enchères
             </Typography>
-            <HomePageList
+            </Grid>
+            <Grid item xs={3}>
+            </Grid>
+            <CategoryLink to={`${navRoutes.ENCHERES}`} >
+              voir tous
+            </CategoryLink>
+            </Grid>
+            {encheres[0] ?(
+              <HomePageList
               ventes={encheres}
               type={navRoutes.ENCHERE}
-              elemsPerLine={4}
+              elemsPerLine={8}
             />
+            ):(
+              <Box sx={{...pinkish, ...styles.textDiv,width:"98%",pt:"3%",pb:"3%", textAlign:"center"}}  > <Typography variant="h2">il n y a pas d'encheres disponibles pour le moment</Typography></Box>
+            )
+
+            }
+
           </Grid>
-          <Grid item xs={1}></Grid>
-          <Grid item xs={5.5}>
+
+          <Grid item xs={12}>
+          <Grid container>
+            <Grid item xs={7}>
             <Typography variant="h4">
-              nos enchères inverses
+              nos enchères
             </Typography>
-            <HomePageList
+            </Grid>
+            <Grid item xs={3}>
+            </Grid>
+            <CategoryLink to={`${navRoutes.ENCHERESINVERSES}`} >
+              voir tous
+            </CategoryLink>
+            </Grid>
+            {encheresInverses[0] ?(
+              <HomePageList
               ventes={encheresInverses}
               type={navRoutes.ENCHEREINVERSE}
-              elemsPerLine={4}
+              elemsPerLine={8}
             />
+            ):(
+              <Box sx={{...pinkish, ...styles.textDiv,width:"98%",pt:"3%",pb:"3%", textAlign:"center"}} > <Typography sx={{...pinkish}} variant="h3">il n y a pas d'encheres inversées disponibles pour le moment</Typography></Box>
+            )}
           </Grid>
         </Grid>
       </Box>

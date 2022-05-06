@@ -1,4 +1,4 @@
-import { Grid, Typography } from '@mui/material';
+import { Checkbox, Grid, Pagination, Typography } from '@mui/material';
 import React from 'react'
 import ProductsListing from '../generalComponents/ProductsListing';
 import axios from 'axios';
@@ -9,6 +9,9 @@ const EncheresParUser = () => {
   const {id} = useParams();
   const [encheres, setEncheres] = React.useState({});
   const [userName, setUserName] = React.useState("")
+  const [page, setPage] = React.useState(1);
+  const [pagesNumber, setPageNumber] = React.useState(1);
+  const [checked, setChecked] = React.useState(false);
   //just to get the username
   function getUser() {
     console.log("user id:",id)
@@ -17,31 +20,97 @@ const EncheresParUser = () => {
       setUserName(response["data"].displayName);
     }).catch(error=>console.log(error))
   }
+  function getPagesNumber() {
+    if(checked){
+      axios
+      .get(`${apiRoutes.API}/encheres/pages`, {
+        params: {
+          user:id
+        },
+      })
+      .then((res) => {
+        if (res["data"]["hydra:member"].length / 12 < 1) {
+          setPageNumber(1);
+        } else {
+          setPageNumber(Math.ceil(res["data"]["hydra:member"].length / 12));
+        }
+      });
+    }else{axios
+      .get(`${apiRoutes.API}/encheres/pages`, {
+        params: {
+          user:id,
+          "endDate[after]": new Date(),
+        },
+      })
+      .then((res) => {
+        if (res["data"]["hydra:member"].length / 12 < 1) {
+          setPageNumber(1);
+        } else {
+          setPageNumber(Math.ceil(res["data"]["hydra:member"].length / 12));
+        }
+      });}
+  }
   
   function getEnchere() {
-    console.log("user id",id)
+    if(checked){
     axios.get(`${apiRoutes.API}/encheres`, {
       params: {
-        page: "1",
+        page: page,
         user: `${id}`
       }
     })
     .then(function (response) {
-      console.log(response["data"]["hydra:member"])
       setEncheres(response["data"]["hydra:member"]);
     }).catch(error=>console.log(error))
+  }else{
+    axios.get(`${apiRoutes.API}/encheres`, {
+      params: {
+        page: page,
+        "endDate[after]": new Date(),
+        user: `${id}`
+      }
+    })
+    .then(function (response) {
+      setEncheres(response["data"]["hydra:member"]);
+    }).catch(error=>console.log(error))
+  }
+  }
+  const handleCheck = (event) => {
+    setChecked(event.target.checked);
+  };
+  const handlePagination = (event, value)=>{
+    setPage(value)
   }
   React.useEffect(()=>{
     getEnchere()
     getUser()
-
+    getPagesNumber()
   },[])
+  React.useEffect(()=>{
+    getEnchere()
+  },[page, checked])
 
       return (
         <Grid container>
-            <Typography variant='h3'>nos encheres de {userName}</Typography>
+          <Grid container>
+        <Grid item xs={7}>
+          <Typography variant="h3">
+            nos encheres inversées de {userName}
+          </Typography>
+        </Grid>
+        <Grid item >
+          <Checkbox
+            checked={checked}
+            onChange={handleCheck}
+            inputProps={{ "aria-label": "controlled" }}
+          />
+          
+        </Grid>
+        <Grid item xs={3}><br /><Typography>afficher les encheres Inversées expirés</Typography></Grid>
+      </Grid>
             <ProductsListing elemsPerLine={6} type={navRoutes.ENCHERE} ventes={encheres}>
             </ProductsListing>
+            <Pagination count={pagesNumber} onChange={handlePagination} color="secondary" />
         </Grid>
       )
 }

@@ -3,17 +3,22 @@ import React from 'react'
 import ProductsListing from '../generalComponents/ProductsListing';
 import axios from 'axios';
 import { apiRoutes, navRoutes } from '../../config/routes';
+import { useParams } from 'react-router-dom';
 
-
-const EncheresInvListing = () => {
-  const [enchereInverses, setEnchereInverses] = React.useState({});
+const UserSearchPage = () => {
+  const [encheres, setEncheres] = React.useState({});
   const [page, setPage] = React.useState(1);
   const [pagesNumber, setPageNumber] = React.useState(1);
   const [checked, setChecked] = React.useState(false);
+  let { search } = useParams();
   function getPagesNumber() {
     if(checked){
       axios
-      .get(`${apiRoutes.API}/enchere_inverses/pages`, {
+      .get(`${apiRoutes.API}/encheres/pages`,
+      {params: {
+        "article.name": search,
+      "endDate[after]": new Date(),
+    }}, {
       })
       .then((res) => {
         if (res["data"]["hydra:member"].length / 12 < 1) {
@@ -23,8 +28,9 @@ const EncheresInvListing = () => {
         }
       });
     }else{axios
-      .get(`${apiRoutes.API}/enchere_inverses/pages`, {
+      .get(`${apiRoutes.API}/encheres/pages`, {
         params: {
+            "article.name": search,
           "endDate[after]": new Date(),
         },
       })
@@ -36,50 +42,51 @@ const EncheresInvListing = () => {
         }
       });}
   }
-  function getEnchereInverses() {
+  function getEncheres() {
     if(checked){
-    axios.get(`${apiRoutes.API}/enchere_inverses`, {
+    axios.get(`${apiRoutes.API}/encheres`, {
       params: {
+        "article.name": search,
         page: page,
       }
     })
     .then(function (response) {
-      console.log(response["data"]["@id"], "retrieved successfully!");
-      setEnchereInverses(response["data"]["hydra:member"]);
-    }).catch(error=>console.log(error))}else{
-      axios.get(`${apiRoutes.API}/enchere_inverses`, {
-        params: {
-          page: page,
-          "endDate[after]": new Date(),
-        }
-      })
-      .then(function (response) {
-        console.log(response["data"]["@id"], "retrieved successfully!");
-        setEnchereInverses(response["data"]["hydra:member"]);
-      }).catch(error=>console.log(error))
-    }
+      setEncheres(response["data"]["hydra:member"]);
+    }).catch(error=>console.log(error))
+  }else{
+    axios.get(`${apiRoutes.API}/encheres`, {
+      params: {
+        "article.name": search,
+        page: page,
+        "endDate[after]": new Date(),
+      }
+    })
+    .then(function (response) {
+      setEncheres(response["data"]["hydra:member"]);
+    }).catch(error=>console.log(error))
   }
+  }
+
   const handlePagination = (event, value) => {
     setPage(value);
   };
   const handleCheck = (event) => {
     setChecked(event.target.checked);
   };
+
   React.useEffect(()=>{
-    getEnchereInverses()
+    getEncheres()
     getPagesNumber();
   },[])
   React.useEffect(() => {
-    getEnchereInverses();
+    getEncheres();
   }, [page, checked]);
 
       return (
         <Grid container>
-           <Grid container>
+          <Grid container>
         <Grid item xs={7}>
-          <Typography variant="h3">
-            nos encheres inversées
-          </Typography>
+        <Typography variant='h3'>nos encheres</Typography>
         </Grid>
         <Grid item >
           <Checkbox
@@ -91,7 +98,8 @@ const EncheresInvListing = () => {
         </Grid>
         <Grid item xs={3}><br /><Typography>afficher les encheres Inversées expirés</Typography></Grid>
       </Grid>
-            <ProductsListing elemsPerLine={6} type={navRoutes.ENCHEREINVERSE} ventes={enchereInverses}>
+            
+            <ProductsListing elemsPerLine={6} type={navRoutes.ENCHERE} ventes={encheres}>
             </ProductsListing>
             <Pagination
         count={pagesNumber}
@@ -102,4 +110,4 @@ const EncheresInvListing = () => {
       )
 }
 
-export default EncheresInvListing
+export default UserSearchPage
