@@ -33,15 +33,15 @@ const TopNavBar = () => {
   const typesOptions  = {
     0 : {
       value:"/encheres",
-      text: "encheres"
+      text: "enchères"
     },
     1 : {
       value:"/enchere_inverses",
-      text: "encheres inversés"
+      text: "enchères inversées"
     },
     2 : {
       value:"/users",
-      text: "users"
+      text: "utilisateurs"
     },
   }
   const handleType = (event) => {
@@ -78,7 +78,7 @@ const TopNavBar = () => {
     
     variableLinks = {
       0: {
-        text: "se deconnecter",
+        text: "se déconnecter",
         path: navRoutes.LOGOUT,
       },
       1: {
@@ -89,11 +89,11 @@ const TopNavBar = () => {
   }
   const constLinks = {
     0: {
-      text: "categories",
+      text: "catégories",
       path: navRoutes.CATEGORIES,
     },
     1: {
-      text: "produits",
+      text: "enchères",
       path: navRoutes.VENTES,
     },
   };
@@ -163,7 +163,8 @@ const TopNavBar = () => {
                 path={variableLinks[key].path}
               ></TopNavLink>
             ))}
-            <NotificationsMenu />
+            {user.id && <NotificationsMenu />}
+            
             {/* <IconButton
               size="large"
               edge="end"

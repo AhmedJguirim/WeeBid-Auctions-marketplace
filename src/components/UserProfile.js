@@ -124,8 +124,8 @@ event.preventDefault();
         </DialogContent>
       </Dialog>
       {/* title */}
-      <Grid container >
-      <Grid xs={12}><Typography variant="h2">buttons for functionalities and things TODO //////////////////////////////////////</Typography>{" "}<br /><br /></Grid>
+      <Grid container>
+      {/* <Grid xs={12}><Typography variant="h2">buttons for functionalities and things TODO //////////////////////////////////////</Typography>{" "}<br /><br /></Grid> */}
         <Grid item xs={3} sx={{ textAlign: "left"}}>
         <Card >
               <CardContent>
@@ -136,8 +136,6 @@ event.preventDefault();
                 
               </CardContent></Card>
         </Grid>
-              
-      
         <Grid item xs={1}>
           
         </Grid>
@@ -166,7 +164,7 @@ event.preventDefault();
             </Grid>
           </Grid>
         ))}
-        <Grid xs={12}><Typography variant="h2">LISTINGS OF auctions TODOOOO ////</Typography>{" "}<br /><br /></Grid>
+        {/* <Grid xs={12}><Typography variant="h2">LISTINGS OF auctions TODOOOO ////</Typography>{" "}<br /><br /></Grid> */}
       </Grid>
     </Grid>
     </Grid>

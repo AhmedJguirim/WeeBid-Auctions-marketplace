@@ -1,6 +1,6 @@
 import DateAdapter from "@mui/lab/AdapterDateFns";
 import Api from "../../AxiosInstance";
-import { ButtonStyles, formBox , FormTextField} from "../base/customComponents/general";
+import { ButtonStyles, formBox , formContainer, FormTextField} from "../base/customComponents/general";
 import {
   DateTimePicker,
   DesktopDatePicker,
@@ -35,6 +35,7 @@ import StepLabel from "@mui/material/StepLabel";
 import { useNavigate } from "react-router-dom";
 import CancelIcon from "@mui/icons-material/Cancel";
 import { useFormik } from "formik";
+import { pinkish } from "../base/customComponents/general";
 
 const steps = [
   "enregistrer un article",
@@ -162,7 +163,14 @@ export default function CreateArticle() {
         return errors;
       };
 
+
   const navigate = new useNavigate();
+  const styles = {
+    error:{
+      fontSize:12,
+      color:"error.main",
+    }
+  }
   //#region stepper part
   const [activeStep, setActiveStep] = React.useState(0);
 
@@ -319,7 +327,9 @@ const handleType = (event) => {
 
   //#endregion
   return (
-    <Box sx={{ width: "60%", display: "blocks", mr: "auto", ml: "auto" }}>
+    <Box sx={pinkish}>
+    <Box sx={formContainer}>
+
       <Stepper activeStep={activeStep}>
         {steps.map((label, index) => {
           const stepProps = {};
@@ -342,7 +352,6 @@ const handleType = (event) => {
                     {steps[0]}
                   </Typography>
                   <Grid item xs={12}>
-                  {formik.errors.name ? <div>{formik.errors.name}</div> : null}
                     <FormTextField
                       fullWidth
                       required
@@ -350,20 +359,24 @@ const handleType = (event) => {
                       label="Nom"
                       value={formik.values.name}
                       onChange={formik.handleChange}
-                    />
+                    />{formik.errors.name ? (
+                      <Typography sx={styles.error}>{formik.errors.name}</Typography>
+                    ) : null}
                   </Grid>
                   <Grid item xs={12}>
-                  {formik.errors.brand ? <div>{formik.errors.brand}</div> : null}
+
                     <FormTextField
                       fullWidth
                       id="brand"
                       label="marque"
                       value={formik.values.brand}
                       onChange={formik.handleChange}
-                    />
+                    />{formik.errors.brand ? (
+                      <Typography sx={styles.error}>{formik.errors.brand}</Typography>
+                    ) : null}
                   </Grid>
                   <Grid item xs={12}>
-                  {formik.errors.localisation ? <div>{formik.errors.localisation}</div> : null}
+
                     <FormTextField
                       fullWidth
                       required
@@ -371,20 +384,22 @@ const handleType = (event) => {
                       label="localisation"
                       value={formik.values.localisation}
                       onChange={formik.handleChange}
-                    />
+                    />{formik.errors.localisation ? (
+                      <Typography sx={styles.error}>{formik.errors.localisation}</Typography>
+                    ) : null}
                   </Grid>
 
                   <Grid item xs={12}>
-                  {formik.errors.codebar ? <div>{formik.errors.codebar}</div> : null}
                     <FormTextField
                       id="codebar"
                       label="code a barre"
                       value={formik.values.codebar}
                       onChange={formik.handleChange}
-                    />
+                    />{formik.errors.codebar ? (
+                      <Typography sx={styles.error}>{formik.errors.codebar}</Typography>
+                    ) : null}
                   </Grid>
                   <Grid item xs={12}>
-                  {formik.errors.date ? <div>{formik.errors.date}</div> : null}
                     {/* TODO: date stays as default , fix it */}
                     <LocalizationProvider dateAdapter={DateAdapter}>
                       <DesktopDatePicker
@@ -396,11 +411,12 @@ const handleType = (event) => {
                           formik.setFieldValue('date', Date.parse(value));
                           }}
                         renderInput={(params) => <FormTextField {...params} />}
-                      />
+                      />{formik.errors.date ? (
+                        <Typography sx={styles.error}>{formik.errors.date}</Typography>
+                      ) : null}
                     </LocalizationProvider>
                   </Grid>
                   <Grid item xs={12}>
-                  {formik.errors.state ? <div>{formik.errors.state}</div> : null}
                     <FormControl sx={{marginTop:"8px"}} fullWidth>
                       <InputLabel id="demo-simple-select-label">
                         état
@@ -416,9 +432,11 @@ const handleType = (event) => {
                         <MenuItem value="utilisé">utilisé</MenuItem>
                       </Select>
                     </FormControl>
-                  </Grid>
+                  </Grid>{formik.errors.state ? (
+                        <Typography sx={styles.error}>{formik.errors.state}</Typography>
+                      ) : null}
                   <Grid item xs={12}>
-                  {formik.errors.description ? <div>{formik.errors.description}</div> : null}
+
                     <textarea
                       name="description"
                       id="description"
@@ -429,7 +447,9 @@ const handleType = (event) => {
                       rows="10"
                       placeholder="description"
                     ></textarea>
-                  </Grid>
+                  </Grid>{formik.errors.description ? (
+                        <Typography sx={styles.error}>{formik.errors.description}</Typography>
+                      ) : null}
                   <Grid item xs={12}>
                       
                     <FormControlLabel
@@ -437,9 +457,7 @@ const handleType = (event) => {
                       label="vous guarentissez la validité de ces informations"
                     />
                   </Grid>
-                  {/* TODO: make it upload multiple files at the end by mapping through the dataform object */}
                   <Grid item xs={12}>
-                      
                     <label htmlFor="contained-button-file">
                       <Input
                         accept="image/*"
@@ -537,43 +555,6 @@ const handleType = (event) => {
                     </RadioGroup>
                   </FormControl>
                   <Grid item xs={12}>
-                  {formik.errors.quantity ? <div>{formik.errors.quantity}</div> : null}
-                    <FormTextField
-                      fullWidth
-                      required
-                      type="number"
-                      id="quantity"
-                      label="quantité"
-                      value={formik.values.quantity}
-                      onChange={formik.handleChange}
-                    />
-                  </Grid>
-                  <Grid item xs={12}>
-                  {formik.errors.immediatePrice ? <div>{formik.errors.immediatePrice}</div> : null}
-                    <FormTextField
-                      fullWidth
-                      required
-                      type="number"
-                      id="immediatePrice"
-                      label="prix immediat"
-                      value={formik.values.immediatePrice}
-                      onChange={formik.handleChange}
-                    />
-                  </Grid>
-
-                  <Grid item xs={12}>
-                  {formik.errors.initPrice ? <div>{formik.errors.initPrice}</div> : null}
-                    <FormTextField
-                      required
-                      fullWidth
-                      type="number"
-                      id="initPrice"
-                      label="prix initial"
-                      value={formik.values.initPrice}
-                      onChange={formik.handleChange}
-                    />
-                  </Grid>
-                  <Grid item xs={12}>
                     <FormControl fullWidth>
                       <InputLabel id="demo-simple-select-label">
                         categorie
@@ -593,6 +574,49 @@ const handleType = (event) => {
                       </Select>
                     </FormControl>
                   </Grid>
+                  <Grid item xs={12}>
+
+                    <FormTextField
+                      fullWidth
+                      required
+                      type="number"
+                      id="quantity"
+                      label="quantité"
+                      value={formik.values.quantity}
+                      onChange={formik.handleChange}
+                    />
+                    {formik.errors.quantity ? (
+                        <Typography sx={styles.error}>{formik.errors.quantity}</Typography>
+                      ) : null}
+                  </Grid>
+                  <Grid item xs={12}>
+                    <FormTextField
+                      fullWidth
+                      required
+                      type="number"
+                      id="immediatePrice"
+                      label="prix immediat"
+                      value={formik.values.immediatePrice}
+                      onChange={formik.handleChange}
+                    />{formik.errors.immediatePrice ? (
+                      <Typography sx={styles.error}>{formik.errors.immediatePrice}</Typography>
+                    ) : null}
+                  </Grid>
+
+                  <Grid item xs={12}>
+                    <FormTextField
+                      required
+                      fullWidth
+                      type="number"
+                      id="initPrice"
+                      label="prix initial"
+                      value={formik.values.initPrice}
+                      onChange={formik.handleChange}
+                    />{formik.errors.initPrice ? (
+                      <Typography sx={styles.error}>{formik.errors.initPrice}</Typography>
+                    ) : null}
+                  </Grid>
+                  
                   <React.Fragment>
                     <Box sx={{ display: "flex", flexDirection: "row", pt: 2 }}>
                       <Button
@@ -622,7 +646,7 @@ const handleType = (event) => {
                     {steps[2]}
                   </Typography>
                   <Grid item xs={12}>
-                  {formik.errors.startDate ? <div>{formik.errors.startDate}</div> : null}
+
                     <LocalizationProvider dateAdapter={DateAdapter}>
                       <DateTimePicker
                         label="date de debut"
@@ -635,9 +659,11 @@ const handleType = (event) => {
                         renderInput={(params) => <FormTextField {...params} />}
                       />
                     </LocalizationProvider>
+                    {formik.errors.startDate ? (
+                      <Typography sx={styles.error}>{formik.errors.startDate}</Typography>
+                    ) : null}
                   </Grid>
                   <Grid item xs={12}>
-                  {formik.errors.endDate ? <div>{formik.errors.endDate}</div> : null}
                     <LocalizationProvider dateAdapter={DateAdapter}>
                       <DateTimePicker
                         label="date de fin"
@@ -650,6 +676,9 @@ const handleType = (event) => {
                         renderInput={(params) => <FormTextField {...params} />}
                       />
                     </LocalizationProvider>
+                    {formik.errors.endDate ? (
+                      <Typography sx={styles.error}>{formik.errors.endDate}</Typography>
+                    ) : null}
                   </Grid>
                   <React.Fragment>
                     <Box sx={{ display: "flex", flexDirection: "row", pt: 2 }}>
@@ -666,53 +695,21 @@ const handleType = (event) => {
                       {activeStep === steps.length ? (
                           <></>
                       ) : (
-                        <Button sx={ButtonStyles} disabled={!stepThree} onClick={handleNext}>
-                          next
+                        <Button sx={ButtonStyles} disabled={!stepThree} type="submit">
+                          soumettre
                         </Button>
                       )}
                     </Box>
                   </React.Fragment>
                 </div>
               )}
-              <Grid item xs={12}>
-                {activeStep === steps.length && (
-                  <React.Fragment>
-                    <Typography sx={{ mt: 2, mb: 1 }}>
-                      All steps completed - you&apos;re finished {activeStep}{" "}
-                      {steps.length}
-                      </Typography>
-                      
-                        {Object.keys(formik.errors).map((key, index) => (
-                          <MenuItem key={index}>
-                            {formik.errors[key]}
-                          </MenuItem>
-                        ))}
-                        <Box sx={{ display: "flex", flexDirection: "row", pt: 2 }}>
-                      <Button
-                        color="inherit"
-                        disabled={activeStep === 0}
-                        onClick={handleBack}
-                        sx={{ ...ButtonStyles, mr: 1 }}
-                      >
-                        Back
-                      </Button>
-                      <Box sx={{ flex: "1 1 auto" }} />
-
-                      <Button sx={ButtonStyles} disabled={containsError} type="submit">
-                          soumettre
-                        </Button>
-                    </Box>
-
-                
-                  </React.Fragment>
-
-                  
-                )}
-              </Grid>
+             
             </Grid>
           </Box>
         </Box>
       </Container>
+
+    </Box>
     </Box>
   );
 }

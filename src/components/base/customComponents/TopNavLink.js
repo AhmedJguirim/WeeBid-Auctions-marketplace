@@ -26,9 +26,9 @@ const TopNavLink = ({ text, path }) => {
 };
 export const CategoryLink = styled(Link)(({ theme }) => ({
   textDecoration: "none",
-  padding: 20,
-  borderRadius: 10,
+  padding: 5,
   fontSize: 20,
+  
   fontFamily: `"Roboto","Helvetica","Arial",sans-serif`,
   "&:hover": {
     color: theme.palette.secondary.main,

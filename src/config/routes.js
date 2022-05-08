@@ -21,8 +21,11 @@ export const navRoutes = {
     ENCHERESEARCH:"/enchereSearch",
     ENCHEREINVERSESEARCH:"/enchereInverseSearch",
     USERSEARCH:"/userSearch",
+
     //posting things
     MAKE_ARTICLE: "/makeArticle",
+
+    NOTIFICATIONS:"/notifications",
 
     //under consctuction route
     INPROGRESS : "/prog"

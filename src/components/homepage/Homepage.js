@@ -11,6 +11,7 @@ import RequestQuoteTwoToneIcon from "@mui/icons-material/RequestQuoteTwoTone";
 import logo from "../../media/images/dotItLogo.png"
 import { pinkish } from "../base/customComponents/general";
 import { CategoryLink } from "../base/customComponents/TopNavLink";
+import NoListing from "../base/customComponents/NoListing";
 
 const styles = {
   subDiv: {
@@ -131,7 +132,7 @@ var today = new Date();
                 color: "primary.main",
               }}
             >
-              bienvenu a notre marketplace
+              bienvenue a notre marketplace
             </Typography>
             <Typography
               color="secondary"
@@ -218,18 +219,12 @@ var today = new Date();
               voir tous
             </CategoryLink>
             </Grid>
-            {encheres[0] ?(
+
               <HomePageList
               ventes={encheres}
               type={navRoutes.ENCHERE}
-              elemsPerLine={8}
+              elemsPerLine={6}
             />
-            ):(
-              <Box sx={{...pinkish, ...styles.textDiv,width:"98%",pt:"3%",pb:"3%", textAlign:"center"}}  > <Typography variant="h2">il n y a pas d'encheres disponibles pour le moment</Typography></Box>
-            )
-
-            }
-
           </Grid>
 
           <Grid item xs={12}>
@@ -245,15 +240,12 @@ var today = new Date();
               voir tous
             </CategoryLink>
             </Grid>
-            {encheresInverses[0] ?(
+
               <HomePageList
               ventes={encheresInverses}
               type={navRoutes.ENCHEREINVERSE}
-              elemsPerLine={8}
+              elemsPerLine={6}
             />
-            ):(
-              <Box sx={{...pinkish, ...styles.textDiv,width:"98%",pt:"3%",pb:"3%", textAlign:"center"}} > <Typography sx={{...pinkish}} variant="h3">il n y a pas d'encheres inversées disponibles pour le moment</Typography></Box>
-            )}
           </Grid>
         </Grid>
       </Box>

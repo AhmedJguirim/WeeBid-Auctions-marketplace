@@ -32,6 +32,8 @@ import Demande from '../demande/Demande'
 import NotFound from './customComponents/NotFound'
 import EnchereInverseSearchPage from '../productsPage/EnchereInverseSearchPage'
 import UserSearchPage from '../productsPage/UserSearchPage'
+import NotificationListing from '../tableListings/NotificationListing'
+import image from "../../media/images/backgroundimg.gif"
 
 
 
@@ -39,7 +41,8 @@ import UserSearchPage from '../productsPage/UserSearchPage'
 
 const styles = {
   body:{
-    backgroundColor: "primary.main"
+    backgroundColor: "#f4ebf5",
+    height:630
   }
 }
 const Base = () => {
@@ -80,6 +83,7 @@ const Base = () => {
         <TopNavBar />
         <Routes>
           {/* TODO: declare the routes in config/route.js */}
+          <Route path={`${navRoutes.NOTIFICATIONS}`} element={<NotificationListing />}></Route>
           <Route path={`${navRoutes.DEMANDE}/:id`} element={<Demande />}></Route>
           <Route path={`${navRoutes.CONSULTUSER}/:id`} element={<ConsultUser />}></Route>
           <Route path={navRoutes.MAKE_ARTICLE} element={<CreateArticle />}></Route>

@@ -103,6 +103,14 @@ const theme = createTheme({
         },
       },
     },
+    MuiPagination:{
+      styleOverrides:{
+        root: {
+          margin: "auto",
+        },
+      
+      }
+    }
   },
 });
 

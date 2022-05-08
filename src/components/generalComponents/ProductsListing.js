@@ -3,6 +3,7 @@ import React from 'react'
 import { Link } from 'react-router-dom';
 import demoListImage from "../../media/images/demoListImage.png";
 import Countdown from '../base/customComponents/Countdown';
+import NoListing from '../base/customComponents/NoListing';
 
 
 
@@ -53,6 +54,7 @@ const ProductsListing = ({ventes ,elemsPerLine , type}) => {
             </Card>
             </Grid>
           ))}
+          {!ventes[0] && <NoListing text={`il n y a pas d'articles disponibles pour le moment`}/>}
         </Grid>
   )
 }

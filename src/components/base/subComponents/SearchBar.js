@@ -5,6 +5,8 @@ import CircularProgress from "@mui/material/CircularProgress";
 import { apiRoutes, navRoutes } from "../../../config/routes";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
+import { Box, Grid, IconButton } from "@mui/material";
+import SearchIcon from '@mui/icons-material/Search';
 
 
 let cancelToken;
@@ -97,6 +99,8 @@ export default function SearchBar({ type }) {
   }
 
   return (
+    <Grid container>
+      <Grid item xs={11.8}>
     <Autocomplete
       id="seachBar"
       sx={{ width: 300  }}
@@ -142,7 +146,23 @@ export default function SearchBar({ type }) {
           }}
         />
       )}
-    />
+    /></Grid>
+
+    <Grid item xs={0.2}>
+
+      {type === "/enchere_inverses" ? (<IconButton  onClick={()=>navigate(`${navRoutes.ENCHEREINVERSESEARCH}/${input}`)}
+       disabled={input===""} sx={{mt:1, ml:2}}>
+        <SearchIcon/>
+        </IconButton>):
+
+      (
+        <IconButton disabled={input===""}  onClick={()=>navigate(`${navRoutes.ENCHERESEARCH}/${input}`)}
+        sx={{mt:1, ml:2}}>
+          <SearchIcon/>
+      </IconButton>)}
+
+    </Grid>
+    </Grid>
   );
         
         }

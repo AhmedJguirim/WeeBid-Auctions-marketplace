@@ -1,5 +1,5 @@
 import DateAdapter from "@mui/lab/AdapterDateFns";
-import { ButtonStyles, formBox, FormTextField } from "../base/customComponents/general";
+import { ButtonStyles, formBox, formContainer, FormTextField } from "../base/customComponents/general";
 import { DesktopDatePicker, LocalizationProvider } from "@mui/lab";
 import * as React from "react";
 import {
@@ -102,7 +102,7 @@ export default function MultiStepRegister() {
     if (!values.password) {
       errors.password = "ce champ est obligatoir";
     } else if (values.password.length < 4) {
-      errors.password = "le mot de passe doit avoir 6 characteres au minimum";
+      errors.password = "le mot de passe doit avoir 4 characteres au minimum";
     }
     if (!values.date) {
       errors.date = "champ obligatoir";
@@ -160,7 +160,7 @@ export default function MultiStepRegister() {
       .then(function (response) {
         localStorage.setItem("token", response.data.token);
 
-        document.location.href = navRoutes.LOGIN;
+        document.location.href = "/";
         // navigate("/");
       })
       .catch(function (error) {
@@ -198,7 +198,7 @@ export default function MultiStepRegister() {
               })
               .catch((error) => console.log(error));
           });
-        document.location.href = navRoutes.LOGIN;
+        document.location.href = "/";
         // navigate("/");
       })
       .catch(function (error) {
@@ -263,21 +263,25 @@ export default function MultiStepRegister() {
       padding: "40px",
       minWidth: "540px",
       borderRadius: "10px",
-      textAlign: "left",
+
       transition: "all 0.4s ease",
       backgroundColor:"primary.main",
     },
     text: {
       mt: 1,
     },
+    error:{
+      fontSize:12,
+      color:"error.main",
+    }
   };
   //#endregion
   return (
     <Box sx={pinkish}>
       <br /><br />
-    <Box sx={styles.container}>
+    <Box sx={formContainer}>
       
-      <Stepper sx={{width:"50%"}} activeStep={activeStep}>
+      <Stepper sx={{width:"80%", margin: "0 auto"}} activeStep={activeStep}>
         {steps.map((label, index) => {
           const stepProps = {};
           const labelProps = {};
@@ -300,70 +304,75 @@ export default function MultiStepRegister() {
                     {steps[0]}
                   </Typography>
                   <Grid item>
-                    {formik.errors.name ? (
-                      <div>{formik.errors.name}</div>
-                    ) : null}
+                    
                     <TextField
                       required
                       id="name"
+                      error={formik.errors.name}
                       label="Nom complet"
                       value={formik.values.name}
                       onChange={formik.handleChange}
-                      x={styles.text}
-                    />
+                      sx={styles.text}
+                    />{formik.errors.name ? (
+                      <Typography sx={styles.error}>{formik.errors.name}</Typography>
+                    ) : null}
                   </Grid>
                   <Grid item>
-                    {formik.errors.displayName ? (
-                      <div>{formik.errors.displayName}</div>
-                    ) : null}
+                    
                     <TextField
                       required
                       id="displayName"
+                      error={formik.errors.displayName}
                       label="Nom d'utilisateur"
                       value={formik.values.displayName}
                       onChange={formik.handleChange}
                       sx={styles.text}
-                    />
+                    />{formik.errors.displayName ? (
+                      <Typography sx={styles.error}>{formik.errors.displayName}</Typography>
+                    ) : null}
                   </Grid>
                   <Grid item>
-                    {formik.errors.email ? (
-                      <div>{formik.errors.email}</div>
-                    ) : null}
+                   
                     <TextField
                       required
                       id="email"
+                      error={formik.errors.email}
                       label="Adresse Email"
                       value={formik.values.email}
                       onChange={formik.handleChange}
                       sx={styles.text}
-                    />
+                    /> {formik.errors.email ? (
+                      <Typography sx={styles.error}>{formik.errors.email}</Typography>
+                    ) : null}
                   </Grid>
                   <Grid item>
-                    {formik.errors.password ? (
-                      <div>{formik.errors.password}</div>
-                    ) : null}
+                    
                     <TextField
                       required
                       id="password"
+                      error={formik.errors.password}
                       label="mot de passe"
                       type="password"
                       value={formik.values.password}
                       onChange={formik.handleChange}
                       sx={styles.text}
-                    />
+                    />{formik.errors.password ? (
+                      <Typography sx={styles.error}>{formik.errors.password}</Typography>
+                    ) : null}
                   </Grid>
                   <Grid item>
-                    {formik.errors.telephone ? (
-                      <div>{formik.errors.telephone}</div>
-                    ) : null}
+                   
                     <TextField
                       required
                       id="telephone"
                       label="numero de téléphone"
+                      error={formik.errors.telephone}
                       value={formik.values.telephone}
                       onChange={formik.handleChange}
                       sx={styles.text}
-                    />
+                    /> {formik.errors.telephone ? (
+                      <Typography sx={styles.error}>{formik.errors.telephone}</Typography>
+                    ) : null}
                   </Grid>
                   <Grid item sx={{mt:1}}>
                   <LocalizationProvider dateAdapter={DateAdapter}>
@@ -406,47 +415,52 @@ export default function MultiStepRegister() {
               {activeStep === 1 && (
                 <div className="step2">
                   <Grid item>
-                    {formik.errors.pays ? (
-                      <div>{formik.errors.pays}</div>
-                    ) : null}
+
                     <Typography variant="h4">adresse:</Typography>
                     <TextField
                       required
                       id="pays"
+                      error={formik.errors.pays}
                       label="Pays"
                       value={formik.values.pays}
                       onChange={formik.handleChange}
                       sx={styles.text}
                     />
+                    {formik.errors.pays ? (
+                      <Typography sx={styles.error}>{formik.errors.pays}</Typography>
+                    ) : null}
                   </Grid>
                   <Grid item>
-                    {formik.errors.ville ? (
-                      <div>{formik.errors.ville}</div>
-                    ) : null}
+
                     <TextField
                       required
                       id="ville"
                       label="ville"
+                      
+                      error={formik.errors.ville}
                       value={formik.values.ville}
                       onChange={formik.handleChange}
                       sx={styles.text}
-                    />
+                    />{formik.errors.ville ? (
+                      <Typography sx={styles.error}>{formik.errors.ville}</Typography>
+                    ) : null}
                   </Grid>
                   <Grid item>
-                    {formik.errors.rue ? <div>{formik.errors.rue}</div> : null}
+
                     <TextField
                       required
                       id="rue"
                       label="rue"
+                      error={formik.errors.rue}
                       value={formik.values.rue}
                       onChange={formik.handleChange}
                       sx={styles.text}
-                    />
+                    />{formik.errors.rue ? (
+                      <Typography sx={styles.error}>{formik.errors.rue}</Typography>
+                    ) : null}
                   </Grid>
                   <Grid item>
-                    {formik.errors.zipcode ? (
-                      <div>{formik.errors.zipcode}</div>
-                    ) : null}
+
                     <TextField
                       required
                       id="zipcode"
@@ -454,7 +468,9 @@ export default function MultiStepRegister() {
                       value={formik.values.zipcode}
                       onChange={formik.handleChange}
                       sx={styles.text}
-                    />
+                    />{formik.errors.zipcode ? (
+                      <Typography sx={styles.error}>{formik.errors.zipcode}</Typography>
+                    ) : null}
                   </Grid>
                   <React.Fragment>
                     <Box sx={{ display: "flex", flexDirection: "row", pt: 2 }}>
@@ -479,7 +495,7 @@ export default function MultiStepRegister() {
                   </React.Fragment>
                 </div>
               )}
-              <Grid item xs={12}>
+              {/* <Grid item xs={12}>
                 {activeStep === steps.length &&
                   (<React.Fragment>
                     <Typography sx={{ mt: 2, mb: 1 }}>
@@ -488,7 +504,7 @@ export default function MultiStepRegister() {
                     </Typography>
                   </React.Fragment>)
                 }
-              </Grid>
+              </Grid> */}
             </Grid>
           </Box>
       </Container>

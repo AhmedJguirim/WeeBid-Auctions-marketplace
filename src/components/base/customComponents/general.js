@@ -67,11 +67,27 @@ export const darkContainer = {
   color: "primary.main",
 };
 
+export const formContainer = {
+
+    width: "60%",
+    display: "blocks",
+    mr: "auto",
+    ml: "auto",
+    mt:"2%",
+
+    border: "1px solid black",
+    padding: 10,
+    padding: "40px",
+    minWidth: "540px",
+    borderRadius: "10px",
+
+    transition: "all 0.4s ease",
+    backgroundColor:"primary.main",
+
+}
+
 export const formBox = {
   marginTop: 8,
-  display: "flex",
-  flexDirection: "column",
-  alignItems: "center",
 };
 
 export const lightContainer = {

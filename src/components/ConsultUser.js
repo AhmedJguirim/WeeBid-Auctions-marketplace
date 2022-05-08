@@ -7,9 +7,11 @@ import {
     DialogContent,
     Dialog,
     Button,
+    Card,
+    CardContent
   } from "@mui/material";
   import React from "react";
-  import { darkContainer } from "./base/customComponents/general";
+  import { darkContainer, pinkish } from "./base/customComponents/general";
   import { Box } from "@mui/system";
   import { ButtonStyles } from "./base/customComponents/general";
   import { apiRoutes } from "../config/routes";
@@ -26,6 +28,7 @@ import Socket from './base/customComponents/Socket'
     //#region form data state
     const [quantity, setQuantity] = React.useState(1);
     const [description, setDescription] = React.useState("");
+    const [avatar, setAvatar] = React.useState("");
     //#endregion
   
     //#region dialog manipulation
@@ -58,15 +61,17 @@ import Socket from './base/customComponents/Socket'
         console.log(data);
         setUser({
           name: data.name,
-          username: data.displayName,
+          displayName: data.displayName,
           email: data.email,
           password: "******",
           telephone: data.telephone,
           birthDate: data.birthDate.slice(0, 10),
         });
-      } catch (error) {
-        console.error(error);
-      }
+        let path = "http://127.0.0.1:8000/user/";
+        const myImg = path.concat(data.image);
+        setAvatar(myImg)
+        console.log(`http://127.0.0.1:8000/${data.image}`)
+      }catch(err){console.log(err)}
     }
     const handleSubmit = (event)=>{
       event.preventDefault();
@@ -90,7 +95,7 @@ import Socket from './base/customComponents/Socket'
         getUser();
       }, [id]);
     return (
-      <Grid container sx={darkContainer}>
+      <Grid container sx={pinkish}>
         <Dialog
           open={open}
           onClose={handleClose}
@@ -133,17 +138,22 @@ import Socket from './base/customComponents/Socket'
         </Dialog>
         {/* title */}
         <Grid container>
-          <Grid item xs={1}>
-            <Avatar>AH</Avatar>
-          </Grid>
-          <Grid item xs={3.5} sx={{ textAlign: "left" }}>
-            <Typography variant="h2">{user.displayName}</Typography>{" "}
-          </Grid>
-          <Grid item xs={3.5} sx={{ textAlign: "right" }}>
-            <Button onClick={handleClickOpen}>demande de devis</Button>
-          </Grid>
+        <Grid xs={12}><Button sx={ButtonStyles} onClick={handleClickOpen}>demande de devis</Button><br /><br /></Grid>
+        <Grid item xs={3} sx={{ textAlign: "left"}}>
+        <Card >
+              <CardContent>
+                <Box >
+              <Avatar sx={{ width: "100%", height: "100%" }} alt="avatar" src={avatar}/>
+              </Box>
+               <Box sx={{ textAlign: "center"}}><Typography variant="h2">{user.displayName}</Typography>{" "}</Box>
+                
+              </CardContent></Card>
         </Grid>
-        <Grid item xs={9} sx={{ mt: 5 }}>
+        <Grid item xs={1}>
+          
+          </Grid>
+        
+        <Grid item xs={7} sx={{ mt: 5 }}>
           {Object.keys(user).map((key, index) => (
             <Grid container key={index}>
               <Grid item xs={6}>
@@ -157,6 +167,7 @@ import Socket from './base/customComponents/Socket'
             
             </Grid>
           ))}
+        </Grid>
         </Grid>
       </Grid>
     );

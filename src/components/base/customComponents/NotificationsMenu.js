@@ -6,7 +6,9 @@ import { Card, CardContent, IconButton, Slide, Snackbar, Typography } from "@mui
 import { useDispatch, useSelector } from "react-redux";
 import Socket from "./Socket";
 import { newNotifications } from "../../../redux/actions";
-import { useNavigate } from "react-router-dom";
+import { NavLink, useNavigate } from "react-router-dom";
+import TopNavLink from "./TopNavLink";
+import { navRoutes } from "../../../config/routes";
 
 
 
@@ -52,9 +54,9 @@ export default function NotificationsMenu() {
       minutes = Math.floor((duration / (1000 * 60)) % 60),
       hours = Math.floor((duration / (1000 * 60 * 60)) % 24),
       days = Math.floor(duration / (1000 * 60 * 60) / 24);
-    days = days < 1 ? "" : days + "d,";
-    hours = (hours-2) < 1 ? "" : (hours-2) + "h,";
-    minutes = minutes < 1 ? "" : minutes + "m";
+    days = days < 1 ? "" : days + "d, ";
+    hours = (hours-2) < 1 ? "" : (hours-2) + "h, ";
+    minutes = minutes < 1 ? "" : minutes + "m ";
     if(days<1 && hours <1 &&minutes < 1){
       return "just now"
     }
@@ -92,15 +94,16 @@ export default function NotificationsMenu() {
           "aria-labelledby": "basic-button",
         }}
       >
+        
         {Object.keys(notifications).map((key, index) => (
           <MenuItem value={notifications[key].id} key={index} >
-            <Card variant="outlined" onClick={()=>navigate(`${notifications[key].route}`)}>
+            <Card variant="outlined" sx={{width:"100%"}} onClick={()=>navigate(`${notifications[key].route}`)}>
               <CardContent>
                 <Typography variant="h6" color="secondary">
                   {notifications[key].title}
                 </Typography>
                 <Typography>{notifications[key].description}</Typography>
-                <Typography>
+                <Typography sx={{fontSize:12, mt:"3%"}}>
                   {msToTime(
                     Math.abs(new Date() - new Date(notifications[key].date))
                   )}
@@ -109,6 +112,21 @@ export default function NotificationsMenu() {
             </Card>
           </MenuItem>
         ))}
+        {!notifications[0] ? (<Card variant="outlined">
+              <CardContent>
+                <Typography variant="h6" color="secondary">
+                  vous n'avez pas de notifications a afficher
+                </Typography>
+              </CardContent>
+              {/* DO THIS: notifications listing */}
+            </Card>):(
+              <Card variant="outlined">
+              <CardContent sx={{textAlign:"center"}}>
+              <TopNavLink path={navRoutes.NOTIFICATIONS} text="afficher tous"/>
+              </CardContent>
+            </Card>
+              
+            )}
       </Menu>
     </div>
   );

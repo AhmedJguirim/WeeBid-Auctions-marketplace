@@ -1,4 +1,4 @@
-import { Card, CardContent, Grid, Typography } from "@mui/material";
+import { Card, CardContent, Divider, Grid, Typography } from "@mui/material";
 import React from "react";
 import axios from "axios";
 import { CategoryLink } from "../base/customComponents/TopNavLink";
@@ -9,6 +9,7 @@ const CategoriesList = () => {
   //#region getting categories
   //TODO: this code is duplicated from productslisting.js , declare it somewhere else then import it
   const [categories, setCategories] = React.useState({});
+  const imageLinkPrefix = "http://127.0.0.1:8000/category/"
   async function getCategories() {
     try {
       const response = await axios.get(`${apiRoutes.API}/categories`);
@@ -40,8 +41,9 @@ const CategoriesList = () => {
       {Object.keys(categories).map((key, index) => (
         <Grid item xs={4} key={index}>
           {/* TODO:make a relation between document and category 1to1 */}
-          <Card variant="outlined">
+          <Card variant="outlined" sx={{minWidth:"30%", minHeight:"50%"}}>
             <CardContent>
+            {categories[key].image?(<img src={`${imageLinkPrefix}${categories[key].image}`} className="categoryImage" />):(<></>)}
               <Typography variant="h4">{categories[key].name}</Typography>
               <br />
               <br />
