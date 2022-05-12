@@ -1,0 +1,26 @@
+
+.logo {
+    width: 10%;
+    min-width: 100px;
+    margin-right: 20px;
+}
+
+.cardImage {
+    height: 150px;
+}
+
+.categoryImage {
+    height: 200px;
+
+}
+
+.dotIt {
+    display: block;
+  margin-left: auto;
+  margin-right: auto;
+  width: 50%;
+}
+
+.descriptionField {
+    margin-top: 8px;
+}

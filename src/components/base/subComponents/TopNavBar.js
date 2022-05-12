@@ -1,0 +1,211 @@
+import * as React from "react";
+import MenuIcon from "@mui/icons-material/Menu";
+import logoPath from "../../../media/images/dotItLogo.png";
+import TopNavLink from "../customComponents/TopNavLink";
+import { TopNavGrid, TopAppBar } from "../customComponents/general";
+import {
+  Box,
+  Select,
+  MenuItem,
+  IconButton,
+  FormControl,
+  InputLabel,
+  Grid,
+} from "@mui/material";
+import MyDrawer from "./Drawer";
+import { useDispatch, useSelector } from "react-redux";
+import { Link } from "react-router-dom";
+import { navRoutes } from "../../../config/routes";
+import SearchBar from "./SearchBar";
+
+import NotificationsNoneTwoToneIcon from '@mui/icons-material/NotificationsNoneTwoTone';
+import NotificationsMenu from "../customComponents/NotificationsMenu";
+import Socket from "../customComponents/Socket";
+import { newNotifications } from "../../../redux/actions";
+
+
+
+
+const TopNavBar = () => {
+
+  // Socket.on("connect",()=>{
+  //   console.log(`you're connected to socket.io`)})
+  //#region type of search (default "enchere" to avoid unnecessary headache))
+  const dispatch = useDispatch();
+  const [openSnack, setOpenSnack] = React.useState(false);
+  const [snackText, setSnackText] = React.useState("");
+
+  // Socket.on("connect", () => {
+  //   //not connected ..  
+  //   console.log("i'm connected ....")
+  //   Socket.on("NOTIFICATION", (notification) => {
+  //     console.log("notified");
+  //     alert("it worked")
+  //     dispatch(newNotifications(notification));
+  //   });
+  // });
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  const [type, setType] = React.useState("/encheres");
+  const typesOptions  = {
+    0 : {
+      value:"/encheres",
+      text: "enchères"
+    },
+    1 : {
+      value:"/enchere_inverses",
+      text: "enchères inversées"
+    },
+    2 : {
+      value:"/users",
+      text: "utilisateurs"
+    },
+  }
+  const handleType = (event) => {
+    setType(event.target.value);
+  };  
+
+  //#endregion
+  const styles = {
+    topBox: {
+      height: 70,
+    },
+    secondGrid: {
+      justifyContent: "flex-end",
+      paddingRight: 2,
+    },
+  };
+  const user = useSelector((state) => state.user);
+  
+  let variableLinks = {};
+  if (user.id === undefined) {
+    variableLinks = {
+      0: {
+        text: "connection",
+        path: navRoutes.LOGIN,
+      },
+      1: {
+        text: "inscription",
+        path: navRoutes.REGISTER,
+      }
+    };
+
+  }
+  else {
+    
+    variableLinks = {
+      0: {
+        text: "se déconnecter",
+        path: navRoutes.LOGOUT,
+      },
+      1: {
+        text: "profile",
+        path: navRoutes.USERPROFILE,
+      },
+    };
+  }
+  const constLinks = {
+    0: {
+      text: "catégories",
+      path: navRoutes.CATEGORIES,
+    },
+    1: {
+      text: "enchères",
+      path: navRoutes.ENCHERES,
+    },
+  };
+
+  const [open, setOpen] = React.useState(false);
+
+  const handleDrawerOpen = () => {
+    setOpen(true);
+  };
+
+  
+  //#region search bar
+  
+
+  //#endregion
+
+  return (
+    <Box sx={styles.topBox}>
+      
+      <TopAppBar position="static" sx={{backgroundColor:"primary.main"}} >
+        <Grid container >
+          <TopNavGrid md={8} sm={11} item>
+            <IconButton
+              size="large"
+              edge="start"
+              aria-label="open drawer"
+              onClick={handleDrawerOpen}
+              sx={{ mr: 2, ...(open && { display: "none" }) }}
+            >
+              <MenuIcon />
+            </IconButton>
+            <Link to="/">
+              <img src={logoPath} alt="logo" className="logo" />
+            </Link>
+            {Object.keys(constLinks).map((key, index) => (
+              <TopNavLink
+                key={index}
+                text={constLinks[key].text}
+                path={constLinks[key].path}
+              ></TopNavLink>
+            ))}
+            <Box sx={{ minWidth: 120 }}>
+              <FormControl  fullWidth>
+                <InputLabel sx={{mt:0 ,color: "secondary.main"}}>type</InputLabel>
+                <Select sx={{mt:0, color:"secondary.main"}} value={type} onChange={handleType}>
+                {Object.keys(typesOptions).map((key, index) => (
+                    <MenuItem value={typesOptions[key].value} key={index}>{typesOptions[key].text}</MenuItem>))}
+                </Select>
+              </FormControl>
+            </Box>
+              {/* my searchBar */}
+            <Box>
+            {/* <TextField
+              id="outlined-basic"
+              variant="outlined"
+              fullWidth
+              label="Search"
+            /> */}
+            <SearchBar type={type} />
+
+            </Box>
+          </TopNavGrid>
+          <TopNavGrid md={4} sm={1} item sx={styles.secondGrid}>
+            {Object.keys(variableLinks).map((key, index) => (
+              <TopNavLink
+                key={index}
+                text={variableLinks[key].text}
+                path={variableLinks[key].path}
+              ></TopNavLink>
+            ))}
+           <NotificationsMenu />
+            
+            {/* <IconButton
+              size="large"
+              edge="end"
+              aria-label="open drawer"
+              sx={{ ml: "0.5%" }}
+            >
+              <NotificationsNoneTwoToneIcon />
+            </IconButton> */}
+          </TopNavGrid>
+        </Grid>
+      </TopAppBar>
+      <MyDrawer open={open} setOpen={setOpen} />
+    </Box>
+  );
+};
+
+export default TopNavBar;
