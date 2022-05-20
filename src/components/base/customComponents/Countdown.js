@@ -15,6 +15,7 @@ const Countdown = (props) => {
         }
         var countDownDate = new Date(props.startDate).getTime();
         var endDate = new Date(props.endDate).getTime();
+        
         // Update the count down every 1 second
         var x = setInterval(function () {
           // Get today's date and time
@@ -23,12 +24,13 @@ const Countdown = (props) => {
           // Find the distance between now and the count down date
           var distance = countDownDate - now;
           var expiration = endDate - now;
+          
           // Time calculations for days, hours, minutes and seconds
           
           // Display the result in the element with id="demo"
           if(distance < 0 && expiration > 0){
             const timer = getTimer(expiration)
-            if(timer[0]!='N'){
+            if(timer[0]!=='N'){
               setTime(timer)
             }
 
@@ -38,7 +40,7 @@ const Countdown = (props) => {
           }
           else{
             const timer = getTimer(distance)
-            if(timer[0]!='N'){
+            if(timer[0]!=='N'){
               setTime(timer)
             }
           }
@@ -51,6 +53,7 @@ const Countdown = (props) => {
 
       
   return (
+    
     <Typography variant={props.variant} sx={{mt:3, textAlign:"center"}}>{time}</Typography>
   )
 }

@@ -86,7 +86,7 @@ const EnchereSearchPage = () => {
         <Grid container>
           <Grid container>
         <Grid item xs={7}>
-        <Typography variant='h3'>nos encheres</Typography>
+        <Typography variant='h3'>resultat de recherche "{search}"</Typography>
         </Grid>
         <Grid item >
           <Checkbox

@@ -53,20 +53,20 @@ const user = useSelector((state) => state.user);
       return (
         <Grid container sx={pinkish}>
             <Grid item xs={12}><br /><Typography variant='h3' marginLeft={3}>votre liste de surveilles</Typography></Grid>
-            <Grid xs={0.3}></Grid>
+            <Grid item xs={0.3}></Grid>
             <Grid item xs={5.6}>
             <br /><br />
             <Typography variant='h5'>enchères Surveillées</Typography>
             <ProductsListing elemsPerLine={3} type={navRoutes.ENCHERE} ventes={encheres}></ProductsListing>
             </Grid>
-            <Grid xs={0.4}></Grid>
+            <Grid item xs={0.4}></Grid>
             
             <Grid item xs={5.6}>
             <br /><br />
             <Typography variant='h5'>enchères Inversées Surveillées</Typography>
             <ProductsListing elemsPerLine={3} type={navRoutes.ENCHEREINVERSE} ventes={encheresInverses}></ProductsListing>
             </Grid>
-            <Grid xs={0.1}></Grid>
+            <Grid item xs={0.1}></Grid>
         </Grid>
       )
 }

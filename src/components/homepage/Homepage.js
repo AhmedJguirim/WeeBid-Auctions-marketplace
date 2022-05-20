@@ -9,9 +9,9 @@ import StorefrontTwoToneIcon from "@mui/icons-material/StorefrontTwoTone";
 import LocalMallTwoToneIcon from "@mui/icons-material/LocalMallTwoTone";
 import RequestQuoteTwoToneIcon from "@mui/icons-material/RequestQuoteTwoTone";
 import logo from "../../media/images/dotItLogo.png"
-import { pinkish } from "../base/customComponents/general";
+// import { pinkish } from "../base/customComponents/general";
 import { CategoryLink } from "../base/customComponents/TopNavLink";
-import NoListing from "../base/customComponents/NoListing";
+// import NoListing from "../base/customComponents/NoListing";
 
 const styles = {
   subDiv: {
@@ -72,6 +72,7 @@ var today = new Date();
         },
       })
       .then(function (response) {
+        console.log(date)
         setEnchereInverses(response["data"]["hydra:member"]);
         console.log(response["data"]["hydra:member"]);
       })

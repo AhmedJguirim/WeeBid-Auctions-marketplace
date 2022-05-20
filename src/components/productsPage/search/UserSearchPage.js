@@ -1,36 +1,31 @@
-import { Checkbox, Grid, Pagination, Typography } from '@mui/material';
+import { Avatar, Card, CardContent, Checkbox, Grid, Pagination, Typography } from '@mui/material';
 import React from 'react'
 import ProductsListing from '../../generalComponents/ProductsListing';
 import axios from 'axios';
 import { apiRoutes, navRoutes } from '../../../config/routes';
 import { useParams } from 'react-router-dom';
+import { Box } from '@mui/system';
+import { CategoryLink } from '../../base/customComponents/TopNavLink';
 
 const UserSearchPage = () => {
-  const [encheres, setEncheres] = React.useState({});
+  const [users, setUsers] = React.useState({});
   const [page, setPage] = React.useState(1);
   const [pagesNumber, setPageNumber] = React.useState(1);
-  const [checked, setChecked] = React.useState(false);
+
+  const styles = {
+    usersGrid: { 
+      backgroundColor: "primary.main" , 
+      padding: 3,
+      mt: 2
+    },
+  }
+
   let { search } = useParams();
   function getPagesNumber() {
-    if(checked){
       axios
-      .get(`${apiRoutes.API}/encheres/pages`,
-      {params: {
-        "article.name": search,
-      "endDate[after]": new Date(),
-    }}, {
-      })
-      .then((res) => {
-        if (res["data"]["hydra:member"].length / 12 < 1) {
-          setPageNumber(1);
-        } else {
-          setPageNumber(Math.ceil(res["data"]["hydra:member"].length / 12));
-        }
-      });
-    }else{axios
-      .get(`${apiRoutes.API}/encheres/pages`, {
+      .get(`${apiRoutes.API}/users/pages`, {
         params: {
-            "article.name": search,
+            "displayName": search,
           "endDate[after]": new Date(),
         },
       })
@@ -41,66 +36,56 @@ const UserSearchPage = () => {
           setPageNumber(Math.ceil(res["data"]["hydra:member"].length / 12));
         }
       });}
-  }
-  function getEncheres() {
-    if(checked){
-    axios.get(`${apiRoutes.API}/encheres`, {
+  
+  function getUsers() {
+
+    axios.get(`${apiRoutes.API}/users`, {
       params: {
-        "article.name": search,
-        page: page,
-      }
-    })
-    .then(function (response) {
-      setEncheres(response["data"]["hydra:member"]);
-    }).catch(error=>console.log(error))
-  }else{
-    axios.get(`${apiRoutes.API}/encheres`, {
-      params: {
-        "article.name": search,
+        "displayName": search,
         page: page,
         "endDate[after]": new Date(),
       }
     })
     .then(function (response) {
-      setEncheres(response["data"]["hydra:member"]);
+      setUsers(response["data"]["hydra:member"]);
     }).catch(error=>console.log(error))
-  }
+
   }
 
   const handlePagination = (event, value) => {
     setPage(value);
   };
-  const handleCheck = (event) => {
-    setChecked(event.target.checked);
-  };
+
 
   React.useEffect(()=>{
-    getEncheres()
+    getUsers()
     getPagesNumber();
   },[])
   React.useEffect(() => {
-    getEncheres();
-  }, [page, checked]);
+    getUsers();
+  }, [page]);
 
       return (
         <Grid container>
           <Grid container>
         <Grid item xs={7}>
-        <Typography variant='h3'>nos encheres</Typography>
+        <Typography variant='h3'>resultat de recherche "{search}"</Typography>
         </Grid>
-        <Grid item >
-          <Checkbox
-            checked={checked}
-            onChange={handleCheck}
-            inputProps={{ "aria-label": "controlled" }}
-          />
-          
-        </Grid>
-        <Grid item xs={3}><br /><Typography>afficher les encheres Inversées expirés</Typography></Grid>
+        
       </Grid>
-            
-            <ProductsListing elemsPerLine={6} type={navRoutes.ENCHERE} ventes={encheres}>
-            </ProductsListing>
+      <Grid container spacing={3} sx={styles.usersGrid}>
+      {Object.keys(users).map((key, index) => (<Grid item xs={2.4} sx={{ textAlign: "left"}}>
+        <Card >
+              <CardContent>
+                <Box >
+              <Avatar sx={{ width: "100%", height: "100%" }} alt="avatar" src={`http://127.0.0.1:8000/user/${users[key].image}`}/>
+              </Box>
+               <Box sx={{ textAlign: "center"}}><CategoryLink to={`${navRoutes.CONSULTUSER}/${users[key].id}`}>{users[key].displayName}</CategoryLink>{" "}</Box>
+                
+              </CardContent></Card>
+        </Grid>))}
+        </Grid>
+
             <Pagination
         count={pagesNumber}
         onChange={handlePagination}

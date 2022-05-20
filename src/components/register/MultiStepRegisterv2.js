@@ -1,5 +1,5 @@
 import DateAdapter from "@mui/lab/AdapterDateFns";
-import { ButtonStyles, formBox, formContainer, FormTextField } from "../base/customComponents/general";
+import { ButtonStyles, formBox,  FormTextField } from "../base/customComponents/general";
 import { DesktopDatePicker, LocalizationProvider } from "@mui/lab";
 import * as React from "react";
 import {
@@ -10,26 +10,30 @@ import {
   TextField,
   CssBaseline,
   Button,
+  DialogTitle,
+  DialogContent,
+  Dialog,
 } from "@mui/material";
-import { apiRoutes, navRoutes } from "../../config/routes";
+import { apiRoutes } from "../../config/routes";
 import Stepper from "@mui/material/Stepper";
 import Step from "@mui/material/Step";
 import StepLabel from "@mui/material/StepLabel";
 import axios from "axios";
-import { useNavigate } from "react-router-dom";
+import image from "../../media/images/inscription.jpg"
+// import { useNavigate } from "react-router-dom";
 import { useFormik } from "formik";
-import { pinkish } from "../base/customComponents/general";
 
 
-const steps = ["données de connection" ,"votre adresse"];
+const steps = ["Inscription" ,"votre adresse"];
 
 export default function MultiStepRegister() {
-  const navigate = new useNavigate();
+  // const navigate = new useNavigate();
   //#region stepper part
   const [activeStep, setActiveStep] = React.useState(0);
   const [containsError , setContainsError] = React.useState(true)
   const [stepOne, setStepOne] = React.useState(false);
   const [stepTwo, setStepTwo] = React.useState(false);
+  const [error, setError] = React.useState("");
 
   const handleNext = () => {
     setActiveStep((prevActiveStep) => prevActiveStep + 1);
@@ -223,26 +227,24 @@ export default function MultiStepRegister() {
       })
       .then(function (response) {
         login();
-        // you need to create an adress in the profile afterwards because of the error
-        // axios
-        //   .post(`${apiRoutes.API}/adresses`, {
-        //     pays: formik.values.pays,
-        //     ville: formik.values.ville,
-        //     rue: formik.values.rue,
-        //     zipcode: formik.values.zipcode,
-        //     user: response["data"]["@id"],
-        //   })
-        //   .then((response) => {
-        //     console.log(response["data"]["@id"], "created successfully!");
-        //     login();
-        //   })
-        //   .catch((error) => console.log(error));
       })
       .catch(function (error) {
         if (error.response) {
-          if (error.response.data["hydra:description"] == "not an error") {
+          if (error.response.data["hydra:description"] === "not an error") {
             
             loginWithError();
+          }
+          else{
+            
+            if(error.response.data["hydra:description"].includes("Duplicate entry")){
+              setError("Email déja inscrit")
+              setOpen(handleClickOpen)
+            }
+            else{
+              setError("Erreur Interne du Serveur")
+              setOpen(handleClickOpen)
+            }
+            console.log(error.response.data)
           }
         }
       });
@@ -256,22 +258,10 @@ export default function MultiStepRegister() {
       display: "flex",
       flexDirection: "column",
     },
-    container: {
-      width: "60%",
-      display: "blocks",
-      mr: "auto",
-      ml: "auto",
-      border: "1px solid black",
-      padding: 10,
-      padding: "40px",
-      minWidth: "540px",
-      borderRadius: "10px",
 
-      transition: "all 0.4s ease",
-      backgroundColor:"primary.main",
-    },
     text: {
       mt: 1,
+      width:"100%"
     },
     error:{
       fontSize:12,
@@ -279,12 +269,44 @@ export default function MultiStepRegister() {
     }
   };
   //#endregion
+  const [open, setOpen] = React.useState(false);
+  const handleClickOpen = () => {
+    setOpen(true);
+  };
+
+  const handleClose = () => {
+    setOpen(false);
+  };
   return (
-    <Box sx={pinkish}>
+    <Grid container sx={{backgroundColor:"primary.main"}}>
       <br /><br />
-    <Box sx={formContainer}>
+      <Dialog
+        open={open}
+        onClose={handleClose}
+        aria-labelledby="alert-dialog-title"
+        aria-describedby="alert-dialog-description"
+      >
+        <DialogTitle id="alert-dialog-title">{error}</DialogTitle>
+        <DialogContent>
+            <Typography>veuillez réessayer ultérieurement</Typography>
+
+          <Button
+            onClick={() => handleClose()}
+            sx={{ ...ButtonStyles, mt: "5%", float: "right" }}
+          >
+            Retourner
+          </Button>
+        </DialogContent>
+      </Dialog>
+      <Grid item xs={5} mt={"5%"}>
+      <img src={image} className={"loginImage"} alt=""></img>
+      <Typography variant="h5" margin={"0 2%"} sx={{ textAlign: "center"}}>Joignez Les autres enchérisseurs et trouvez les meilleurs affaires chez nous
+        
+      </Typography>
+      </Grid>
+    <Grid item xs={7}>
       
-      <Stepper sx={{width:"80%", margin: "0 auto"}} activeStep={activeStep}>
+      <Stepper sx={{width:"80%", margin: "5% auto"}} activeStep={activeStep}>
         {steps.map((label, index) => {
           const stepProps = {};
           const labelProps = {};
@@ -296,17 +318,22 @@ export default function MultiStepRegister() {
         })}
       </Stepper>
 
-      <Container component="main" maxWidth="xs">
+      <Container component="main">
         <CssBaseline />
 
           <Box component="form" onSubmit={onSubmit} sx={{...formBox, mt: 3 }}>
-            <Grid container spacing={2}>
+            
               {activeStep === 0 && (
-                <div className="step1">
-                  <Typography variant="h2" sx={{ mb: 2 }}>
+                <Grid container spacing={2}
+              alignItems="center"
+              justifyContent="center">
+                <Grid item xs={12} textAlign={"center"}>
+                <Typography variant="h2" sx={{ mb: 2 }}>
                     {steps[0]}
                   </Typography>
-                  <Grid item>
+                </Grid>
+                  
+                  <Grid item xs={5}>
                     
                     <TextField
                       required
@@ -316,11 +343,12 @@ export default function MultiStepRegister() {
                       value={formik.values.name}
                       onChange={formik.handleChange}
                       sx={styles.text}
+                      
                     />{formik.errors.name ? (
                       <Typography sx={styles.error}>{formik.errors.name}</Typography>
                     ) : null}
                   </Grid>
-                  <Grid item>
+                  <Grid item xs={5}>
                     
                     <TextField
                       required
@@ -334,7 +362,7 @@ export default function MultiStepRegister() {
                       <Typography sx={styles.error}>{formik.errors.displayName}</Typography>
                     ) : null}
                   </Grid>
-                  <Grid item>
+                  <Grid item xs={5}>
                    
                     <TextField
                       required
@@ -348,7 +376,7 @@ export default function MultiStepRegister() {
                       <Typography sx={styles.error}>{formik.errors.email}</Typography>
                     ) : null}
                   </Grid>
-                  <Grid item>
+                  <Grid item xs={5}>
                     
                     <TextField
                       required
@@ -363,7 +391,7 @@ export default function MultiStepRegister() {
                       <Typography sx={styles.error}>{formik.errors.password}</Typography>
                     ) : null}
                   </Grid>
-                  <Grid item>
+                  <Grid item xs={10}>
                    
                     <TextField
                       required
@@ -377,21 +405,22 @@ export default function MultiStepRegister() {
                       <Typography sx={styles.error}>{formik.errors.telephone}</Typography>
                     ) : null}
                   </Grid>
-                  <Grid item sx={{mt:1}}>
+                  <Grid item xs={10} >
                   <LocalizationProvider dateAdapter={DateAdapter}>
                       <DesktopDatePicker
                         label="date de naissance"
                         inputFormat="MM/dd/yyyy"
                         value={formik.values.date}
                         name="date"
+                        
                         onChange={(value) => {
                           formik.setFieldValue('date', Date.parse(value));
                           }}
-                        renderInput={(params) => <FormTextField {...params} />}
+                        renderInput={(params) => <FormTextField sx={styles.text} {...params} />}
                       />
                     </LocalizationProvider>
                   </Grid>
-                  <React.Fragment>
+                  <Grid item xs={10} >
                     <Box sx={{ display: "flex", flexDirection: "row", pt: 2 }}>
                       <Button
                         color="inherit"
@@ -399,25 +428,27 @@ export default function MultiStepRegister() {
                         onClick={handleBack}
                         sx={{ ...ButtonStyles, mr: 1 }}
                       >
-                        Back
+                        Retourner
                       </Button>
                       <Box sx={{ flex: "1 1 auto" }} />
 
                       {activeStep === steps.length ? (
                           <></>
                       ) : (
-                        <Button sx={ButtonStyles} disabled={!stepOne} onClick={handleNext}>
-                          next
+                        <Button sx={{...ButtonStyles, float:"right"}} disabled={!stepOne} onClick={handleNext}>
+                          Suivant
                         </Button>
                       )}
                     </Box>
-                  </React.Fragment>
-                </div>
+                  </Grid>
+                </Grid>
               )}
               {/* TODO: make an optional step for documents */}
               {activeStep === 1 && (
-                <div className="step2">
-                  <Grid item>
+                <Grid container spacing={2}
+              alignItems="center"
+              justifyContent="center">
+                  <Grid item xs={8} >
 
                     <Typography variant="h4">adresse:</Typography>
                     <TextField
@@ -433,7 +464,7 @@ export default function MultiStepRegister() {
                       <Typography sx={styles.error}>{formik.errors.pays}</Typography>
                     ) : null}
                   </Grid>
-                  <Grid item>
+                  <Grid item xs={8} >
 
                     <TextField
                       required
@@ -448,7 +479,7 @@ export default function MultiStepRegister() {
                       <Typography sx={styles.error}>{formik.errors.ville}</Typography>
                     ) : null}
                   </Grid>
-                  <Grid item>
+                  <Grid item xs={8} >
 
                     <TextField
                       required
@@ -462,7 +493,7 @@ export default function MultiStepRegister() {
                       <Typography sx={styles.error}>{formik.errors.rue}</Typography>
                     ) : null}
                   </Grid>
-                  <Grid item>
+                  <Grid item xs={8} >
 
                     <TextField
                       required
@@ -475,7 +506,7 @@ export default function MultiStepRegister() {
                       <Typography sx={styles.error}>{formik.errors.zipcode}</Typography>
                     ) : null}
                   </Grid>
-                  <React.Fragment>
+                  <Grid item xs={10}>
                     <Box sx={{ display: "flex", flexDirection: "row", pt: 2 }}>
                       <Button
                         color="inherit"
@@ -483,7 +514,7 @@ export default function MultiStepRegister() {
                         onClick={handleBack}
                         sx={{ ...ButtonStyles, mr: 1 }}
                       >
-                        Back
+                        RETOURNER
                       </Button>
                       <Box sx={{ flex: "1 1 auto" }} />
 
@@ -491,12 +522,12 @@ export default function MultiStepRegister() {
                           <></>
                       ) : (
                         <Button sx={ButtonStyles} disabled={!stepTwo} type="submit">
-                          next
+                          SOUMETTRE
                         </Button>
                       )}
                     </Box>
-                  </React.Fragment>
-                </div>
+                  </Grid>
+                </Grid>
               )}
               {/* <Grid item xs={12}>
                 {activeStep === steps.length &&
@@ -508,11 +539,11 @@ export default function MultiStepRegister() {
                   </React.Fragment>)
                 }
               </Grid> */}
-            </Grid>
+
           </Box>
       </Container>
-    </Box>
+    </Grid>
     <br /><br />
-    </Box>
+    </Grid>
   );
 }

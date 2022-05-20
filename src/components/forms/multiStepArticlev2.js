@@ -511,7 +511,7 @@ const handleType = (event) => {
                         onClick={handleBack}
                         sx={{ ...ButtonStyles, mr: 1 }}
                       >
-                        Back
+                        Revenir
                       </Button>
                       <Box sx={{ flex: "1 1 auto" }} />
 
@@ -519,7 +519,7 @@ const handleType = (event) => {
                           <></>
                       ) : (
                         <Button sx={ButtonStyles} disabled={!stepOne} onClick={handleNext}>
-                          next
+                          Suivant
                         </Button>
                       )}
                     </Box>

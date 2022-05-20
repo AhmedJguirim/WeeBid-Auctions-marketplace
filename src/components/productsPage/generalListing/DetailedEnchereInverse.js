@@ -62,7 +62,9 @@ const DetailedEnchereInverse = () => {
             Socket.emit("leave-room", `/api/enchere_inverses/${id}`)
       };
   }, []);
-
+  const styles={
+    counterBox:{backgroundColor:"primary.main",  width:"25%", mr:"auto", ml:"auto"}
+  }
     //socket code
     Socket.on("connect",()=>{
       console.log(`you're connected to Socket.io from product`)
@@ -263,12 +265,11 @@ const getImages = (rawImages)=>{
         aria-labelledby="alert-dialog-title"
         aria-describedby="alert-dialog-description"
       >
-        <DialogTitle id="alert-dialog-title">verification</DialogTitle>
+        <DialogTitle id="alert-dialog-title">vérification</DialogTitle>
         <DialogContent>
           <DialogContentText id="alert-dialog-description">
-            are you sure ? if the seller complains about you not paying the
-            given amount we will add your cin to the blackList and you'll be
-            banned permanently
+          Est ce que vous êtes sur ? cette reduction est permenante et changer l'avis n'est pas possible.
+            une reduction faussive peut resulter dans des pénalités.
           </DialogContentText>
         </DialogContent>
         <DialogActions>
@@ -278,7 +279,7 @@ const getImages = (rawImages)=>{
               handleClose();
             }}
           >
-            Disagree
+            Refuser
           </Button>
           <Button
             sx={ButtonStyles}
@@ -288,7 +289,7 @@ const getImages = (rawImages)=>{
             }}
             autoFocus
           >
-            Agree
+            Accepter
           </Button>
         </DialogActions>
       </Dialog>
@@ -299,10 +300,12 @@ const getImages = (rawImages)=>{
         sx={pinkish}
         spacing={2}
       >
-        <Container sx={{mb:5}}>
-        {live===true &&(<Typography variant="h3" sx={{textAlign:"center", mt:5}}>live</Typography>)}
+        <Grid item xs={12} sx={{mb:3 , }}>
+                <Box sx={styles.counterBox}>
+        {live===true &&(<Typography sx={{textAlign:"center", mt:2}} variant="h3">live</Typography>)}
       <Countdown variant="h4" endDate={enchere.endDate} startDate={enchere.startDate}/>
-      </Container>
+      </Box>
+      </Grid>
         <Grid item xs={12}>
           <Typography variant="h3" color="primary.main">
             {article.name}

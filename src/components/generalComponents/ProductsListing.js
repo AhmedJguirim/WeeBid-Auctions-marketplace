@@ -22,8 +22,10 @@ const styles = {
       fontFamily: `"Roboto","Helvetica","Arial",sans-serif`,
     }
 }
+
 const ProductsListing = ({ventes ,elemsPerLine , type}) => {
     // TODO: create links that don't get invisible in small screens like topnav ones
+    
   return (
     <Grid container sx={{...styles.productsGrid, textAlign: "center"}} spacing={3}>
           {Object.keys(ventes).map((key, index) => (

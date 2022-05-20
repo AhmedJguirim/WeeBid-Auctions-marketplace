@@ -24,7 +24,8 @@ export const navRoutes = {
 
     //posting things
     MAKE_ARTICLE: "/makeArticle",
-
+    DEMANDESLISTING: "/demandes",
+    PROPOSITIONSLISTING: "/propositions",
     NOTIFICATIONS:"/notifications",
 
     //under consctuction route

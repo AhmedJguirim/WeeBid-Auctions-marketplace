@@ -11,7 +11,9 @@
 
 .categoryImage {
     height: 200px;
-
+}
+.loginImage {
+    width: 100%;
 }
 
 .dotIt {

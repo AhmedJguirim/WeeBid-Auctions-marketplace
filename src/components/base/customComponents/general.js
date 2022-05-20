@@ -78,13 +78,10 @@ export const formContainer = {
     mr: "auto",
     ml: "auto",
     mt:"2%",
-
     border: "1px solid black",
-    padding: 10,
     padding: "40px",
     minWidth: "540px",
     borderRadius: "10px",
-
     transition: "all 0.4s ease",
     backgroundColor:"primary.main",
 

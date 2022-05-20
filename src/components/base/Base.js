@@ -8,6 +8,7 @@ import VentesListing from '../productsPage/VentesListing.js'
 import UserProfile from '../UserProfile';
 import EncheresHistory from '../userHistory/EncheresHistory'
 import {BrowserRouter as Router,  Route,Routes} from 'react-router-dom';
+import DemandesListing from '../tableListings/DemandesListing'
 import { useDispatch, useSelector } from 'react-redux'
 import { checkUser, getUserData } from '../../redux/actions'
 import CategoriesList from '../productsPage/generalListing/CategoriesList'
@@ -33,6 +34,7 @@ import NotFound from './customComponents/NotFound'
 import EnchereInverseSearchPage from '../productsPage/search/EnchereInverseSearchPage'
 import UserSearchPage from '../productsPage/search/UserSearchPage'
 import NotificationListing from '../tableListings/NotificationListing'
+import PropositionsListing from '../tableListings/propositionsListing'
 // import image from "../../media/images/backgroundimg.gif"
 
 
@@ -83,6 +85,9 @@ const Base = () => {
         <TopNavBar />
         <Routes>
           {/* TODO: declare the routes in config/route.js */}
+          <Route path={`${navRoutes.USERSEARCH}/:search`} element={<UserSearchPage /> }></Route>
+          <Route path={`${navRoutes.PROPOSITIONSLISTING}`} element={<PropositionsListing /> }></Route>
+          <Route path={`${navRoutes.DEMANDESLISTING}`} element={<DemandesListing /> }></Route>
           <Route path={`${navRoutes.NOTIFICATIONS}`} element={<NotificationListing />}></Route>
           <Route path={`${navRoutes.DEMANDE}/:id`} element={<Demande />}></Route>
           <Route path={`${navRoutes.CONSULTUSER}/:id`} element={<ConsultUser />}></Route>

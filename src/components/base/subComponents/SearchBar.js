@@ -150,13 +150,18 @@ export default function SearchBar({ type }) {
 
     <Grid item xs={0.2}>
 
-      {type === "/enchere_inverses" ? (<IconButton  onClick={()=>navigate(`${navRoutes.ENCHEREINVERSESEARCH}/${input}`)}
+      {type === "/enchere_inverses" && (<IconButton  onClick={()=>navigate(`${navRoutes.ENCHEREINVERSESEARCH}/${input}`)}
        disabled={input===""} sx={{mt:1, ml:2}}>
         <SearchIcon/>
-        </IconButton>):
-
-      (
+        </IconButton>)
+      }
+      {type === "/encheres" && (
         <IconButton disabled={input===""}  onClick={()=>navigate(`${navRoutes.ENCHERESEARCH}/${input}`)}
+        sx={{mt:1}}>
+          <SearchIcon/>
+      </IconButton>)}
+      {type === "/users" && (
+        <IconButton disabled={input===""}  onClick={()=>navigate(`${navRoutes.USERSEARCH}/${input}`)}
         sx={{mt:1, ml:2}}>
           <SearchIcon/>
       </IconButton>)}

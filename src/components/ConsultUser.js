@@ -208,7 +208,7 @@ import { CategoryLink } from "./base/customComponents/TopNavLink";
           <Grid container>
   
             <Grid item>
-              <Grid xs={12}><Button sx={ButtonStyles} onClick={handleClickOpen}>demande de devis</Button><br /><br /></Grid>
+              <Grid item xs={12}><Button sx={ButtonStyles} onClick={handleClickOpen}>demande de devis</Button><br /><br /></Grid>
 
             </Grid>
             <Grid item>

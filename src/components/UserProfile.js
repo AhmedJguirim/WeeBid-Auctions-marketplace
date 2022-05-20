@@ -13,6 +13,7 @@ import {
   CardContent,
   Divider,
   ListItem,
+  Badge,
 } from "@mui/material";
 import React from "react";
 import EditIcon from "@mui/icons-material/Edit";
@@ -48,11 +49,11 @@ const UserProfile = () => {
         params: {
           page: "1",
           "endDate[after]": date,
-          user: `/api/users/${myUser.id}`
+          user: `/api/users/${myUser.id}`,
         },
       })
       .then(function (response) {
-        setEnchereInverses(response["data"]["hydra:member"]);
+        setEnchereInverses(response["data"]["hydra:member"].slice(0,5));
         console.log(response["data"]["hydra:member"]);
       })
       .catch((error) => console.log(error));
@@ -63,38 +64,40 @@ const UserProfile = () => {
         params: {
           page: "1",
           "endDate[after]": date,
-          user: `/api/users/${myUser.id}`
+          user: `/api/users/${myUser.id}`,
         },
       })
       .then(function (response) {
-        setEncheres(response["data"]["hydra:member"]);
-        console.log(response["data"]["hydra:member"])
+        setEncheres(response["data"]["hydra:member"].slice(0,5));
+        console.log(response["data"]["hydra:member"]);
       })
       .catch((error) => console.log(error));
   }
   //#endregion
   const navigate = useNavigate();
-  const getCounts = ()=>{
+  const getCounts = () => {
     axios
-    .get(`${apiRoutes.API}/encheres/pages`, {
-      params: {
-        user: `/api/users/${myUser.id}`
-      },
-    })
-    .then((res) => {
-      setEncheresCount(res["data"]["hydra:member"].length);
-  }).catch(err=>console.log(err))
-  axios
-    .get(`${apiRoutes.API}/enchere_inverses/pages`, {
-      params: {
-        user: `/api/users/${myUser.id}`
-      },
-    })
-    .then((res) => {
-      setEncheresInverseesCount(res["data"]["hydra:member"].length);
-  }).catch(err=>console.log(err))}
+      .get(`${apiRoutes.API}/encheres/pages`, {
+        params: {
+          user: `/api/users/${myUser.id}`,
+        },
+      })
+      .then((res) => {
+        setEncheresCount(res["data"]["hydra:member"].length);
+      })
+      .catch((err) => console.log(err));
+    axios
+      .get(`${apiRoutes.API}/enchere_inverses/pages`, {
+        params: {
+          user: `/api/users/${myUser.id}`,
+        },
+      })
+      .then((res) => {
+        setEncheresInverseesCount(res["data"]["hydra:member"].length);
+      })
+      .catch((err) => console.log(err));
+  };
 
-  
   //#region dialog manipulation
   const [open, setOpen] = React.useState(false);
 
@@ -107,7 +110,6 @@ const UserProfile = () => {
   };
   //#endregion
   //#region state manipulation mathods
-
 
   const handleModification = (event) => {
     setModification(event.target.value);
@@ -131,27 +133,31 @@ const UserProfile = () => {
       });
       let path = "http://127.0.0.1:8000/user/";
       const myImg = path.concat(data.image);
-      setAvatar(myImg)
-      console.log(`http://127.0.0.1:8000/${data.image}`)
+      setAvatar(myImg);
+      console.log(`http://127.0.0.1:8000/${data.image}`);
     } catch (error) {
       console.error(error);
     }
   }
 
   const submitHandler = (event) => {
-event.preventDefault();
+    event.preventDefault();
     console.log("under construction");
-    let data = {}
-    data[isEditing] = modification
+    let data = {};
+    data[isEditing] = modification;
 
-    console.log(data)
-    if(isEditing==="password"){
-      API.put(`${apiRoutes.API}/putPassword/${myUser.id}`,data).then(res=>getUser()).catch(err=>console.log(err))
-    }else{
-      API.put(`${apiRoutes.API}/users/${myUser.id}`,data).then(res=>getUser()).catch(err=>console.log(err))
+    console.log(data);
+    if (isEditing === "password") {
+      API.put(`${apiRoutes.API}/putPassword/${myUser.id}`, data)
+        .then((res) => getUser())
+        .catch((err) => console.log(err));
+    } else {
+      API.put(`${apiRoutes.API}/users/${myUser.id}`, data)
+        .then((res) => getUser())
+        .catch((err) => console.log(err));
     }
 
-    handleClose()
+    handleClose();
   };
   React.useEffect(() => {
     getUser();
@@ -161,7 +167,7 @@ event.preventDefault();
   }, []);
 
   return (
-    <Grid container sx={{...pinkish}}>
+    <Grid container sx={{ ...pinkish }}>
       <Dialog
         open={open}
         onClose={handleClose}
@@ -179,128 +185,185 @@ event.preventDefault();
               value={modification}
               onChange={handleModification}
             />
-            <Button type="submit" sx={ButtonStyles}>submit</Button>
+            <Button type="submit" sx={ButtonStyles}>
+              submit
+            </Button>
             <Button
-            sx={ButtonStyles}
-            onClick={() => {
-              handleClose();
-            }}
-          >
-            Disagree
-          </Button>
+              sx={ButtonStyles}
+              onClick={() => {
+                handleClose();
+              }}
+            >
+              Disagree
+            </Button>
           </Box>
         </DialogContent>
       </Dialog>
       {/* title */}
-      <Grid container  margin={"2%"}>
-      {/* <Grid xs={12}><Typography variant="h2">buttons for functionalities and things TODO //////////////////////////////////////</Typography>{" "}<br /><br /></Grid> */}
+      <Grid container margin={"2%"}>
+        {/* <Grid xs={12}><Typography variant="h2">buttons for functionalities and things TODO //////////////////////////////////////</Typography>{" "}<br /><br /></Grid> */}
         <Grid item xs={12} marginBottom={2}>
           <Grid container>
             <Grid item>
-              <Button onClick={()=>navigate(navRoutes.WATCHLIST)} sx={ButtonStyles}>liste de surveilles</Button>
-              </Grid>   
-        
-            <Grid item>
-              <Button onClick={()=>navigate(`${navRoutes.ENCHERES}${navRoutes.PERUSER}/${myUser.id}`)} sx={ButtonStyles}>vos enchères</Button>
-            </Grid>   
-            <Grid item>
-              <Button onClick={()=>navigate(`${navRoutes.ENCHERESINVERSES}${navRoutes.PERUSER}/${myUser.id}`)} sx={ButtonStyles}>vos enchères inversées</Button>
-            </Grid>   
-            </Grid>
-        </Grid>
-        <Grid item xs={3} sx={{ textAlign: "left"}}>
-        <Card >
-              <CardContent>
-                <Box >
-              <Avatar sx={{ width: "100%", height: "100%" }} alt="avatar" src={avatar}/>
-              </Box>
-               <Box sx={{ textAlign: "center"}}><Typography variant="h2">{user["nom d'utilisateur"]}</Typography>{" "}</Box>
-                
-              </CardContent></Card>
-        </Grid>
-        <Grid item xs={1}>
-          
-        </Grid>
-      
-      <Grid item xs={7} sx={{backgroundColor:"primary.main", padding:"2%"}}>
-        {Object.keys(user).map((key, index) => (
-          <ListItem key={index} divider>
-          <Grid container >
-            <Grid item xs={6}>
-              {" "}
-              <Typography variant="h4">{key}:</Typography>
-            </Grid>
-            <Grid item xs={5}>
-              {" "}
-              <Typography variant="h5" marginTop="3%">{user[key]}</Typography>
-            </Grid>
-            <Grid item >
-              <IconButton
-                onClick={() => {
-                  handleClickOpen();
-                  setIsEditing(key);
-                }}
-                id={key}
+              <Button
+                onClick={() => navigate(navRoutes.WATCHLIST)}
+                sx={ButtonStyles}
               >
-                <EditIcon color="secondary" size="large" />{" "}
-              </IconButton>
+                liste de surveilles
+              </Button>
             </Grid>
 
+            <Grid item>
+              <Button
+                onClick={() =>
+                  navigate(
+                    `${navRoutes.ENCHERES}${navRoutes.PERUSER}/${myUser.id}`
+                  )
+                }
+                sx={ButtonStyles}
+              >
+                vos enchères
+              </Button>
+            </Grid>
+            <Grid item>
+              <Button
+                onClick={() =>
+                  navigate(
+                    `${navRoutes.ENCHERESINVERSES}${navRoutes.PERUSER}/${myUser.id}`
+                  )
+                }
+                sx={ButtonStyles}
+              >
+                vos enchères inversées
+              </Button>
+            </Grid>
+            <Grid item>
+              <Button
+                onClick={() => navigate(navRoutes.DEMANDESLISTING)}
+                sx={ButtonStyles}
+              >
+                demandes de devis recus
+              </Button>
+            </Grid>
+            <Grid item>
+              <Button
+                onClick={() => navigate(navRoutes.PROPOSITIONSLISTING)}
+                sx={ButtonStyles}
+              >
+                propositions recus
+              </Button>
+            </Grid>
           </Grid>
-          </ListItem>
+        </Grid>
+        <Grid item xs={3} sx={{ textAlign: "left" }}>
+          <Card>
+            <CardContent>
+              <Box>
+                
+                {/* <Badge
+                  overlap="circular"
+                  anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
+                  badgeContent={<IconButton><EditIcon /></IconButton> }
+                > */}
+                  <Avatar
+                sx={{ width: "100%", height: "100%" }}
+                alt="avatar"
+                src={avatar}
+              />
+              {/* </Badge> */}
+              </Box>
+              <Box sx={{ textAlign: "center" }}>
+                <Typography variant="h2">
+                  {user["nom d'utilisateur"]}
+                </Typography>{" "}
+              </Box>
+            </CardContent>
+          </Card>
+        </Grid>
+        <Grid item xs={1}></Grid>
 
-        ))}
-        <Grid container sx={{textAlign: "center"}}>
-          <Grid item xs={6}>
+        <Grid
+          item
+          xs={7}
+          sx={{ backgroundColor: "primary.main", padding: "2%" }}
+        >
+          {Object.keys(user).map((key, index) => (
+            <ListItem key={index} divider>
+              <Grid container>
+                <Grid item xs={6}>
+                  {" "}
+                  <Typography variant="h4">{key}:</Typography>
+                </Grid>
+                <Grid item xs={5}>
+                  {" "}
+                  <Typography variant="h5" marginTop="3%">
+                    {user[key]}
+                  </Typography>
+                </Grid>
+                <Grid item>
+                  <IconButton
+                    onClick={() => {
+                      handleClickOpen();
+                      setIsEditing(key);
+                    }}
+                    id={key}
+                  >
+                    <EditIcon color="secondary" size="large" />{" "}
+                  </IconButton>
+                </Grid>
+              </Grid>
+            </ListItem>
+          ))}
+          <Grid container sx={{ textAlign: "center" }}>
+            <Grid item xs={6}>
               <Typography variant="h1">{encheresCount}</Typography>
               <Typography variant="h4">enchères crées</Typography>
-          </Grid>
-          <Grid item xs={6}>
+            </Grid>
+            <Grid item xs={6}>
               <Typography variant="h1">{encheresInverseesCount}</Typography>
               <Typography variant="h4">enchères inversées crées</Typography>
+            </Grid>
           </Grid>
         </Grid>
       </Grid>
-    </Grid>
-    <Box sx={{marginTop: "5%", ml:"2%",width:"90%",ml:"auto", mr:"auto"}}>
-
-        <Grid container >
+      <Box
+        sx={{ marginTop: "5%", ml: "2%", width: "90%", ml: "auto", mr: "auto" }}
+      >
+        <Grid container>
           <Grid item xs={12}>
-          <Grid container>
-            <Grid item xs={7}>
-            <Typography variant="h4">
-              vos enchères
-            </Typography>
-            </Grid>
-            <Grid item xs={3}>
-            </Grid>
-            <CategoryLink to={`${navRoutes.ENCHERES}${navRoutes.PERUSER}/${myUser.id}`} >
-              voir tous
-            </CategoryLink>
+            <Grid container>
+              <Grid item xs={7}>
+                <Typography variant="h4">vos enchères</Typography>
+              </Grid>
+              <Grid item xs={3}></Grid>
+              <CategoryLink
+                to={`${navRoutes.ENCHERES}${navRoutes.PERUSER}/${myUser.id}`}
+              >
+                voir tous
+              </CategoryLink>
             </Grid>
 
-              <ProductsListing
+            <ProductsListing
               ventes={encheres}
               type={navRoutes.ENCHERE}
               elemsPerLine={5}
             />
           </Grid>
 
-          <Grid item xs={12} sx={{mt:"4%"}}>
-          <Grid container>
-            <Grid item xs={7}>
-            <Typography variant="h4">
-              vos enchères inversées
-            </Typography>
-            </Grid>
-            <Grid item xs={3}>
-            </Grid>
-            <CategoryLink to={`${navRoutes.ENCHERESINVERSES}${navRoutes.PERUSER}/${myUser.id}`} >
-              voir tous
-            </CategoryLink>
+          <Grid item xs={12} sx={{ mt: "4%" }}>
+            <Grid container>
+              <Grid item xs={7}>
+                <Typography variant="h4">vos enchères inversées</Typography>
+              </Grid>
+              <Grid item xs={3}></Grid>
+              <CategoryLink
+                to={`${navRoutes.ENCHERESINVERSES}${navRoutes.PERUSER}/${myUser.id}`}
+              >
+                voir tous
+              </CategoryLink>
             </Grid>
 
-              <ProductsListing
+            <ProductsListing
               ventes={encheresInverses}
               type={navRoutes.ENCHEREINVERSE}
               elemsPerLine={5}
