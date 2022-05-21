@@ -9,6 +9,14 @@ import {
   DialogActions,
   DialogTitle,
   Container,
+  Divider,
+  TableCell,
+  TableRow,
+  TableBody,
+  TableContainer,
+  Paper,
+  Table,
+  TableHead,
 } from "@mui/material";
 import { Box } from "@mui/system";
 import React, { useRef } from "react";
@@ -21,15 +29,19 @@ import {
   pinkish,
 } from "../../base/customComponents/general";
 import axios from "axios";
-import { useParams } from "react-router-dom";
-import { apiRoutes } from "../../../config/routes";
+import { useNavigate, useParams } from "react-router-dom";
+import { apiRoutes, navRoutes } from "../../../config/routes";
 import Api from "../../../AxiosInstance";
 import { useDispatch, useSelector } from "react-redux";
 import Socket from "../../base/customComponents/Socket";
 import { fetchWatchList } from "../../../redux/actions";
 import placeHolder from "../../../media/images/imagelessAuction.png"
 import Countdown from "../../base/customComponents/Countdown";
+import { CategoryLink } from "../../base/customComponents/TopNavLink";
 
+function createData(id,userId,user, telephone, montant, date) {
+  return { id,userId,user, telephone, montant, date };
+}
 
 const DetailedEnchere = () => {
   const dispatch = useDispatch();
@@ -56,6 +68,47 @@ const DetailedEnchere = () => {
 
   //#endregion
 
+  const [augmentations, setAugmentations] = React.useState([])
+  const [loadedPage, setLoadedPage] = React.useState(1)
+  const navigate = useNavigate();
+
+
+  function getAugmentations(){
+      console.log(loadedPage)
+      Api.get(`/augmentationsTable`,{
+          params:{
+              page:loadedPage,
+              enchereInverse: `/api/encheres/${id}`,
+              "order[date]": "desc"
+          }
+      }).then(res=>{
+          console.log(res)
+          fill(res["data"]["hydra:member"]);
+      }).catch(err=>console.log(err))
+  }
+
+
+  const fill = (res)=>{
+      let rows = [];
+      if(augmentations[0]){
+          rows.push(...augmentations)
+      }
+
+      res.forEach(augmentation=>{
+          rows.push(createData(augmentation.id,augmentation.user.id,augmentation.user.displayName,augmentation.user.telephone
+              , augmentation.value,augmentation.date),)
+      })
+      setAugmentations(rows)
+      console.log(rows)
+  }
+
+
+  const handleAddMore = ()=>{
+      setLoadedPage(loadedPage +1);
+  }
+  React.useEffect(()=>{
+      getAugmentations()
+  },[loadedPage])
   //#region state handlers
   const handleAugmentation = (event) => {
     setAugmentation(parseFloat(event.target.value));
@@ -310,7 +363,62 @@ const styles={
     <Grid container sx={{...pinkish, mt:5}}>
       {/* could be used for anything */}
       {/* this is just a verification popUp */}
-      <Dialog
+      {user.id === seller.id ?(
+        <Dialog
+        open={open}
+        onClose={handleClose}
+        aria-labelledby="alert-dialog-title"
+        aria-describedby="alert-dialog-description"
+      >
+        <DialogTitle id="alert-dialog-title">les augmentations</DialogTitle>
+        <DialogContent>
+
+      <TableContainer component={Paper}>
+        <Table   aria-label="simple table">
+          <TableHead>
+            <TableRow>
+              <TableCell>transmetteur </TableCell>
+              <TableCell align="right">Enchère proposé&nbsp;</TableCell>
+              <TableCell align="right">Date&nbsp;</TableCell>
+              <TableCell align="right">actions&nbsp;</TableCell>
+            </TableRow>
+          </TableHead>
+          <TableBody>
+            {augmentations.map((augmentation) => (
+              <TableRow
+                key={augmentation.id}
+                sx={{ "&:last-child td, &:last-child th": { border: 0 } }}
+              >
+                <TableCell scope="row">
+                  <CategoryLink to={`${navRoutes.CONSULTUSER}/${augmentation.userId}`}>{augmentation.user}</CategoryLink>
+                </TableCell>
+                <TableCell align="right">{augmentation.montant}</TableCell>
+                <TableCell align="right">{augmentation.date.slice(0,10)}</TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
+        {augmentations.length === loadedPage*15 && <div> <Divider/>
+        <Typography onClick={handleAddMore} sx={{textAlign:"center", fontSize:20,margin:"10px 0"}}>afficher plus de notifications</Typography></div>}
+        
+      </TableContainer>
+        </DialogContent>
+        <DialogActions>
+          <Button
+            sx={ButtonStyles}
+            onClick={() => {
+              handleClose();
+              setAugmentations([])
+            }}
+          >
+            Fermer
+          </Button>
+
+        </DialogActions>
+      </Dialog>
+
+      ):(
+        <Dialog
         open={open}
         onClose={handleClose}
         aria-labelledby="alert-dialog-title"
@@ -319,7 +427,7 @@ const styles={
         <DialogTitle id="alert-dialog-title">vérification</DialogTitle>
         <DialogContent>
           <DialogContentText id="alert-dialog-description">
-            Est ce que vous êtes sur ? cette augmentation est permenante et changer l'avis n'est pas possible.
+          Est ce que vous êtes sur ? cette augmentation est permenante et changer l'avis n'est pas possible.
             une augmentation faussive peut resulter dans des pénalités.
           </DialogContentText>
         </DialogContent>
@@ -330,7 +438,7 @@ const styles={
               handleClose();
             }}
           >
-           Je refuse
+            Refuser
           </Button>
           <Button
             sx={ButtonStyles}
@@ -340,10 +448,12 @@ const styles={
             }}
             autoFocus
           >
-            J'accepte
+            Accepter
           </Button>
         </DialogActions>
       </Dialog>
+
+      )}
       <Grid item xs={2}></Grid>
 
       <Grid
@@ -452,10 +562,16 @@ const styles={
               </Grid>
 
               <Grid item xs={4}>
-                <Button sx={ButtonStyles} onClick={handleClickOpen}>
-                  {" "}
-                  encherir
-                </Button>
+              {isOwner === true ? (<Button sx={ButtonStyles} onClick={()=>
+              {
+                handleClickOpen()
+                getAugmentations()
+              }
+              }>les augmentations</Button>):(<Button sx={ButtonStyles} onClick={handleClickOpen}>
+                {" "}
+                encherir
+              </Button>)}
+                
               </Grid>
             </Grid>
           </Box>):(<></>)}

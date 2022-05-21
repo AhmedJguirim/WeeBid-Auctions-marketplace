@@ -1,6 +1,6 @@
 import DateAdapter from "@mui/lab/AdapterDateFns";
 import Api from "../../AxiosInstance";
-import { ButtonStyles, formBox , formContainer, FormTextField} from "../base/customComponents/general";
+import { ButtonStyles, formBox , formContainer, FormTextField, lightContainer} from "../base/customComponents/general";
 import {
   DateTimePicker,
   DesktopDatePicker,
@@ -35,12 +35,11 @@ import StepLabel from "@mui/material/StepLabel";
 import { useNavigate } from "react-router-dom";
 import CancelIcon from "@mui/icons-material/Cancel";
 import { useFormik } from "formik";
-import { pinkish } from "../base/customComponents/general";
+import image from "../../media/images/auctionCreate.png"
 
 const steps = [
   "enregistrer un article",
   "enregistrer l'offre",
-  "fixer les dates",
 ];
 var someDate = new Date();
 const stateOptions = ["utilisé", "neuf"];
@@ -96,16 +95,7 @@ export default function CreateArticle() {
         } else if (values.initPrice < 0) {
           errors.initPrice = "le prix initial doit être positif";
         }
-      
-        //immediatePrice validation
-        if (!values.immediatePrice) {
-          errors.immediatePrice = "champ obligatoir";
-        } else if (values.immediatePrice < 0) {
-          errors.immediatePrice = "le prix immediat doit être positif";
-        } else if (values.immediatePrice < values.initPrice) {
-          errors.immediatePrice =
-            "le prix immediat doit être superieur au prix initial";
-        }
+
 
 
         //fabrication date validation
@@ -147,18 +137,14 @@ export default function CreateArticle() {
       }else{
         setStepOne(false)
       }
-      if(errors.quantity === undefined && errors.initPrice=== undefined && errors.immediatePrice=== undefined && category !==""){
+      if(errors.quantity === undefined && errors.endDate === undefined && errors.startDate=== undefined 
+        && errors.initPrice=== undefined && errors.immediatePrice=== undefined && category !==""){
         setStepTwo(true)      
         
       }else{
         setStepTwo(false)
       }
       
-      if(errors.endDate == undefined && errors.startDate== undefined ){
-        setStepThree(true)      
-      }else{
-        setStepThree(false)
-      }
 
         return errors;
       };
@@ -195,7 +181,6 @@ export default function CreateArticle() {
 
   const [stepOne, setStepOne] = React.useState(false);
   const [stepTwo, setStepTwo] = React.useState(false);
-  const [stepThree, setStepThree] = React.useState(false);
 const handleState = (event) => {
     setState(event.target.value);
   };
@@ -327,9 +312,16 @@ const handleType = (event) => {
 
   //#endregion
   return (
-    <Box sx={pinkish}>
-    <Box sx={formContainer}>
-
+    
+    <Grid container sx={{backgroundColor:"primary.main"}}>
+      <Grid item xs={6} mt="10%">
+        <Box
+          component="img"
+          src={image}
+          sx={{maxWidth:"100%"}}
+        ></Box>
+      </Grid>
+      <Grid item xs={6} sx={{mt:"2%"}}>
       <Stepper activeStep={activeStep}>
         {steps.map((label, index) => {
           const stepProps = {};
@@ -341,17 +333,21 @@ const handleType = (event) => {
           );
         })}
       </Stepper>
-      <Container component="main" maxWidth="xs">
+
         <CssBaseline />
-        <Box sx={formBox}>
+        <Box sx={{...formBox, width:"90%", margin:"0 auto"}}>
           <Box component="form" onSubmit={submitHandler} sx={{ mt: 3 }}>
-            <Grid container spacing={2}>
+            
               {activeStep === 0 && (
-                <div className="step1">
+                <Grid container spacing={2}
+                alignItems="center"
+                justifyContent="center">
+                  <Grid item xs={12}>
                   <Typography variant="h2" sx={{ mb: 2 }}>
                     {steps[0]}
                   </Typography>
-                  <Grid item xs={12}>
+                  </Grid>
+                  <Grid item xs={6}>
                     <FormTextField
                       fullWidth
                       required
@@ -363,7 +359,7 @@ const handleType = (event) => {
                       <Typography sx={styles.error}>{formik.errors.name}</Typography>
                     ) : null}
                   </Grid>
-                  <Grid item xs={12}>
+                  <Grid item xs={6}>
 
                     <FormTextField
                       fullWidth
@@ -375,7 +371,7 @@ const handleType = (event) => {
                       <Typography sx={styles.error}>{formik.errors.brand}</Typography>
                     ) : null}
                   </Grid>
-                  <Grid item xs={12}>
+                  <Grid item xs={6}>
 
                     <FormTextField
                       fullWidth
@@ -389,8 +385,9 @@ const handleType = (event) => {
                     ) : null}
                   </Grid>
 
-                  <Grid item xs={12}>
+                  <Grid item xs={6}>
                     <FormTextField
+                    fullWidth
                       id="codebar"
                       label="code a barre"
                       value={formik.values.codebar}
@@ -399,7 +396,7 @@ const handleType = (event) => {
                       <Typography sx={styles.error}>{formik.errors.codebar}</Typography>
                     ) : null}
                   </Grid>
-                  <Grid item xs={12}>
+                  <Grid item xs={6}>
                     {/* TODO: date stays as default , fix it */}
                     <LocalizationProvider dateAdapter={DateAdapter}>
                       <DesktopDatePicker
@@ -410,13 +407,13 @@ const handleType = (event) => {
                         onChange={(value) => {
                           formik.setFieldValue('date', Date.parse(value));
                           }}
-                        renderInput={(params) => <FormTextField {...params} />}
+                        renderInput={(params) => <FormTextField fullWidth {...params} />}
                       />{formik.errors.date ? (
                         <Typography sx={styles.error}>{formik.errors.date}</Typography>
                       ) : null}
                     </LocalizationProvider>
                   </Grid>
-                  <Grid item xs={12}>
+                  <Grid item xs={6}>
                     <FormControl sx={{marginTop:"8px"}} fullWidth>
                       <InputLabel id="demo-simple-select-label">
                         état
@@ -435,29 +432,22 @@ const handleType = (event) => {
                   </Grid>{formik.errors.state ? (
                         <Typography sx={styles.error}>{formik.errors.state}</Typography>
                       ) : null}
-                  <Grid item xs={12}>
-
-                    <textarea
-                      name="description"
-                      id="description"
-                      value={formik.values.description}
-                      onChange={formik.handleChange}
-                      className="descriptionField"
-                      cols="30"
-                      rows="10"
-                      placeholder="description"
-                    ></textarea>
-                  </Grid>{formik.errors.description ? (
-                        <Typography sx={styles.error}>{formik.errors.description}</Typography>
-                      ) : null}
-                  <Grid item xs={12}>
-                      
-                    <FormControlLabel
-                      control={<Checkbox value="validation" />}
-                      label="vous guarentissez la validité de ces informations"
+                  <Grid item xs={6}>
+                    <TextField
+                    fullWidth
+                    multiline
+                    name="description"
+                    id="description"
+                    value={formik.values.description}
+                    onChange={formik.handleChange}
+                    placeholder="description"
+                    cols={35}
+                    rows={9}
                     />
-                  </Grid>
-                  <Grid item xs={12}>
+                    {formik.errors.description ? (
+                        <Typography sx={styles.error}>{formik.errors.description}</Typography>
+                      ) : null}</Grid>
+                    <Grid item xs={6}>
                     <label htmlFor="contained-button-file">
                       <Input
                         accept="image/*"
@@ -487,9 +477,6 @@ const handleType = (event) => {
                         Upload
                       </Button>
                     </label>
-                  </Grid>
-                  <Grid item xs={12}>
-
                     {images.map((image) => (
                       <MenuItem value={image} key={image.get("file").name}>
                         <Typography>{image.get("file").name}</Typography>
@@ -503,37 +490,43 @@ const handleType = (event) => {
                       </MenuItem>
                     ))}
                   </Grid>
-                  <React.Fragment>
-                    <Box sx={{ display: "flex", flexDirection: "row", pt: 2 }}>
-                      <Button
-                        color="inherit"
-                        disabled={activeStep === 0}
-                        onClick={handleBack}
-                        sx={{ ...ButtonStyles, mr: 1 }}
-                      >
-                        Revenir
-                      </Button>
-                      <Box sx={{ flex: "1 1 auto" }} />
+                  <Grid item xs={12}>
+                      
+                    <FormControlLabel
+                      control={<Checkbox value="validation" />}
+                      label="vous guarentissez la validité de ces informations"
+                    />
+                  </Grid>
+                 
+                  <Grid item xs={12}>
+                  <Box sx={{ display: "flex", flexDirection: "row", pt: 2 }}>
 
-                      {activeStep === steps.length ? (
-                          <></>
-                      ) : (
+                      <Box sx={{ flex: "1 1 auto" }} />
+ 
                         <Button sx={ButtonStyles} disabled={!stepOne} onClick={handleNext}>
                           Suivant
                         </Button>
-                      )}
                     </Box>
-                  </React.Fragment>
-                </div>
+                    
+                  </Grid>
+
+                    
+                  </Grid>
+
               )}
               {/* TODO: make an optional step for documents */}
               {activeStep === 1 && (
-                <div className="step2">
+                <Grid container spacing={2}
+                alignItems="center"
+                justifyContent="center">
+                  <Grid item xs={12} textAlign={"center"}>
                   <Typography variant="h2" sx={{ mb: 2 }}>
                     {steps[1]}
                   </Typography>
+                  </Grid>
+                  <Grid item></Grid>
                   <FormControl>
-                    <FormLabel id="demo-controlled-radio-buttons-group">
+                    <FormLabel sx={{ml:"2%"}} id="demo-controlled-radio-buttons-group">
                       Type :
                     </FormLabel>
                     <RadioGroup
@@ -542,18 +535,31 @@ const handleType = (event) => {
                       value={type}
                       onChange={handleType}
                     >
-                      <FormControlLabel
-                        value="enchere_inverses"
-                        control={<Radio />}
-                        label="EnchereInversé"
-                      />
+                      <Grid container margin="0 auto" spacing={2}><Grid item xs={6}>
                       <FormControlLabel
                         value="encheres"
                         control={<Radio />}
-                        label="Enchere"
+                        label="Enchère"
                       />
+                      <Typography fontSize={12}>commancer une enchère ou les autres utilisateurs peuvent
+                      enchérir compétitivement pour acquirir l'article que vous avez décrit dans l'étape
+                      précédente </Typography>
+                      </Grid>
+                      <Grid item xs={6}>
+                      <FormControlLabel
+                        value="enchere_inverses"
+                        control={<Radio />}
+                        label="Enchère inversée"
+                      />
+                      <Typography fontSize={12}>commancer une enchère inversée ou les autres utilisateurs donnent
+                      leurs meilleurs prix sur l'article que vous avez décrit dans l'étape
+                      précédente
+                      </Typography>
+                      </Grid>
+                      </Grid>
                     </RadioGroup>
                   </FormControl>
+
                   <Grid item xs={12}>
                     <FormControl fullWidth>
                       <InputLabel id="demo-simple-select-label">
@@ -574,7 +580,7 @@ const handleType = (event) => {
                       </Select>
                     </FormControl>
                   </Grid>
-                  <Grid item xs={12}>
+                  <Grid item xs={6}>
 
                     <FormTextField
                       fullWidth
@@ -589,21 +595,8 @@ const handleType = (event) => {
                         <Typography sx={styles.error}>{formik.errors.quantity}</Typography>
                       ) : null}
                   </Grid>
-                  <Grid item xs={12}>
-                    <FormTextField
-                      fullWidth
-                      required
-                      type="number"
-                      id="immediatePrice"
-                      label="prix immediat"
-                      value={formik.values.immediatePrice}
-                      onChange={formik.handleChange}
-                    />{formik.errors.immediatePrice ? (
-                      <Typography sx={styles.error}>{formik.errors.immediatePrice}</Typography>
-                    ) : null}
-                  </Grid>
 
-                  <Grid item xs={12}>
+                  <Grid item xs={6}>
                     <FormTextField
                       required
                       fullWidth
@@ -616,36 +609,7 @@ const handleType = (event) => {
                       <Typography sx={styles.error}>{formik.errors.initPrice}</Typography>
                     ) : null}
                   </Grid>
-                  
-                  <React.Fragment>
-                    <Box sx={{ display: "flex", flexDirection: "row", pt: 2 }}>
-                      <Button
-                        color="inherit"
-                        disabled={activeStep === 0}
-                        onClick={handleBack}
-                        sx={{ ...ButtonStyles, mr: 1 }}
-                      >
-                        Back
-                      </Button>
-                      <Box sx={{ flex: "1 1 auto" }} />
-
-                      {activeStep === steps.length ? (
-                          <></>
-                      ) : (
-                        <Button sx={ButtonStyles} disabled={!stepTwo} onClick={handleNext}>
-                          next
-                        </Button>
-                      )}
-                    </Box>
-                  </React.Fragment>
-                </div>
-              )}
-              {activeStep === 2 && (
-                <div className="step3">
-                  <Typography variant="h2" sx={{ mb: 2 }}>
-                    {steps[2]}
-                  </Typography>
-                  <Grid item xs={12}>
+                  <Grid item xs={6}>
 
                     <LocalizationProvider dateAdapter={DateAdapter}>
                       <DateTimePicker
@@ -663,7 +627,7 @@ const handleType = (event) => {
                       <Typography sx={styles.error}>{formik.errors.startDate}</Typography>
                     ) : null}
                   </Grid>
-                  <Grid item xs={12}>
+                  <Grid item xs={6}>
                     <LocalizationProvider dateAdapter={DateAdapter}>
                       <DateTimePicker
                         label="date de fin"
@@ -680,7 +644,8 @@ const handleType = (event) => {
                       <Typography sx={styles.error}>{formik.errors.endDate}</Typography>
                     ) : null}
                   </Grid>
-                  <React.Fragment>
+                  
+                  <Grid item xs={12}>
                     <Box sx={{ display: "flex", flexDirection: "row", pt: 2 }}>
                       <Button
                         color="inherit"
@@ -688,28 +653,28 @@ const handleType = (event) => {
                         onClick={handleBack}
                         sx={{ ...ButtonStyles, mr: 1 }}
                       >
-                        Back
+                        Retourner
                       </Button>
                       <Box sx={{ flex: "1 1 auto" }} />
 
                       {activeStep === steps.length ? (
                           <></>
                       ) : (
-                        <Button sx={ButtonStyles} disabled={!stepThree} type="submit">
-                          soumettre
+                        <Button sx={ButtonStyles} disabled={!stepTwo}  type="submit">
+                         Soumettre
                         </Button>
                       )}
                     </Box>
-                  </React.Fragment>
-                </div>
+                  </Grid>
+              </Grid>
               )}
+              
              
-            </Grid>
+
           </Box>
         </Box>
-      </Container>
 
-    </Box>
-    </Box>
+      </Grid>
+    </Grid>
   );
 }

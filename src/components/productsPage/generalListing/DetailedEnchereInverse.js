@@ -9,20 +9,34 @@ import {
   DialogActions,
   DialogTitle,
   Container,
+  TableCell,
+  TableRow,
+  TableContainer,
+  Paper,
+  Table,
+  TableHead,
+  TableBody,
+  Divider,
 } from "@mui/material";
 import { Box} from "@mui/system";
 import React, { useRef } from "react";
 import PersonIcon from "@mui/icons-material/Person";
 import { ArticleImage, ArticleSubImage, ButtonStyles, lightContainer, pinkish } from "../../base/customComponents/general";
 import axios from "axios";
-import { useParams } from "react-router-dom";
-import { apiRoutes } from "../../../config/routes";
+import { useNavigate, useParams } from "react-router-dom";
+import { apiRoutes, navRoutes } from "../../../config/routes";
 import Api from "../../../AxiosInstance";
 import { useDispatch, useSelector } from "react-redux";
 import Socket from "../../base/customComponents/Socket";
 import {fetchWatchList} from '../../../redux/actions';
 import placeHolder from "../../../media/images/imagelessAuction.png"
 import Countdown from "../../base/customComponents/Countdown";
+import { CategoryLink } from "../../base/customComponents/TopNavLink";
+
+
+function createData(id,userId,user, telephone, montant, date) {
+  return { id,userId,user, telephone, montant, date };
+}
 
 const DetailedEnchereInverse = () => {
 
@@ -48,6 +62,47 @@ const DetailedEnchereInverse = () => {
 
   //#endregion
 
+  const [reductions, setReductions] = React.useState([])
+  const [loadedPage, setLoadedPage] = React.useState(1)
+  const navigate = useNavigate();
+
+
+  function getReductions(){
+      console.log(loadedPage)
+      Api.get(`/reductionsTable`,{
+          params:{
+              page:loadedPage,
+              enchereInverse: `/api/enchere_inverses/${id}`,
+              "order[date]": "desc"
+          }
+      }).then(res=>{
+          console.log(res)
+          fill(res["data"]["hydra:member"]);
+      }).catch(err=>console.log(err))
+  }
+
+
+  const fill = (res)=>{
+      let rows = [];
+      if(reductions[0]){
+          rows.push(...reductions)
+      }
+
+      res.forEach(reduction=>{
+          rows.push(createData(reduction.id,reduction.user.id,reduction.user.displayName,reduction.user.telephone
+              , reduction.value,reduction.date),)
+      })
+      setReductions(rows)
+      console.log(rows)
+  }
+
+
+  const handleAddMore = ()=>{
+      setLoadedPage(loadedPage +1);
+  }
+  React.useEffect(()=>{
+      getReductions()
+  },[loadedPage])
   //#region state handlers
   const handleReduction = (event) => {
     setReduction(parseFloat(event.target.value));
@@ -74,7 +129,6 @@ const DetailedEnchereInverse = () => {
           Socket.on("NEW_PRICE", (myEnchere, user, newPrice, initPrice)=>{
             dispatch({type:"SETPRICE",newPrice});
             getCurrentPrice(initPrice,id)
-            alert(`${user} has updated the price of ${myEnchere} to ${newPrice}`)
             })   
         
       })
@@ -259,7 +313,62 @@ const getImages = (rawImages)=>{
     <Grid container sx={{...pinkish, mt:5}}>
       {/* could be used for anything */}
       {/* this is just a verification popUp */}
-      <Dialog
+      {user.id === seller.id ?(
+        <Dialog
+        open={open}
+        onClose={handleClose}
+        aria-labelledby="alert-dialog-title"
+        aria-describedby="alert-dialog-description"
+      >
+        <DialogTitle id="alert-dialog-title">les augmentations</DialogTitle>
+        <DialogContent>
+
+      <TableContainer component={Paper}>
+        <Table   aria-label="simple table">
+          <TableHead>
+            <TableRow>
+              <TableCell>transmetteur </TableCell>
+              <TableCell align="right">Enchère proposé&nbsp;</TableCell>
+              <TableCell align="right">Date&nbsp;</TableCell>
+            </TableRow>
+          </TableHead>
+          <TableBody>
+            {reductions.map((reduction) => (
+              <TableRow
+                key={reduction.id}
+                sx={{ "&:last-child td, &:last-child th": { border: 0 } }}
+              >
+                <TableCell scope="row">
+                  <CategoryLink to={`${navRoutes.CONSULTUSER}/${reduction.userId}`}>{reduction.user}</CategoryLink>
+                </TableCell>
+                <TableCell align="right">{reduction.montant}</TableCell>
+                <TableCell align="right">{reduction.date.slice(0,10)}</TableCell>
+                <TableCell align="right">actions&nbsp;</TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
+        {reductions.length === loadedPage*15 && <div> <Divider/>
+        <Typography onClick={handleAddMore} sx={{textAlign:"center", fontSize:20,margin:"10px 0"}}>afficher plus de notifications</Typography></div>}
+        
+      </TableContainer>
+        </DialogContent>
+        <DialogActions>
+          <Button
+            sx={ButtonStyles}
+            onClick={() => {
+              handleClose();
+              setReduction([])
+            }}
+          >
+            Fermer
+          </Button>
+
+        </DialogActions>
+      </Dialog>
+
+      ):(
+        <Dialog
         open={open}
         onClose={handleClose}
         aria-labelledby="alert-dialog-title"
@@ -293,7 +402,9 @@ const getImages = (rawImages)=>{
           </Button>
         </DialogActions>
       </Dialog>
-      <Grid item xs={2}></Grid>
+
+      )}
+            <Grid item xs={2}></Grid>
 
       <Grid
         container
@@ -402,10 +513,18 @@ const getImages = (rawImages)=>{
               </Grid>
 
               <Grid item xs={4}>
-                <Button sx={ButtonStyles} onClick={handleClickOpen}>
+                {user.id === seller.id ? (<Button sx={ButtonStyles} onClick={handleClickOpen}>
+                  {" "}
+                  les Reductions
+                </Button>):(<Button sx={ButtonStyles} onClick={()=>{
+                handleClickOpen()
+                getReductions()
+              }
+                  }>
                   {" "}
                   encherir
                 </Button>
+                )}
               </Grid>
             </Grid>
           </Box>):(<></>)}
