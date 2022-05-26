@@ -49,6 +49,15 @@ export const ArticleSubImage = styled("img")(({ theme }) => ({
 export const FormTextField = styled(TextField)(({ theme }) => ({
   marginTop: 8,
 }));
+export const FooterLink = styled(Link)(({ theme }) => ({
+  marginTop:"25%",
+textDecoration: "none",
+fontWeight: "bold",
+color: "secondary.main",
+fontSize:15,
+fontFamily: `"Roboto,"Helvetica","Arial",sans-serif"`,
+}));
+
 export const ButtonStyles = {
   color: "secondary.main",
   border: "1px solid black",

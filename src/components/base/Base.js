@@ -35,18 +35,14 @@ import EnchereInverseSearchPage from '../productsPage/search/EnchereInverseSearc
 import UserSearchPage from '../productsPage/search/UserSearchPage'
 import NotificationListing from '../tableListings/NotificationListing'
 import PropositionsListing from '../tableListings/propositionsListing'
+import Footer from './subComponents/Footer'
 // import image from "../../media/images/backgroundimg.gif"
 
 
 
 
 
-const styles = {
-  body:{
-    backgroundColor: "#f4ebf5",
-    height:630
-  }
-}
+
 const Base = () => {
   const watchList = useSelector((state) => state.watchList)
   const user = useSelector((state) => state.user)
@@ -78,7 +74,12 @@ const Base = () => {
       
     },[])
     
-  
+    const styles = {
+      body:{
+        backgroundColor: "primary.main",
+        height:630
+      }
+    }
   return (
     <Router>
       <Box sx={styles.body}>
@@ -119,6 +120,7 @@ const Base = () => {
 
           
         </Routes>
+        <Footer />
       </Box>
     </Router>
   )

@@ -171,7 +171,11 @@ const styles={
       .then(function (response) {
         const data = response["data"];
         console.log(response["data"]["@id"], "retrieved successfully!");
-        if(new Date(response["data"].endDate).getTime() < new Date().getTime()){
+        if(response["data"].fermeture !== null){
+          setLive(false);
+          setExpired(true);
+        }
+        else if(new Date(response["data"].endDate).getTime() < new Date().getTime()){
           setLive(false);
           setExpired(true);
 
@@ -330,7 +334,7 @@ const styles={
         },
       }).then(res=>{
         Api.post(`${apiRoutes.API}/fermetures`,{
-        user:res["data"]["hydra:member"]["0"].user,
+        user:res["data"]["hydra:member"]["0"].user["@id"],
         date: new Date().getTime(),
         isSold: true,
         finalPrice:res["data"]["hydra:member"]["0"].value,
@@ -465,7 +469,8 @@ const styles={
       ><Grid item xs={12} sx={{mb:3 , }}>
                 <Box sx={styles.counterBox}>
         {live===true &&(<Typography sx={{textAlign:"center", mt:2}} variant="h3">live</Typography>)}
-      <Countdown variant="h4" endDate={enchere.endDate} startDate={enchere.startDate}/>
+        {expired === true ? (<Typography sx={{textAlign:"center", mt:2}} variant="h3">expiré</Typography>):
+        (<Countdown variant="h4" endDate={enchere.endDate} startDate={enchere.startDate}/>)}
       </Box>
       </Grid>
         
@@ -475,7 +480,7 @@ const styles={
         <Grid item ml={4}>
         {followable === true &&
           <Grid item><Button onClick={handleWatch} sx={{...ButtonStyles, backgroundColor:"primary.main"}}> {watchButton} </Button></Grid>}
-        {isOwner === true &&
+        {isOwner === true && expired !==true &&
           <Grid item><Button onClick={handleFermeture} sx={{...ButtonStyles, backgroundColor:"primary.main"}}> fermer </Button></Grid>}
           </Grid>
           {/* documents */}
@@ -534,19 +539,32 @@ const styles={
             {article.nom}
           </Typography>
 
-        {live===true ? (<Box sx={lightContainer}>
-          <Grid container spacing={2}>
+          {live===true ? (<Box sx={lightContainer}>
+          {/* selling section */}
+
+            <Grid container spacing={2}>
+            {isOwner === false ? (<> 
               <Grid item xs={4}>
-                <Typography variant="h6">encherir:</Typography>{" "}
+                <Typography variant="h6">Enchérir:</Typography>{" "}
               </Grid>
               <Grid item xs={4}>
                 <Typography variant="h6">
                   prix actuel: {thePrice}TND
                 </Typography>
+              </Grid></>):(<> 
+                <Grid item xs={4}>
+                <Typography variant="h6">Prix actuel:</Typography>{" "}
               </Grid>
               <Grid item xs={4}>
+                <Typography variant="h6">
+                  {thePrice}TND
+                </Typography>
+              </Grid></>
+              )}
+              
+              {isOwner === false && <> <Grid item xs={4}>
                 <Typography variant="h8">
-                  prix apres l'augmentation: {thePrice + augmentation} TND
+                  prix apres la reduction: {Math.round((thePrice - augmentation) * 100) / 100} TND
                 </Typography>
               </Grid>
               <Grid item xs={4}></Grid>
@@ -554,27 +572,50 @@ const styles={
                 <TextField
                   required
                   type="number"
-                  id="augmentation"
-                  label="augmentation"
+                  id="reduction"
+                  label="reduction"
                   value={augmentation}
                   onChange={handleAugmentation}
                 />
-              </Grid>
+              </Grid></>}
 
               <Grid item xs={4}>
-              {isOwner === true ? (<Button sx={ButtonStyles} onClick={()=>
-              {
+                {isOwner ? (<Button sx={ButtonStyles} onClick={handleClickOpen}>
+                  {" "}
+                  les augmentations
+                </Button>):(<Button sx={ButtonStyles} onClick={()=>{
                 handleClickOpen()
                 getAugmentations()
               }
-              }>les augmentations</Button>):(<Button sx={ButtonStyles} onClick={handleClickOpen}>
-                {" "}
-                encherir
-              </Button>)}
-                
+                  }>
+                  {" "}
+                  Enchérir
+                </Button>
+                )}
               </Grid>
             </Grid>
           </Box>):(<></>)}
+          {
+            expired &&
+            <Box sx={lightContainer}>
+            <Grid container >
+              <Grid item xs={4}>
+                <Typography variant="h6">Prix actuel:</Typography>{" "}
+              </Grid>
+              <Grid item xs={4}>
+                <Typography variant="h6">
+                  {thePrice}TND
+                </Typography>
+              </Grid>
+              <Grid item xs={4}>
+              {isOwner ? (<Button sx={ButtonStyles} onClick={handleClickOpen}>
+                  {" "}
+                  les augmentations
+                </Button>):(<></>)}
+                </Grid>
+            </Grid>
+            </Box>
+          }
           {/* selling section */}
           
           {/* sale details section*/}

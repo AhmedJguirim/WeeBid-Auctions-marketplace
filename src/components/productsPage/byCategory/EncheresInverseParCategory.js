@@ -105,11 +105,11 @@ const EncheresInverseParCategory = () => {
     <Grid container>
       <Grid container>
         <Grid item xs={7}>
-          <Typography variant="h3">
-            nos encheres inversées de {categoryName}
+          <Typography variant="h3" ml="2%">
+            Nos enchères inversées de  catégorie {categoryName}
           </Typography>
         </Grid>
-        <Grid item >
+        <Grid item sx = {{mt:1}} >
           <Checkbox
             checked={checked}
             onChange={handleCheck}

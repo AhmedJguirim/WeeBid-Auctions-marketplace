@@ -39,12 +39,7 @@ const MyDrawer = ({ open, setOpen }) => {
   const listeElems1 = {
     "tous les encheres": navRoutes.ENCHERES,
     "nos enchères inversées": navRoutes.ENCHERESINVERSES,
-    // "nos produits": navRoutes.VENTES,
-
     categories: navRoutes.CATEGORIES,
-
-    // "a propos de nous": navRoutes.INPROGRESS,
-    // "contactez nous": navRoutes.INPROGRESS,
   };
 
   let listeElems2 = {};
@@ -52,20 +47,17 @@ const MyDrawer = ({ open, setOpen }) => {
     listeElems2 = {
       "créer un compte": navRoutes.REGISTER,
       "se connecter": navRoutes.LOGIN,
-      "politiques d'intimité": navRoutes.INPROGRESS,
     };
   } else {
     listeElems2 = {
       "commancer un enchère ou enchere inversé": navRoutes.MAKE_ARTICLE,
-      // "envoyer une demande de devis": navRoutes.INPROGRESS,
       "votre profile": navRoutes.USERPROFILE,
       "liste de surveilles": navRoutes.WATCHLIST,
       "vos Encheres": `${navRoutes.ENCHERES}${navRoutes.PERUSER}/${user.id}`,
       "vos Encheres Inversés": `${navRoutes.ENCHERESINVERSES}${navRoutes.PERUSER}/${user.id}`,
-      "les demandes de devis recus": navRoutes.INPROGRESS,
-      "les propositions recus": navRoutes.INPROGRESS,
+      "les demandes de devis recus": navRoutes.DEMANDESLISTING,
+      "les propositions recus": navRoutes.PROPOSITIONSLISTING,
       "se déconnecter": navRoutes.LOGOUT,
-      // "politiques d'intimité": navRoutes.INPROGRESS,
     };
   }
 

@@ -78,9 +78,9 @@ const EncheresListing = () => {
         <Grid container>
           <Grid container>
         <Grid item xs={7}>
-        <Typography variant='h3'>nos encheres</Typography>
+        <Typography variant='h3'>nos enchères</Typography>
         </Grid>
-        <Grid item >
+        <Grid item sx = {{mt:1}} >
           <Checkbox
             checked={checked}
             onChange={handleCheck}

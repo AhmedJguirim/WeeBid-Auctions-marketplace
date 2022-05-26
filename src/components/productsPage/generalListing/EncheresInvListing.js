@@ -77,11 +77,11 @@ const EncheresInvListing = () => {
         <Grid container>
            <Grid container>
         <Grid item xs={7}>
-          <Typography variant="h3">
-            nos encheres inversées
+          <Typography variant="h3" ml="2%">
+            Nos enchères inversées
           </Typography>
         </Grid>
-        <Grid item >
+        <Grid item sx = {{mt:1}} >
           <Checkbox
             checked={checked}
             onChange={handleCheck}

@@ -320,6 +320,7 @@ const handleType = (event) => {
           src={image}
           sx={{maxWidth:"100%"}}
         ></Box>
+        <Typography variant="h5" textAlign={"center"}>Créez un événement et maximisez vos profits</Typography>
       </Grid>
       <Grid item xs={6} sx={{mt:"2%"}}>
       <Stepper activeStep={activeStep}>

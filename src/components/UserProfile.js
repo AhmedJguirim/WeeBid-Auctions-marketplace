@@ -6,7 +6,6 @@ import {
   TextField,
   DialogTitle,
   DialogContent,
-  DialogActions,
   Dialog,
   Button,
   Card,
@@ -273,7 +272,7 @@ const UserProfile = () => {
               {/* </Badge> */}
               </Box>
               <Box sx={{ textAlign: "center" }}>
-                <Typography variant="h2">
+                <Typography variant="h5">
                   {user["nom d'utilisateur"]}
                 </Typography>{" "}
               </Box>
@@ -292,11 +291,11 @@ const UserProfile = () => {
               <Grid container>
                 <Grid item xs={6}>
                   {" "}
-                  <Typography variant="h4">{key}:</Typography>
+                  <Typography variant="h5">{key}:</Typography>
                 </Grid>
                 <Grid item xs={5}>
                   {" "}
-                  <Typography variant="h5" marginTop="3%">
+                  <Typography variant="h6">
                     {user[key]}
                   </Typography>
                 </Grid>

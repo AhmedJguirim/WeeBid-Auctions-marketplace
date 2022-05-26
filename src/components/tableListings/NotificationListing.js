@@ -63,7 +63,7 @@ const NotificationListing = () => {
     },[myUser, loadedPage])
   return (
     <Box sx={lightContainer}>
-        <Typography ></Typography>
+        <Typography variant="h4" > Vos notifications</Typography>
       <TableContainer component={Paper}>
         <Table sx={{ minWidth: 650 }} aria-label="simple table">
           <TableHead>

@@ -59,6 +59,7 @@ const DetailedEnchereInverse = () => {
   const [watchButton, setWatchButton] = React.useState("surveiller");
   const [live, setLive] = React.useState(false);
   const [expired, setExpired] = React.useState(false);
+  const [isOwner, setIsOwner] = React.useState(false);
 
   //#endregion
 
@@ -182,7 +183,11 @@ const DetailedEnchereInverse = () => {
       .then(function (response) {
         const data = response["data"];
         console.log(response["data"]["@id"], "retrieved successfully!");
-        if(new Date(response["data"].endDate).getTime() < new Date().getTime()){
+        if(response["data"].fermeture !== null){
+          setLive(false);
+          setExpired(true);
+        }
+        else if(new Date(response["data"].endDate).getTime() < new Date().getTime()){
           setLive(false);
           setExpired(true);
 
@@ -256,6 +261,28 @@ const handleWatch = ()=>{
     setWatchButton("surveiller")
 }
 }
+//#region handle fermetures
+const handleFermeture = ()=>{
+  //TODO: the case of no one augmenting
+  axios
+    .get(`${apiRoutes.API}/reductionLowest`, {
+      params: {
+        page: 1,
+        enchereInverse: `/api/enchere_inverses/${id}`,
+        "order[date]": "desc",
+      },
+    }).then(res=>{
+      Api.post(`${apiRoutes.API}/fermetures`,{
+      user:res["data"]["hydra:member"]["0"].user["@id"],
+      date: new Date().getTime(),
+      isSold: true,
+      finalPrice:res["data"]["hydra:member"]["0"].value,
+      enchereInverse: `/api/enchere_inverses/${id}`
+    }).then(res=>console.log("fermeture created , please redirect user"))})
+  
+}
+//#endregion
+
   //#region augmentation zone
   function reduire() {
     const newPrice = Math.round((thePrice - reduction) * 100) / 100;
@@ -305,6 +332,13 @@ const getImages = (rawImages)=>{
       setFollowable(false)
     }else{
       setFollowable(true)
+    }
+    if(user.id === seller.id){
+      setIsOwner(true)
+      console.log(isOwner)
+    }else{
+      setIsOwner(false)
+      console.log(isOwner)
     }
   }, [seller,user]);
 
@@ -414,7 +448,9 @@ const getImages = (rawImages)=>{
         <Grid item xs={12} sx={{mb:3 , }}>
                 <Box sx={styles.counterBox}>
         {live===true &&(<Typography sx={{textAlign:"center", mt:2}} variant="h3">live</Typography>)}
-      <Countdown variant="h4" endDate={enchere.endDate} startDate={enchere.startDate}/>
+        {expired === true ? (<Typography sx={{textAlign:"center", mt:2}} variant="h3">expiré</Typography>):
+        (<Countdown variant="h4" endDate={enchere.endDate} startDate={enchere.startDate}/>)}
+      
       </Box>
       </Grid>
         <Grid item xs={12}>
@@ -429,6 +465,8 @@ const getImages = (rawImages)=>{
         <Grid item ml={4}>
         {followable === true &&
           <Grid item><Button onClick={handleWatch} sx={{...ButtonStyles, backgroundColor:"primary.main"}}> {watchButton} </Button></Grid>}
+          {isOwner === true && expired !==true &&
+          <Grid item><Button onClick={handleFermeture} sx={{...ButtonStyles, backgroundColor:"primary.main"}}> fermer </Button></Grid>}
           </Grid>
           {/* documents */}
           <Grid item>
@@ -453,7 +491,7 @@ const getImages = (rawImages)=>{
             <Grid item xs={12} sx={lightContainer}>
               <Typography variant="h3">
                 <PersonIcon fontSize="large" sx={{ mr: 2 }} />
-                le vendeur
+                Le vendeur
               </Typography>
               {/* seller data details */}
               <Grid item sx={{ mt: 2 }}>
@@ -462,16 +500,16 @@ const getImages = (rawImages)=>{
                     <Grid item xs={6}>
                       <Typography variant="h6">nom d'utilisateur: </Typography>
                     </Grid>
-                    <Grid item xs={6}>
-                      <Typography variant="h6">{seller["nom d'utilisateur"]} </Typography>
+                    <Grid item sx={{mt:"1%"}} xs={6}>
+                      <CategoryLink  to={`${navRoutes.CONSULTUSER}/${seller.id}`}>{seller["nom d'utilisateur"]} </CategoryLink>
                     </Grid>
                   </Grid>
                   <Grid container sx={{ mb: 2 }}>
-                    <Grid item xs={6}>
+                    <Grid item xs={6} >
                       <Typography variant="h6">localisation: </Typography>
                     </Grid>
-                    <Grid item xs={6}>
-                      <Typography variant="h6">{seller.localisation} </Typography>
+                    <Grid item xs={6} >
+                      <Typography sx={{ml:"2%"}} variant="h6">{seller.localisation} </Typography>
                     </Grid>
                   </Grid>
               </Grid>
@@ -486,18 +524,29 @@ const getImages = (rawImages)=>{
           </Typography>
         {live===true ? (<Box sx={lightContainer}>
           {/* selling section */}
+
             <Grid container spacing={2}>
+            {isOwner === false ? (<> 
               <Grid item xs={4}>
-                <Typography variant="h6">encherir:</Typography>{" "}
+                <Typography variant="h6">Enchérir:</Typography>{" "}
               </Grid>
               <Grid item xs={4}>
                 <Typography variant="h6">
                   prix actuel: {thePrice}TND
                 </Typography>
+              </Grid></>):(<> 
+                <Grid item xs={4}>
+                <Typography variant="h6">Prix actuel:</Typography>{" "}
               </Grid>
               <Grid item xs={4}>
+                <Typography variant="h6">
+                  {thePrice}TND
+                </Typography>
+              </Grid></>
+              )}
+              {isOwner === false && <> <Grid item xs={4}>
                 <Typography variant="h8">
-                  prix apres l'augmentation: {Math.round((thePrice - reduction) * 100) / 100} TND
+                  prix apres la reduction: {Math.round((thePrice - reduction) * 100) / 100} TND
                 </Typography>
               </Grid>
               <Grid item xs={4}></Grid>
@@ -510,10 +559,10 @@ const getImages = (rawImages)=>{
                   value={reduction}
                   onChange={handleReduction}
                 />
-              </Grid>
+              </Grid></>}
 
               <Grid item xs={4}>
-                {user.id === seller.id ? (<Button sx={ButtonStyles} onClick={handleClickOpen}>
+                {isOwner ? (<Button sx={ButtonStyles} onClick={handleClickOpen}>
                   {" "}
                   les Reductions
                 </Button>):(<Button sx={ButtonStyles} onClick={()=>{
@@ -522,12 +571,33 @@ const getImages = (rawImages)=>{
               }
                   }>
                   {" "}
-                  encherir
+                  Enchérir
                 </Button>
                 )}
               </Grid>
             </Grid>
           </Box>):(<></>)}
+          {
+            expired &&
+            <Box sx={lightContainer}>
+            <Grid container >
+              <Grid item xs={4}>
+                <Typography variant="h6">Prix actuel:</Typography>{" "}
+              </Grid>
+              <Grid item xs={4}>
+                <Typography variant="h6">
+                  {thePrice}TND
+                </Typography>
+              </Grid>
+              <Grid item xs={4}>
+              {isOwner ? (<Button sx={ButtonStyles} onClick={handleClickOpen}>
+                  {" "}
+                  les Reductions
+                </Button>):(<></>)}
+                </Grid>
+            </Grid>
+            </Box>
+          }
           {/* sale details section*/}
           <Box>
             <Grid container spacing={2} sx={{ mt: 2 }}>

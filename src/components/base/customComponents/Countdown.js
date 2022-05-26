@@ -10,7 +10,7 @@ const Countdown = (props) => {
           );
           var minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
           var seconds = Math.floor((distance % (1000 * 60)) / 1000);
-          return days + "d " + hours + "h " + minutes + "m " + seconds + "s "
+          return days + "j " + hours + "h " + minutes + "m " + seconds + "s "
       
         }
         var countDownDate = new Date(props.startDate).getTime();

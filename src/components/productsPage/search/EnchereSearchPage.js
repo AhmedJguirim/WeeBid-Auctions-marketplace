@@ -88,7 +88,7 @@ const EnchereSearchPage = () => {
         <Grid item xs={7}>
         <Typography variant='h3'>resultat de recherche "{search}"</Typography>
         </Grid>
-        <Grid item >
+        <Grid item sx = {{mt:1}} >
           <Checkbox
             checked={checked}
             onChange={handleCheck}

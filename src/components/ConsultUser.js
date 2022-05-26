@@ -167,7 +167,7 @@ import { CategoryLink } from "./base/customComponents/TopNavLink";
           aria-labelledby="alert-dialog-title"
           aria-describedby="alert-dialog-description"
         >
-          <DialogTitle id="alert-dialog-title">demander de {user.displayName} </DialogTitle>
+          <DialogTitle id="alert-dialog-title" >demander de {user["nom d'utilisateur"]} </DialogTitle>
           <DialogContent>
             <Box component="form" onSubmit={handleSubmit}>
               <TextField
@@ -175,28 +175,29 @@ import { CategoryLink } from "./base/customComponents/TopNavLink";
                 required
                 type="number"
                 id="quantity"
-                label="quantity"
+                label="quantité"
                 value={quantity}
                 onChange={handleQuantity}
               />
-              <textarea
-                      name="description"
-                      id="description"
-                      value={description}
-                      onChange={handleDescription}
-                      className="descriptionField"
-                      cols="30"
-                      rows="10"
-                      placeholder="description"
-                    ></textarea>
-              <Button type="submit" sx={ButtonStyles}>submit</Button>
+                    <TextField
+                    fullWidth
+                    multiline
+                    name="description"
+                    id="description"
+                    value={description}
+                    onChange={handleDescription}
+                    placeholder="description"
+                    cols={30}
+                    rows={10}
+                    />
+              <Button type="submit" sx={ButtonStyles}>Soumettre</Button>
               <Button
               sx={ButtonStyles}
               onClick={() => {
                 handleClose();
               }}
             >
-              Disagree
+              Fermer
             </Button>
             </Box>
           </DialogContent>
