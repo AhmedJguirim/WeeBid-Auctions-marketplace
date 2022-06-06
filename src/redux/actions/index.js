@@ -1,5 +1,6 @@
 import axios from 'axios'
 import { StatusCodes } from 'http-status-codes'
+import { useHref } from 'react-router-dom'
 import { apiRoutes } from '../../config/routes'
 
 
@@ -18,11 +19,18 @@ export function getUserData() {
     }
   })
   .then(function (response) {
-    const data = response.data
-    dispatch(checkUser(data));
-    dispatch(fetchWatchList(data.id))
-    dispatch(fetchNotifications(data.id))
+    if(response.data.isActive === false){
+      localStorage.clear();
+      alert("votre compte est désactivé , veuillez contacter l'administration")
+      document.location.href("/")
+    }else{
+      const data = response.data
+      dispatch(checkUser(data));
+      dispatch(fetchWatchList(data.id))
+      dispatch(fetchNotifications(data.id))
+      }
     }
+    
   )
   .catch(function (error) {
     dispatch(checkUser({}))

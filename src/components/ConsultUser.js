@@ -17,7 +17,7 @@ import {
   import { ButtonStyles } from "./base/customComponents/general";
   import { apiRoutes, navRoutes } from "../config/routes";
 import axios from "axios";
-import { useNavigate, useParams } from "react-router-dom";
+import { NavLink, useNavigate, useParams } from "react-router-dom";
 import Api from '../AxiosInstance';
 import { useSelector } from "react-redux";
 import Socket from './base/customComponents/Socket'
@@ -117,6 +117,7 @@ import { CategoryLink } from "./base/customComponents/TopNavLink";
   
     //get user and set it to state
     const [user, setUser] = React.useState({});
+    
     async function getUser() {
       try {
         const response = await axios.get(`${apiRoutes.API}/users/${id}`);
@@ -129,8 +130,17 @@ import { CategoryLink } from "./base/customComponents/TopNavLink";
           ["téléphone"]: data.telephone,
           ["date de naissance"]: data.birthDate.slice(0, 10),
         });
-        let path = "http://127.0.0.1:8000/user/";
-        const myImg = path.concat(data.image);
+        let myImg = "";
+        console.log(myUser)
+
+    
+        if(data.avatar){
+          let path = "http://127.0.0.1:8000/media/";
+          myImg = path.concat(data.avatar.filePath);
+        }else{
+          let path = "http://127.0.0.1:8000/user/";
+          myImg = path.concat(data.image);
+        }
         setAvatar(myImg)
         console.log(`http://127.0.0.1:8000/${data.image}`)
       }catch(err){console.log(err)}
@@ -152,7 +162,6 @@ import { CategoryLink } from "./base/customComponents/TopNavLink";
     ).catch(err=>console.log(err))
       
     }
-  
     React.useEffect(() => {
         getUser();
         getCounts();

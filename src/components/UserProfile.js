@@ -130,8 +130,15 @@ const UserProfile = () => {
         ["téléphone"]: data.telephone,
         ["date de naissance"]: data.birthDate.slice(0, 10),
       });
-      let path = "http://127.0.0.1:8000/user/";
-      const myImg = path.concat(data.image);
+      let myImg = "";
+        if(data.avatar){
+          let path = "http://127.0.0.1:8000/media/";
+          myImg = path.concat(data.avatar.filePath);
+        }else{
+          let path = "http://127.0.0.1:8000/user/";
+          myImg = path.concat(data.image);
+        }
+        
       setAvatar(myImg);
       console.log(`http://127.0.0.1:8000/${data.image}`);
     } catch (error) {

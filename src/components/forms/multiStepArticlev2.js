@@ -355,9 +355,11 @@ const handleType = (event) => {
                       id="name"
                       label="Nom"
                       value={formik.values.name}
+                      error={formik.errors.name && formik.touched.name}
+                      onBlur={formik.handleBlur}
                       onChange={formik.handleChange}
-                    />{formik.errors.name ? (
-                      <Typography sx={styles.error}>{formik.errors.name}</Typography>
+                    />{formik.errors.name && formik.touched.name ? (
+                      <Typography sx={styles.error}>{formik.errors.name }</Typography>
                     ) : null}
                   </Grid>
                   <Grid item xs={6}>
@@ -366,9 +368,11 @@ const handleType = (event) => {
                       fullWidth
                       id="brand"
                       label="marque"
+                      error={formik.errors.brand && formik.touched.brand}
                       value={formik.values.brand}
+                      onBlur={formik.handleBlur}
                       onChange={formik.handleChange}
-                    />{formik.errors.brand ? (
+                    />{formik.errors.brand && formik.touched.brand ? (
                       <Typography sx={styles.error}>{formik.errors.brand}</Typography>
                     ) : null}
                   </Grid>
@@ -379,9 +383,11 @@ const handleType = (event) => {
                       required
                       id="localisation"
                       label="localisation"
+                      error={formik.errors.localisation && formik.touched.localisation}
                       value={formik.values.localisation}
+                      onBlur={formik.handleBlur}
                       onChange={formik.handleChange}
-                    />{formik.errors.localisation ? (
+                    />{formik.errors.localisation && formik.touched.localisation ? (
                       <Typography sx={styles.error}>{formik.errors.localisation}</Typography>
                     ) : null}
                   </Grid>
@@ -392,8 +398,10 @@ const handleType = (event) => {
                       id="codebar"
                       label="code a barre"
                       value={formik.values.codebar}
+                      error={formik.errors.codebar && formik.touched.codebar}
+                      onBlur={formik.handleBlur}
                       onChange={formik.handleChange}
-                    />{formik.errors.codebar ? (
+                    />{formik.errors.codebar && formik.touched.codebar ? (
                       <Typography sx={styles.error}>{formik.errors.codebar}</Typography>
                     ) : null}
                   </Grid>
@@ -403,13 +411,15 @@ const handleType = (event) => {
                       <DesktopDatePicker
                         label="date de fabrication"
                         inputFormat="MM/dd/yyyy"
+                        error={formik.errors.date && formik.touched.date}
                         value={formik.values.date}
+                        onBlur={formik.handleBlur}
                         name="date"
                         onChange={(value) => {
                           formik.setFieldValue('date', Date.parse(value));
                           }}
                         renderInput={(params) => <FormTextField fullWidth {...params} />}
-                      />{formik.errors.date ? (
+                      />{formik.errors.date && formik.touched.date ? (
                         <Typography sx={styles.error}>{formik.errors.date}</Typography>
                       ) : null}
                     </LocalizationProvider>
@@ -423,6 +433,8 @@ const handleType = (event) => {
                         labelId="demo-simple-select-label"
                         id="demo-simple-select"
                         label="etat"
+                        error={formik.errors.state && formik.touched.state}
+                        onBlur={formik.handleBlur}
                         onChange={handleState}
                         value={state}
                       >
@@ -430,7 +442,7 @@ const handleType = (event) => {
                         <MenuItem value="utilisé">utilisé</MenuItem>
                       </Select>
                     </FormControl>
-                  </Grid>{formik.errors.state ? (
+                  </Grid>{formik.errors.state && formik.touched.state ? (
                         <Typography sx={styles.error}>{formik.errors.state}</Typography>
                       ) : null}
                   <Grid item xs={6}>
@@ -439,13 +451,15 @@ const handleType = (event) => {
                     multiline
                     name="description"
                     id="description"
+                    error={formik.errors.description && formik.touched.description}
+                    onBlur={formik.handleBlur}
                     value={formik.values.description}
                     onChange={formik.handleChange}
                     placeholder="description"
                     cols={35}
                     rows={9}
                     />
-                    {formik.errors.description ? (
+                    {formik.errors.description && formik.touched.description ? (
                         <Typography sx={styles.error}>{formik.errors.description}</Typography>
                       ) : null}</Grid>
                     <Grid item xs={6}>
@@ -508,10 +522,7 @@ const handleType = (event) => {
                           Suivant
                         </Button>
                     </Box>
-                    
                   </Grid>
-
-                    
                   </Grid>
 
               )}
@@ -569,6 +580,7 @@ const handleType = (event) => {
                       <Select
                         labelId="demo-simple-select-label"
                         id="demo-simple-select"
+                        
                         onChange={handleCategory}
                         label="category"
                         value={category}
@@ -589,10 +601,12 @@ const handleType = (event) => {
                       type="number"
                       id="quantity"
                       label="quantité"
+                      error={formik.errors.quantity && formik.touched.quantity}
+                      onBlur={formik.handleBlur}
                       value={formik.values.quantity}
                       onChange={formik.handleChange}
                     />
-                    {formik.errors.quantity ? (
+                    {formik.errors.quantity && formik.touched.quantity ? (
                         <Typography sx={styles.error}>{formik.errors.quantity}</Typography>
                       ) : null}
                   </Grid>
@@ -604,9 +618,11 @@ const handleType = (event) => {
                       type="number"
                       id="initPrice"
                       label="prix initial"
+                      onBlur={formik.handleBlur}
+                      error={formik.errors.initPrice && formik.touched.initPrice}
                       value={formik.values.initPrice}
                       onChange={formik.handleChange}
-                    />{formik.errors.initPrice ? (
+                    />{formik.errors.initPrice && formik.touched.initPrice ? (
                       <Typography sx={styles.error}>{formik.errors.initPrice}</Typography>
                     ) : null}
                   </Grid>
@@ -617,6 +633,8 @@ const handleType = (event) => {
                         label="date de debut"
                         name="startDate"
                         inputFormat="MM/dd/yyyy"
+                        error={formik.errors.startDate && formik.touched.startDate}
+                        onBlur={formik.handleBlur}
                         value={formik.values.startDate}
                         onChange={(value) => {
                           formik.setFieldValue('startDate', Date.parse(value));
@@ -624,7 +642,7 @@ const handleType = (event) => {
                         renderInput={(params) => <FormTextField {...params} />}
                       />
                     </LocalizationProvider>
-                    {formik.errors.startDate ? (
+                    {formik.errors.startDate && formik.touched.startDate ? (
                       <Typography sx={styles.error}>{formik.errors.startDate}</Typography>
                     ) : null}
                   </Grid>
@@ -634,6 +652,8 @@ const handleType = (event) => {
                         label="date de fin"
                         inputFormat="MM/dd/yyyy"
                         name="endDate"
+                        error={formik.errors.endDate && formik.touched.endDate}
+                        onBlur={formik.handleBlur}
                         value={formik.values.endDate}
                         onChange={(value) => {
                           formik.setFieldValue('endDate',Date.parse(value));
@@ -641,7 +661,7 @@ const handleType = (event) => {
                         renderInput={(params) => <FormTextField {...params} />}
                       />
                     </LocalizationProvider>
-                    {formik.errors.endDate ? (
+                    {formik.errors.endDate && formik.touched.endDate ? (
                       <Typography sx={styles.error}>{formik.errors.endDate}</Typography>
                     ) : null}
                   </Grid>

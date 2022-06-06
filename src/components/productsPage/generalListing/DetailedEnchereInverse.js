@@ -1,3 +1,4 @@
+import DateAdapter from "@mui/lab/AdapterDateFns";
 import {
   Grid,
   Typography,
@@ -21,7 +22,7 @@ import {
 import { Box} from "@mui/system";
 import React, { useRef } from "react";
 import PersonIcon from "@mui/icons-material/Person";
-import { ArticleImage, ArticleSubImage, ButtonStyles, lightContainer, pinkish } from "../../base/customComponents/general";
+import { ArticleImage, ArticleSubImage, ButtonStyles, FormTextField, lightContainer, pinkish } from "../../base/customComponents/general";
 import axios from "axios";
 import { useNavigate, useParams } from "react-router-dom";
 import { apiRoutes, navRoutes } from "../../../config/routes";
@@ -32,6 +33,7 @@ import {fetchWatchList} from '../../../redux/actions';
 import placeHolder from "../../../media/images/imagelessAuction.png"
 import Countdown from "../../base/customComponents/Countdown";
 import { CategoryLink } from "../../base/customComponents/TopNavLink";
+import { DesktopDatePicker, LocalizationProvider } from "@mui/lab";
 
 
 function createData(id,userId,user, telephone, montant, date) {
@@ -140,7 +142,7 @@ const DetailedEnchereInverse = () => {
           Api.get(`/surveilles`,{
             params:{
               user:`/api/users/${user.id}`,
-              enchereInverse:`/api/encheres/${id}`
+              enchereInverse:`/api/enchere_inverses/${id}`
             }
           }).then(res=>{
             console.log(res["data"]["hydra:member"])
@@ -175,13 +177,41 @@ const DetailedEnchereInverse = () => {
       })
       .catch((error) => console.log(error));
   }
-
+//#region ici la modification des dates
+const [dateEditor, setDateEditor] = React.useState(false);
+const [startDate, setStartDate] = React.useState("");
+const [endDate, setEndDate] = React.useState("");
+    function handleOpenDateEdit(){
+      setDateEditor(true)
+    }
+    function handleCloseDateEdit(){
+      setDateEditor(false)
+    }
+    function handleDateEdit(){
+      Api.put(`/enchere_inverses/${id}`,{
+        startDate: startDate,
+        endDate: endDate
+      }).then((res)=>{handleCloseDateEdit()
+        getEnchere();
+      }).catch((err)=>{
+        if (err.response.status >= 500) {
+          alert("Erreur Interne du Serveur");
+          handleCloseDateEdit();
+        }else{
+          alert("Dates invalides");
+          handleCloseDateEdit()
+        }
+      })
+    }
+    //#endregion
   //gets the actual enchere
   function getEnchere() {
     axios
       .get(`${apiRoutes.API}/enchere_inverses/${id}`)
       .then(function (response) {
         const data = response["data"];
+        setStartDate(response.data.startDate);
+        setEndDate(response.data.endDate);
         console.log(response["data"]["@id"], "retrieved successfully!");
         if(response["data"].fermeture !== null){
           setLive(false);
@@ -282,7 +312,21 @@ const handleFermeture = ()=>{
   
 }
 //#endregion
+//#region delete warning
+const [deleting, setDeleting] = React.useState(false);
+const handleOpenDeleting = ()=>setDeleting(true)
+const handleCloseDeleting = ()=>setDeleting(false)
+const handleDelete = ()=>{
+  Api.delete(`/enchere_inverses/${id}`).then(res=>{handleCloseDeleting()
+  navigate("/")
+  })
+  .catch(err=>{alert("il y a un erreur , veuillez contacter le support technique")
+handleCloseDeleting()
 
+})
+}
+  
+//#endregion
   //#region augmentation zone
   function reduire() {
     const newPrice = Math.round((thePrice - reduction) * 100) / 100;
@@ -438,6 +482,98 @@ const getImages = (rawImages)=>{
       </Dialog>
 
       )}
+      <Dialog
+        open={deleting}
+        onClose={handleCloseDeleting}
+        aria-labelledby="alert-dialog-title"
+        aria-describedby="alert-dialog-description"
+      >
+        <DialogTitle id="alert-dialog-title"></DialogTitle>
+        <DialogContent>
+          <Typography>Est ce que vous êtes sure que vous voulez supprimer cette enchère inversée?</Typography>
+          
+        </DialogContent>
+        <DialogActions>
+          <Button
+            sx={ButtonStyles}
+            onClick={() => {
+              handleCloseDeleting();
+            }}
+          >
+            Fermer
+          </Button>
+          <Button
+            sx={ButtonStyles}
+            onClick={() => {
+              handleDelete();
+              handleCloseDeleting();
+            }}
+            autoFocus
+          >
+            Valider
+          </Button>
+        </DialogActions>
+      </Dialog>
+      <Dialog
+        open={dateEditor}
+        onClose={handleCloseDateEdit}
+        aria-labelledby="alert-dialog-title"
+        aria-describedby="alert-dialog-description"
+      >
+        <DialogTitle id="alert-dialog-title">Modifier les dates</DialogTitle>
+        <DialogContent>
+          <Typography>Date de debut</Typography>
+          <LocalizationProvider dateAdapter={DateAdapter}>
+                    <DesktopDatePicker
+                      label="date de debut"
+                      inputFormat="MM/dd/yyyy"
+                      value={startDate}
+                      name="startDate"
+                      onChange={(value) => {
+                        setStartDate(new Date(value));
+                      }}
+                      renderInput={(params) => (
+                        <FormTextField sx={styles.text} {...params} />
+                      )}
+                    />
+                  </LocalizationProvider>
+          <Typography>Date de fin</Typography>
+          <LocalizationProvider dateAdapter={DateAdapter}>
+                    <DesktopDatePicker
+                      label="date de fin"
+                      inputFormat="MM/dd/yyyy"
+                      value={endDate}
+                      name="endDate"
+                      onChange={(value) => {
+                        setEndDate(new Date(value));
+                      }}
+                      renderInput={(params) => (
+                        <FormTextField sx={styles.text} {...params} />
+                      )}
+                    />
+                  </LocalizationProvider>
+        </DialogContent>
+        <DialogActions>
+          <Button
+            sx={ButtonStyles}
+            onClick={() => {
+              handleCloseDateEdit();
+            }}
+          >
+            Fermer
+          </Button>
+          <Button
+            sx={ButtonStyles}
+            onClick={() => {
+              handleDateEdit();
+              handleCloseDateEdit();
+            }}
+            autoFocus
+          >
+            Valider
+          </Button>
+        </DialogActions>
+      </Dialog>
             <Grid item xs={2}></Grid>
 
       <Grid
@@ -463,10 +599,17 @@ const getImages = (rawImages)=>{
         <Grid item xs={5.8}>
         
         <Grid item ml={4}>
+          <Grid container>
         {followable === true &&
           <Grid item><Button onClick={handleWatch} sx={{...ButtonStyles, backgroundColor:"primary.main"}}> {watchButton} </Button></Grid>}
-          {isOwner === true && expired !==true &&
-          <Grid item><Button onClick={handleFermeture} sx={{...ButtonStyles, backgroundColor:"primary.main"}}> fermer </Button></Grid>}
+          {isOwner === true && expired !==true && <>
+          <Grid item><Button onClick={handleFermeture} sx={{...ButtonStyles, backgroundColor:"primary.main"}}> Fermer </Button></Grid>
+          <Grid item><Button onClick={handleOpenDeleting} sx={{...ButtonStyles, backgroundColor:"primary.main"}}> Supprimer </Button></Grid>
+          </>}
+          {isOwner === true && expired !==true && endDate!=="" && startDate!=="" &&
+          <Grid item><Button onClick={handleOpenDateEdit} sx={{...ButtonStyles, backgroundColor:"primary.main"}}> Changer les dates </Button></Grid>
+          }
+          </Grid>
           </Grid>
           {/* documents */}
           <Grid item>
