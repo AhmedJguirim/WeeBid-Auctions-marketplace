@@ -67,6 +67,7 @@ var today = new Date();
     axios
       .get(`${apiRoutes.API}/enchere_inverses/getEight`, {
         params: {
+          fermeture: null,
           page: "1",
           "endDate[after]": date,
         },
@@ -96,6 +97,7 @@ var today = new Date();
     axios
       .get(`${apiRoutes.API}/encheres/getEight`, {
         params: {
+          fermeture: null,
           page: "1",
           "endDate[after]": date,
         },

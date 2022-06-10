@@ -57,11 +57,11 @@ export default function NotificationsMenu() {
       minutes = Math.floor((duration / (1000 * 60)) % 60),
       hours = Math.floor((duration / (1000 * 60 * 60)) % 24),
       days = Math.floor(duration / (1000 * 60 * 60) / 24);
-    days = days < 1 ? "" : days + "d, ";
+    days = days < 1 ? "" : days + "j, ";
     hours = (hours-2) < 1 ? "" : (hours-2) + "h, ";
     minutes = minutes < 1 ? "" : minutes + "m ";
     if(days<1 && hours <1 &&minutes < 1){
-      return "just now"
+      return "maintenant"
     }
 
     return days + hours + minutes;
@@ -100,7 +100,7 @@ export default function NotificationsMenu() {
         
         {Object.keys(notifications).map((key, index) => (
           <MenuItem value={notifications[key].id} key={index} >
-            <Card variant="outlined" sx={{width:"100%"}} onClick={()=>navigate(`${notifications[key].route}`)}>
+            <Card variant="outlined" sx={{width:"100%"}} onClick={()=>document.location.href=`${notifications[key].route}`}>
               <CardContent>
                 <Typography variant="h6" color="secondary">
                   {notifications[key].title}

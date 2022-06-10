@@ -167,8 +167,8 @@ const Demande = () => {
               <Grid item xs={6}>
                 <Typography variant="h4" color={"secondary.main"}>description:</Typography>
               </Grid>
-              <Grid item xs={6}>
-                <Typography variant="h5">
+              <Grid item xs={6} mt={0.5}>
+                <Typography>
                   {demande.descriptionArticle}
                 </Typography>
               </Grid>
@@ -229,7 +229,7 @@ const Demande = () => {
           )}
         />
         <Button onClick={handleSubmit} sx={styles.submitButton}>
-          submit
+          Sousmettre
         </Button>
         </Box>
       </Grid>

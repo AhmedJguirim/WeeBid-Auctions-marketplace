@@ -46,6 +46,7 @@ const UserProfile = () => {
     axios
       .get(`${apiRoutes.API}/enchere_inverses/getEight`, {
         params: {
+          fermeture: null,
           page: "1",
           "endDate[after]": date,
           user: `/api/users/${myUser.id}`,
@@ -61,6 +62,7 @@ const UserProfile = () => {
     axios
       .get(`${apiRoutes.API}/encheres/getEight`, {
         params: {
+          fermeture: null,
           page: "1",
           "endDate[after]": date,
           user: `/api/users/${myUser.id}`,
@@ -153,6 +155,43 @@ const UserProfile = () => {
     data[isEditing] = modification;
 
     console.log(data);
+    switch (isEditing) {
+      case "password":
+        API.put(`${apiRoutes.API}/putPassword/${myUser.id}`, data)
+        .then((res) => getUser())
+        .catch((err) => console.log(err));
+        break;
+      case "nom":
+        API.put(`${apiRoutes.API}/users/${myUser.id}`,{
+          name: modification
+        })
+        .then((res) => getUser())
+        .catch((err) => console.log(err));
+        break;
+      case "nom d'utilisateur":
+        API.put(`${apiRoutes.API}/users/${myUser.id}`,{
+         displayName: modification
+        })
+        .then((res) => getUser())
+        .catch((err) => console.log(err));
+        break;
+      case "email":
+        API.put(`${apiRoutes.API}/users/${myUser.id}`,{
+          email: modification
+        })
+        .then((res) => getUser())
+        .catch((err) => console.log(err));
+        break;
+      case "téléphone":
+        API.put(`${apiRoutes.API}/users/${myUser.id}`,{
+          telephone: modification
+        })
+        .then((res) => getUser())
+        .catch((err) => console.log(err));
+        break;
+      default:
+        break;
+    }
     if (isEditing === "password") {
       API.put(`${apiRoutes.API}/putPassword/${myUser.id}`, data)
         .then((res) => getUser())
@@ -182,7 +221,8 @@ const UserProfile = () => {
       >
         <DialogTitle id="alert-dialog-title">changer {isEditing} </DialogTitle>
         <DialogContent>
-          <Box component="form" onSubmit={submitHandler}>
+          <Box component="form">
+          {isEditing==="email" && <Typography fontSize={12}>vous devez se reconnecter après changer votre adresse email</Typography>}
             <TextField
               fullWidth
               required
@@ -190,9 +230,9 @@ const UserProfile = () => {
               label="modification"
               value={modification}
               onChange={handleModification}
-            />
-            <Button type="submit" sx={ButtonStyles}>
-              submit
+            />    
+            <Button onClick={submitHandler} sx={ButtonStyles}>
+              Sousmettre
             </Button>
             <Button
               sx={ButtonStyles}
@@ -200,7 +240,7 @@ const UserProfile = () => {
                 handleClose();
               }}
             >
-              Disagree
+              Fermer
             </Button>
           </Box>
         </DialogContent>
@@ -307,7 +347,7 @@ const UserProfile = () => {
                   </Typography>
                 </Grid>
                 <Grid item>
-                  <IconButton
+                  {key !== "date de naissance" && <IconButton
                     onClick={() => {
                       handleClickOpen();
                       setIsEditing(key);
@@ -315,7 +355,8 @@ const UserProfile = () => {
                     id={key}
                   >
                     <EditIcon color="secondary" size="large" />{" "}
-                  </IconButton>
+                  </IconButton>}
+                  
                 </Grid>
               </Grid>
             </ListItem>

@@ -1,6 +1,7 @@
 import { Card, CardContent, CardMedia, Grid, Typography } from '@mui/material'
 import React from 'react'
 import { Link } from 'react-router-dom';
+import { date } from 'yup';
 import { navRoutes } from '../../config/routes';
 import demoListImage from "../../media/images/demoListImage.png";
 import Countdown from '../base/customComponents/Countdown';
@@ -12,6 +13,7 @@ import NoListing from '../base/customComponents/NoListing';
 
 const ProductsListing = ({ventes ,elemsPerLine , type}) => {
     // TODO: create links that don't get invisible in small screens like topnav ones
+   
     const styles = {
       productsTypography:{
         fontSize:15
@@ -53,7 +55,7 @@ const ProductsListing = ({ventes ,elemsPerLine , type}) => {
                 
                 
                 <br />
-                  <Link style={styles.productLink} to={`${type}/${ventes[key].id}`} >{ventes[key].article.name}</Link>
+                  <a style={styles.productLink} href={`${type}/${ventes[key].id}`} >{ventes[key].article.name}</a>
                   <Typography sx={{...styles.productsTypography,mt:"2%"}}>
                     quantité: {ventes[key].quantity}
                   </Typography> 
@@ -65,7 +67,11 @@ const ProductsListing = ({ventes ,elemsPerLine , type}) => {
                     par:<Link style={styles.productLink} to={`${navRoutes.CONSULTUSER}/${ventes[key].user.id}`} >{ventes[key].user.displayName}</Link> 
                   </Typography>
                   
-                  
+                  {new Date(ventes[key].startDate) < new Date() && new Date(ventes[key].endDate) > new Date() && 
+                  (<Typography variant='h5' sx={{mt:"10%"}}>
+                  live
+                </Typography>)}
+                 
                     <Countdown endDate={ventes[key].endDate} startDate={ventes[key].startDate} />
 
                 

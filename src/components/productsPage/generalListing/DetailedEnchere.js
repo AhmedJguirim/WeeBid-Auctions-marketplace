@@ -1,4 +1,5 @@
 import DateAdapter from "@mui/lab/AdapterDateFns";
+import DeleteIcon from '@mui/icons-material/Delete';
 import {
   Grid,
   Typography,
@@ -18,6 +19,7 @@ import {
   Paper,
   Table,
   TableHead,
+  IconButton,
 } from "@mui/material";
 import { Box } from "@mui/system";
 import React, { useRef } from "react";
@@ -47,6 +49,7 @@ function createData(id,userId,user, telephone, montant, date) {
 }
 
 const DetailedEnchere = () => {
+  const [loading, setLoading] = React.useState(true);
   const dispatch = useDispatch();
   //GET DATA FROM STORE/PARAMS
   const watchList = useSelector((state) => state.watchList);
@@ -85,9 +88,24 @@ const [endDate, setEndDate] = React.useState("");
     function handleCloseDateEdit(){
       setDateEditor(false)
     }
-    function handleDateEdit(){
+
+    function handleStartDateEdit(){
       Api.put(`/encheres/${id}`,{
         startDate: startDate,
+      }).then((res)=>{handleCloseDateEdit()
+        getEnchere();
+      }).catch((err)=>{
+        if (err.response.status >= 500) {
+          alert("Erreur Interne du Serveur");
+          handleCloseDateEdit();
+        }else{
+          alert("Dates invalides");
+          handleCloseDateEdit()
+        }
+      })
+    }
+    function handleEndDateEdit(){
+      Api.put(`/encheres/${id}`,{
         endDate: endDate
       }).then((res)=>{handleCloseDateEdit()
         getEnchere();
@@ -120,7 +138,7 @@ const [endDate, setEndDate] = React.useState("");
 
   const fill = (res)=>{
       let rows = [];
-      if(augmentations[0]){
+      if(augmentations[14]){
           rows.push(...augmentations)
       }
 
@@ -131,7 +149,13 @@ const [endDate, setEndDate] = React.useState("");
       setAugmentations(rows)
       console.log(rows)
   }
+  const handleDeleteAug = (id)=>{
+    Api.delete(`/augmentations/${id}`).then(res=>{console.log("aug deleted succesfully")
+    getEnchere();
+    getAugmentations();})
+    .catch(err=>alert("un erreur interne du serveur"));
 
+  }
 
 //#region delete warning
 const [deleting, setDeleting] = React.useState(false);
@@ -267,8 +291,9 @@ const styles={
               })
               .then((response) => {
                 getImages(response["data"]["hydra:member"]);
+                setLoading(false)
               })
-              .catch((error) => console.log(error));
+              .catch((error) => setLoading(false));
             setArticle({
               Nom: data.name,
               ["Etat"]: data.state,
@@ -292,8 +317,9 @@ const styles={
         }
       }).then(res=>{
         console.log(res["data"]["hydra:member"])
-        if(res["data"]["hydra:member"]!==[])
+        if(res["data"]["hydra:member"]["0"]!==undefined)
         {
+          console.log(res["data"]["hydra:member"])
           setWatched(true)
           setWatchButton("unsurveiller")
         }else{
@@ -363,7 +389,9 @@ const styles={
   const [open, setOpen] = React.useState(false);
 
   const handleClickOpen = () => {
+     console.log("opened")
     setOpen(true);
+    getAugmentations();
   };
 
   const handleClose = () => {
@@ -373,22 +401,14 @@ const styles={
 
   //#region handle fermeture
   const handleFermeture = ()=>{
-    //TODO: the case of no one augmenting
-    axios
-      .get(`${apiRoutes.API}/augmentationHighest`, {
-        params: {
-          page: 1,
-          enchere: `/api/encheres/${id}`,
-          "order[date]": "desc",
-        },
-      }).then(res=>{
         Api.post(`${apiRoutes.API}/fermetures`,{
-        user:res["data"]["hydra:member"]["0"].user["@id"],
-        date: new Date().getTime(),
-        isSold: true,
-        finalPrice:res["data"]["hydra:member"]["0"].value,
-        enchere: `/api/encheres/${id}`
-      }).then(res=>console.log("fermeture created , please redirect user"))})
+          date: new Date().getTime(),
+          isSold: true,
+          finalPrice: thePrice,
+          enchere: `/api/encheres/${id}`
+        }).then(res=>{console.log("fermeture created , please redirect user")
+        getEnchere()
+      })
     
   }
   //#endregion
@@ -431,7 +451,7 @@ const styles={
           <TableHead>
             <TableRow>
               <TableCell>transmetteur </TableCell>
-              <TableCell align="right">Enchère proposé&nbsp;</TableCell>
+              <TableCell align="right">prix proposé&nbsp;</TableCell>
               <TableCell align="right">Date&nbsp;</TableCell>
               <TableCell align="right">actions&nbsp;</TableCell>
             </TableRow>
@@ -447,6 +467,11 @@ const styles={
                 </TableCell>
                 <TableCell align="right">{augmentation.montant}</TableCell>
                 <TableCell align="right">{augmentation.date.slice(0,10)}</TableCell>
+                <TableCell align="right">
+                  <IconButton onClick={()=>handleDeleteAug(augmentation.id)}>
+                    <DeleteIcon />
+                  </IconButton>
+                </TableCell>
               </TableRow>
             ))}
           </TableBody>
@@ -458,6 +483,7 @@ const styles={
         </DialogContent>
         <DialogActions>
           <Button
+
             sx={ButtonStyles}
             onClick={() => {
               handleClose();
@@ -486,6 +512,7 @@ const styles={
         </DialogContent>
         <DialogActions>
           <Button
+
             sx={ButtonStyles}
             onClick={() => {
               handleClose();
@@ -547,7 +574,10 @@ const styles={
       >
         <DialogTitle id="alert-dialog-title">Modifier les dates</DialogTitle>
         <DialogContent>
-          <Typography>Date de debut</Typography>
+        <Grid container>
+          <Grid item xs={12}>
+          <Typography>Date de debut</Typography></Grid>
+          <Grid item xs={6}>
           <LocalizationProvider dateAdapter={DateAdapter}>
                     <DesktopDatePicker
                       label="date de debut"
@@ -562,7 +592,22 @@ const styles={
                       )}
                     />
                   </LocalizationProvider>
-          <Typography>Date de fin</Typography>
+                  </Grid>
+                  <Grid item xs={6}  mt={2}>
+                  <Button
+            sx={ButtonStyles}
+            onClick={() => {
+              handleStartDateEdit();
+              handleCloseDateEdit();
+            }}
+            autoFocus
+          >
+            Modifier la date de debut
+          </Button>
+          </Grid>
+          <Grid item xs={12}>
+          <Typography>Date de fin</Typography></Grid>
+          <Grid item xs={6} >
           <LocalizationProvider dateAdapter={DateAdapter}>
                     <DesktopDatePicker
                       label="date de fin"
@@ -577,6 +622,19 @@ const styles={
                       )}
                     />
                   </LocalizationProvider>
+                  </Grid>
+                  <Grid item xs={6}  mt={2}>
+                  <Button 
+            sx={ButtonStyles}
+            onClick={() => {
+              handleEndDateEdit();
+              handleCloseDateEdit();
+            }}
+            autoFocus
+          >
+            Modifier la date de fin
+          </Button>
+          </Grid></Grid>
         </DialogContent>
         <DialogActions>
           <Button
@@ -587,16 +645,7 @@ const styles={
           >
             Fermer
           </Button>
-          <Button
-            sx={ButtonStyles}
-            onClick={() => {
-              handleDateEdit();
-              handleCloseDateEdit();
-            }}
-            autoFocus
-          >
-            Valider
-          </Button>
+          
         </DialogActions>
       </Dialog>
       <Grid item xs={2}></Grid>
@@ -615,19 +664,22 @@ const styles={
       </Box>
       </Grid>
         
-
         {/* first section */}
         <Grid item xs={5.8} >
         <Grid item ml={4}>
         <Grid container>
         {followable === true &&
-          <Grid item><Button onClick={handleWatch} sx={{...ButtonStyles, backgroundColor:"primary.main"}}> {watchButton} </Button></Grid>}
+          <Grid item><Button disabled={loading} onClick={handleWatch} sx={{...ButtonStyles, backgroundColor:"primary.main"}}> {watchButton} </Button></Grid>}
           {isOwner === true && expired !==true && <>
-          <Grid item><Button onClick={handleFermeture} sx={{...ButtonStyles, backgroundColor:"primary.main"}}> Fermer </Button></Grid>
-          <Grid item><Button onClick={handleOpenDeleting} sx={{...ButtonStyles, backgroundColor:"primary.main"}}> Supprimer </Button></Grid>
+          <Grid item><Button disabled={loading} onClick={handleFermeture} sx={{...ButtonStyles, backgroundColor:"primary.main"}}> Fermer </Button></Grid>
+          
           </>}
-          {isOwner === true && expired !==true && endDate!=="" && startDate!=="" &&
-          <Grid item><Button onClick={handleOpenDateEdit} sx={{...ButtonStyles, backgroundColor:"primary.main"}}> Changer les dates </Button></Grid>
+          {isOwner === true && 
+          <Grid item><Button disabled={loading} onClick={handleOpenDeleting} sx={{...ButtonStyles, backgroundColor:"primary.main"}}> Supprimer </Button></Grid>
+
+          }
+                    {isOwner === true  && endDate!=="" && startDate!=="" &&
+          <Grid item><Button disabled={loading} onClick={handleOpenDateEdit} sx={{...ButtonStyles, backgroundColor:"primary.main"}}> Changer les dates </Button></Grid>
           }
           </Grid>          
           </Grid>
@@ -682,11 +734,11 @@ const styles={
         {/* second section */}
         
         <Grid item xs={5.8} sx={{ color: "secondary.main" }}>
-
         <Typography sx={{ml:5}} variant="h3" color={"black"}>
-            {article.nom}
+            {article.Nom}
           </Typography>
-
+        
+ 
           {live===true ? (<Box sx={lightContainer}>
           {/* selling section */}
 
@@ -712,7 +764,7 @@ const styles={
               
               {isOwner === false && <> <Grid item xs={4}>
                 <Typography variant="h8">
-                  prix apres la reduction: {Math.round((thePrice - augmentation) * 100) / 100} TND
+                  prix apres l'augmentation: {Math.round((thePrice + augmentation) * 100) / 100} TND
                 </Typography>
               </Grid>
               <Grid item xs={4}></Grid>
@@ -720,20 +772,19 @@ const styles={
                 <TextField
                   required
                   type="number"
-                  id="reduction"
-                  label="reduction"
+                  id="augmentation"
+                  label="augmentation"
                   value={augmentation}
                   onChange={handleAugmentation}
                 />
               </Grid></>}
 
               <Grid item xs={4}>
-                {isOwner ? (<Button sx={ButtonStyles} onClick={handleClickOpen}>
+                {isOwner ? (<Button disabled={loading} sx={ButtonStyles} onClick={handleClickOpen}>
                   {" "}
                   les augmentations
-                </Button>):(<Button sx={ButtonStyles} onClick={()=>{
+                </Button>):(<Button disabled={loading} sx={ButtonStyles} onClick={()=>{
                 handleClickOpen()
-                getAugmentations()
               }
                   }>
                   {" "}
@@ -756,7 +807,7 @@ const styles={
                 </Typography>
               </Grid>
               <Grid item xs={4}>
-              {isOwner ? (<Button sx={ButtonStyles} onClick={handleClickOpen}>
+              {isOwner ? (<Button disabled={loading} sx={ButtonStyles} onClick={handleClickOpen}>
                   {" "}
                   les augmentations
                 </Button>):(<></>)}

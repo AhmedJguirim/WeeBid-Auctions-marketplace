@@ -46,6 +46,7 @@ import { CategoryLink } from "./base/customComponents/TopNavLink";
       axios
         .get(`${apiRoutes.API}/enchere_inverses/getEight`, {
           params: {
+            fermeture: null,
             page: "1",
             "endDate[after]": date,
             user: `/api/users/${id}`
@@ -61,6 +62,7 @@ import { CategoryLink } from "./base/customComponents/TopNavLink";
       axios
         .get(`${apiRoutes.API}/encheres/getEight`, {
           params: {
+            fermeture: null,
             page: "1",
             "endDate[after]": date,
             user: `/api/users/${id}`

@@ -1,4 +1,5 @@
 import DateAdapter from "@mui/lab/AdapterDateFns";
+import DeleteIcon from '@mui/icons-material/Delete';
 import {
   Grid,
   Typography,
@@ -8,6 +9,7 @@ import {
   DialogContent,
   Dialog,
   DialogActions,
+  IconButton,
   DialogTitle,
   Container,
   TableCell,
@@ -49,7 +51,7 @@ const DetailedEnchereInverse = () => {
   const user = useSelector((state) => state.user);
   let { id } = useParams();
   //#region states
-
+  const [loading, setLoading] = React.useState(true);
   const [enchere, setEnchere] = React.useState({});
   const [article, setArticle] = React.useState({});
   const [description, setDescription] = React.useState("");
@@ -87,7 +89,7 @@ const DetailedEnchereInverse = () => {
 
   const fill = (res)=>{
       let rows = [];
-      if(reductions[0]){
+      if(reductions[14]){
           rows.push(...reductions)
       }
 
@@ -99,6 +101,13 @@ const DetailedEnchereInverse = () => {
       console.log(rows)
   }
 
+  const handleDeleteRed = (id)=>{
+    Api.delete(`/reductions/${id}`).then(res=>{console.log("reduction deleted succesfully")
+    getEnchere();
+    getReductions();})
+    .catch(err=>alert("un erreur interne du serveur"));
+    
+  }
 
   const handleAddMore = ()=>{
       setLoadedPage(loadedPage +1);
@@ -146,7 +155,7 @@ const DetailedEnchereInverse = () => {
             }
           }).then(res=>{
             console.log(res["data"]["hydra:member"])
-            if(res["data"]["hydra:member"]!==[])
+            if(res["data"]["hydra:member"]["0"]!==undefined)
             {
               setWatched(true)
               setWatchButton("unsurveiller")
@@ -187,9 +196,24 @@ const [endDate, setEndDate] = React.useState("");
     function handleCloseDateEdit(){
       setDateEditor(false)
     }
-    function handleDateEdit(){
+
+    function handleStartDateEdit(){
       Api.put(`/enchere_inverses/${id}`,{
         startDate: startDate,
+      }).then((res)=>{handleCloseDateEdit()
+        getEnchere();
+      }).catch((err)=>{
+        if (err.response.status >= 500) {
+          alert("Erreur Interne du Serveur");
+          handleCloseDateEdit();
+        }else{
+          alert("Dates invalides");
+          handleCloseDateEdit()
+        }
+      })
+    }
+    function handleEndDateEdit(){
+      Api.put(`/enchere_inverses/${id}`,{
         endDate: endDate
       }).then((res)=>{handleCloseDateEdit()
         getEnchere();
@@ -255,8 +279,9 @@ const [endDate, setEndDate] = React.useState("");
               headers:{
                 "Content-Type": "multipart/form-data",
               }
-            }).then(response=>{getImages(response["data"]["hydra:member"])})
-              .catch(error=>console.log(error))
+            }).then(response=>{getImages(response["data"]["hydra:member"])
+            setLoading(false)})
+              .catch(setLoading(false))
             setArticle({
               nom: data.name,
               etat: data.state,
@@ -294,21 +319,15 @@ const handleWatch = ()=>{
 //#region handle fermetures
 const handleFermeture = ()=>{
   //TODO: the case of no one augmenting
-  axios
-    .get(`${apiRoutes.API}/reductionLowest`, {
-      params: {
-        page: 1,
-        enchereInverse: `/api/enchere_inverses/${id}`,
-        "order[date]": "desc",
-      },
-    }).then(res=>{
+  
       Api.post(`${apiRoutes.API}/fermetures`,{
-      user:res["data"]["hydra:member"]["0"].user["@id"],
       date: new Date().getTime(),
       isSold: true,
-      finalPrice:res["data"]["hydra:member"]["0"].value,
+      finalPrice:thePrice,
       enchereInverse: `/api/enchere_inverses/${id}`
-    }).then(res=>console.log("fermeture created , please redirect user"))})
+    }).then(res=>{console.log("fermeture created , please redirect user")
+  getEnchere()
+  })
   
 }
 //#endregion
@@ -359,6 +378,7 @@ const getImages = (rawImages)=>{
   const [open, setOpen] = React.useState(false);
 
   const handleClickOpen = () => {
+    getReductions();
     setOpen(true);
   };
 
@@ -398,7 +418,7 @@ const getImages = (rawImages)=>{
         aria-labelledby="alert-dialog-title"
         aria-describedby="alert-dialog-description"
       >
-        <DialogTitle id="alert-dialog-title">les augmentations</DialogTitle>
+        <DialogTitle id="alert-dialog-title">les réductions</DialogTitle>
         <DialogContent>
 
       <TableContainer component={Paper}>
@@ -406,8 +426,9 @@ const getImages = (rawImages)=>{
           <TableHead>
             <TableRow>
               <TableCell>transmetteur </TableCell>
-              <TableCell align="right">Enchère proposé&nbsp;</TableCell>
+              <TableCell align="right">prix proposé&nbsp;</TableCell>
               <TableCell align="right">Date&nbsp;</TableCell>
+              <TableCell align="right">actions&nbsp;</TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
@@ -421,7 +442,12 @@ const getImages = (rawImages)=>{
                 </TableCell>
                 <TableCell align="right">{reduction.montant}</TableCell>
                 <TableCell align="right">{reduction.date.slice(0,10)}</TableCell>
-                <TableCell align="right">actions&nbsp;</TableCell>
+                <TableCell align="right">
+                  <IconButton onClick={()=>handleDeleteRed(reduction.id)}>
+                    <DeleteIcon />
+                  </IconButton>
+                </TableCell>
+                
               </TableRow>
             ))}
           </TableBody>
@@ -522,7 +548,10 @@ const getImages = (rawImages)=>{
       >
         <DialogTitle id="alert-dialog-title">Modifier les dates</DialogTitle>
         <DialogContent>
-          <Typography>Date de debut</Typography>
+          <Grid container>
+          <Grid item xs={12}>
+          <Typography>Date de debut</Typography></Grid>
+          <Grid item xs={6}>
           <LocalizationProvider dateAdapter={DateAdapter}>
                     <DesktopDatePicker
                       label="date de debut"
@@ -537,7 +566,23 @@ const getImages = (rawImages)=>{
                       )}
                     />
                   </LocalizationProvider>
-          <Typography>Date de fin</Typography>
+                  </Grid>
+                  <Grid item xs={6} mt={2}>
+                  <Button 
+            sx={ButtonStyles}
+            onClick={() => {
+              handleStartDateEdit();
+              handleCloseDateEdit();
+            }}
+            autoFocus
+          >
+            Modifier la date de debut
+          </Button>
+          </Grid>
+          
+          <Grid item xs={12} mt={2}>
+          <Typography>Date de fin</Typography></Grid>
+          <Grid item xs={6}>
           <LocalizationProvider dateAdapter={DateAdapter}>
                     <DesktopDatePicker
                       label="date de fin"
@@ -552,6 +597,20 @@ const getImages = (rawImages)=>{
                       )}
                     />
                   </LocalizationProvider>
+                  </Grid>
+                  <Grid item xs={6} mt={2}>
+                  <Button
+            sx={ButtonStyles}
+            onClick={() => {
+              handleEndDateEdit();
+              handleCloseDateEdit();
+            }}
+            autoFocus
+          >
+            Modifier la date de fin
+          </Button>
+          </Grid>
+          </Grid>
         </DialogContent>
         <DialogActions>
           <Button
@@ -562,16 +621,7 @@ const getImages = (rawImages)=>{
           >
             Fermer
           </Button>
-          <Button
-            sx={ButtonStyles}
-            onClick={() => {
-              handleDateEdit();
-              handleCloseDateEdit();
-            }}
-            autoFocus
-          >
-            Valider
-          </Button>
+          
         </DialogActions>
       </Dialog>
             <Grid item xs={2}></Grid>
@@ -601,13 +651,17 @@ const getImages = (rawImages)=>{
         <Grid item ml={4}>
           <Grid container>
         {followable === true &&
-          <Grid item><Button onClick={handleWatch} sx={{...ButtonStyles, backgroundColor:"primary.main"}}> {watchButton} </Button></Grid>}
+          <Grid item><Button disabled={loading} onClick={handleWatch} sx={{...ButtonStyles, backgroundColor:"primary.main"}}> {watchButton} </Button></Grid>}
           {isOwner === true && expired !==true && <>
-          <Grid item><Button onClick={handleFermeture} sx={{...ButtonStyles, backgroundColor:"primary.main"}}> Fermer </Button></Grid>
-          <Grid item><Button onClick={handleOpenDeleting} sx={{...ButtonStyles, backgroundColor:"primary.main"}}> Supprimer </Button></Grid>
+            <Grid item><Button disabled={loading} onClick={handleFermeture} sx={{...ButtonStyles, backgroundColor:"primary.main"}}> Fermer </Button></Grid>
+          
           </>}
-          {isOwner === true && expired !==true && endDate!=="" && startDate!=="" &&
-          <Grid item><Button onClick={handleOpenDateEdit} sx={{...ButtonStyles, backgroundColor:"primary.main"}}> Changer les dates </Button></Grid>
+          {isOwner === true && 
+          <Grid item><Button disabled={loading} onClick={handleOpenDeleting} sx={{...ButtonStyles, backgroundColor:"primary.main"}}> Supprimer </Button></Grid>
+
+          }
+                    {isOwner === true  && endDate!=="" && startDate!=="" &&
+          <Grid item><Button disabled={loading} onClick={handleOpenDateEdit} sx={{...ButtonStyles, backgroundColor:"primary.main"}}> Changer les dates </Button></Grid>
           }
           </Grid>
           </Grid>
@@ -705,10 +759,10 @@ const getImages = (rawImages)=>{
               </Grid></>}
 
               <Grid item xs={4}>
-                {isOwner ? (<Button sx={ButtonStyles} onClick={handleClickOpen}>
+                {isOwner ? (<Button disabled={loading} sx={ButtonStyles} onClick={handleClickOpen}>
                   {" "}
                   les Reductions
-                </Button>):(<Button sx={ButtonStyles} onClick={()=>{
+                </Button>):(<Button disabled={loading} sx={ButtonStyles} onClick={()=>{
                 handleClickOpen()
                 getReductions()
               }
