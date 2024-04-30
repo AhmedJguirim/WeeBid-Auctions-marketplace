@@ -1,4 +1,4 @@
-# Auctions marketplace web application
+# WeeBid: Auctions marketplace
 Welcome to project of end of studies that covered the topic of an auctions marketplace achieved using mainly ReactJS/Symfony/NodeJS. i worked on this project for about 3 to 4 months including a full 40 pages report in french about it. This project was a big step for me in my journey of Web development but i am aware that i'm still at the beginnings and i still have a lot to learn.
 
 ## The idea of the project
