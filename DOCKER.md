@@ -9,8 +9,8 @@ docker compose up -d --build
 
 | What | URL |
 |------|-----|
-| The app | `http://<host>/` (port `WEB_PORT`, default 80) |
-| Admin dashboard (EasyAdmin) | `http://<host>:8000/admin` (port `ADMIN_PORT`) |
+| The app | `http://<host>:18080/` (`WEB_PORT`) |
+| Admin dashboard (EasyAdmin) | `http://<host>:18000/admin` (`ADMIN_PORT`) |
 | Default admin login | `admin@weebid.local` / `admin1234` (`ADMIN_EMAIL` / `ADMIN_PASSWORD`) |
 
 First start takes a few minutes (image builds). The backend waits for the DB, generates the JWT keys,
@@ -19,7 +19,7 @@ creates the DB schema from the entities (the repo ships no migrations) and creat
 ## How it is wired
 
 ```
-browser ──> web (nginx :80) ─┬─ /            React build
+browser ──> web (nginx, host :18080) ─┬─ /            React build
                              ├─ /api, /media, /user/*.img, /category/*.img  ──> backend (PHP 8.1 + Apache)
                              └─ /socket.io   ──> socket (Node)
 backend ──> db (MariaDB)          socket ──> backend (creates notifications)
@@ -33,11 +33,11 @@ The socket server reads `PORT`, `API_URL`, `CORS_ORIGIN`.
 
 1. Install Docker + the compose plugin, clone the repo.
 2. `cp .env.example .env` and **change** `APP_SECRET`, `JWT_PASSPHRASE`, `DB_PASSWORD`, `DB_ROOT_PASSWORD`, `ADMIN_PASSWORD`,
-   and set `PUBLIC_URL` to what users type in the browser (e.g. `http://203.0.113.10` or `https://demo.example.com`).
+   and set `PUBLIC_URL` to what users type in the browser (e.g. `http://203.0.113.10:18080`; it must match the browser URL exactly, port included).
 3. `docker compose up -d --build`
-4. Open ports 80 (and 8000 for the admin, or set `ADMIN_PORT=127.0.0.1:8000` and use an SSH tunnel).
+4. Open ports 18080 (and 18000 for the admin, or set `ADMIN_PORT=127.0.0.1:18000` and use an SSH tunnel).
 
-HTTPS: put Caddy/Traefik/Cloudflare in front of port 80 (nginx already forwards `X-Forwarded-Proto`).
+HTTPS: put Caddy/Traefik/Cloudflare in front of port 18080 (shared reverse proxy for several apps) (nginx already forwards `X-Forwarded-Proto`).
 Update `PUBLIC_URL` to the `https://` address.
 
 ## Useful commands

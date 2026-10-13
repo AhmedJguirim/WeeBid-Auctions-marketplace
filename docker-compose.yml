@@ -1,5 +1,6 @@
+name: weebid
 # WeeBid demo stack:  docker compose up -d --build
-# Public entrypoint: http://<host>:${WEB_PORT:-80}
+# Public entrypoint: http://<host>:${WEB_PORT:-18080}   Admin: http://<host>:${ADMIN_PORT:-18000}/admin
 services:
   db:
     image: mariadb:10.11
@@ -39,7 +40,7 @@ services:
     ports:
       # Symfony directly: EasyAdmin dashboard at http://<host>:8000/admin
       # (its /login would clash with the React /login route behind nginx)
-      - "${ADMIN_PORT:-8000}:80"
+      - "${ADMIN_PORT:-18000}:80"
 
   socket:
     build: ./socket
@@ -49,7 +50,7 @@ services:
     environment:
       PORT: 8081
       API_URL: http://backend
-      CORS_ORIGIN: ${PUBLIC_URL:-http://localhost}
+      CORS_ORIGIN: ${PUBLIC_URL:-http://localhost:18080}
 
   web:
     build: .
@@ -58,7 +59,7 @@ services:
       - backend
       - socket
     ports:
-      - "${WEB_PORT:-80}:80"
+      - "${WEB_PORT:-18080}:80"
 
 volumes:
   db-data:
