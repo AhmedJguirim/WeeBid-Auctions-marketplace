@@ -2,11 +2,13 @@ import React from "react";
 import axios from "axios";
 import { Link, Navigate } from "react-router-dom";
 import { useSelector } from "react-redux";
+import { useTranslation } from "react-i18next";
 import { AlertCircle, Eye, EyeOff, Loader2 } from "lucide-react";
 import { apiRoutes, navRoutes } from "../../config/routes";
 import AuthLayout from "../ui/AuthLayout";
 
 const Login = () => {
+  const { t } = useTranslation();
   const currentUser = useSelector((state) => state.user);
   const [error, setError] = React.useState("");
   const [email, setEmail] = React.useState("");
@@ -27,8 +29,8 @@ const Login = () => {
       })
       .catch((err) => {
         setLoading(false);
-        if (err.response && err.response.status === 401) setError("Email ou mot de passe incorrect.");
-        else setError("Erreur interne du serveur, veuillez réessayer.");
+        if (err.response && err.response.status === 401) setError(t("login.wrongCredentials"));
+        else setError(t("login.serverError"));
       });
   };
 
@@ -36,12 +38,12 @@ const Login = () => {
 
   return (
     <AuthLayout
-      title="Bon retour parmi nous"
-      subtitle="Connectez-vous pour suivre vos enchères et enchérir en direct."
+      title={t("login.title")}
+      subtitle={t("login.subtitle")}
       footer={
         <>
-          Pas encore de compte ?{" "}
-          <Link to={navRoutes.REGISTER} className="font-semibold text-brand-600 hover:underline">Créer un compte</Link>
+          {t("login.noAccount")}{" "}
+          <Link to={navRoutes.REGISTER} className="font-semibold text-brand-600 hover:underline">{t("footer.createAccount")}</Link>
         </>
       }
     >
@@ -52,20 +54,20 @@ const Login = () => {
           </div>
         )}
         <div>
-          <label htmlFor="email" className="mb-1.5 block text-sm font-semibold text-slate-700">Adresse e-mail</label>
-          <input id="email" type="email" required autoComplete="email" className="input" placeholder="vous@exemple.com" value={email} onChange={(e) => setEmail(e.target.value)} />
+          <label htmlFor="email" className="mb-1.5 block text-sm font-semibold text-slate-700">{t("form.email")}</label>
+          <input id="email" type="email" required autoComplete="email" className="input" placeholder={t("login.emailPlaceholder")} value={email} onChange={(e) => setEmail(e.target.value)} />
         </div>
         <div>
-          <label htmlFor="password" className="mb-1.5 block text-sm font-semibold text-slate-700">Mot de passe</label>
+          <label htmlFor="password" className="mb-1.5 block text-sm font-semibold text-slate-700">{t("form.password")}</label>
           <div className="relative">
             <input id="password" type={show ? "text" : "password"} required autoComplete="current-password" className="input pr-11" placeholder="••••••••" value={password} onChange={(e) => setPassword(e.target.value)} />
-            <button type="button" onClick={() => setShow((s) => !s)} aria-label="Afficher le mot de passe" className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600">
+            <button type="button" onClick={() => setShow((s) => !s)} aria-label={t("login.showPassword")} className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600">
               {show ? <EyeOff size={18} /> : <Eye size={18} />}
             </button>
           </div>
         </div>
         <button type="submit" disabled={loading} className="btn-primary w-full !py-3">
-          {loading && <Loader2 size={16} className="animate-spin" />} Se connecter
+          {loading && <Loader2 size={16} className="animate-spin" />} {t("footer.login")}
         </button>
       </form>
     </AuthLayout>

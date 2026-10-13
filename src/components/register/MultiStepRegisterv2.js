@@ -1,6 +1,7 @@
 import * as React from "react";
 import axios from "axios";
 import { useFormik } from "formik";
+import { useTranslation } from "react-i18next";
 import { Link, Navigate } from "react-router-dom";
 import { useSelector } from "react-redux";
 import { AlertCircle, ArrowLeft, ArrowRight, Check, Loader2 } from "lucide-react";
@@ -8,36 +9,37 @@ import { apiRoutes, navRoutes } from "../../config/routes";
 import AuthLayout from "../ui/AuthLayout";
 import Field from "../ui/Field";
 
-const steps = ["Votre compte", "Votre adresse"];
 const stepFields = [
   ["name", "displayName", "email", "password", "telephone", "birthDate"],
   ["pays", "ville", "rue", "zipcode"],
 ];
 
 // the rules mirror the constraints of the Symfony entities
-const validate = (v) => {
+const makeValidate = (t) => (v) => {
   const e = {};
-  if (!v.name) e.name = "Ce champ est obligatoire";
-  else if (!/^[a-z ,.'-]+$/i.test(v.name)) e.name = "Lettres et espaces uniquement";
-  if (!v.displayName) e.displayName = "Ce champ est obligatoire";
-  else if (v.displayName.length < 5 || v.displayName.length > 15) e.displayName = "Entre 5 et 15 caractères";
-  if (!v.email) e.email = "Ce champ est obligatoire";
-  else if (!/^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i.test(v.email)) e.email = "Adresse e-mail invalide";
-  if (!v.password) e.password = "Ce champ est obligatoire";
-  else if (v.password.length < 6) e.password = "6 caractères minimum";
-  if (!v.telephone) e.telephone = "Ce champ est obligatoire";
-  else if (!/^[0-9]{8}$/.test(v.telephone)) e.telephone = "Exactement 8 chiffres";
-  if (!v.birthDate) e.birthDate = "Ce champ est obligatoire";
-  else if (new Date(v.birthDate) > new Date()) e.birthDate = "La date doit être dans le passé";
-  if (!v.pays) e.pays = "Ce champ est obligatoire";
-  if (!v.ville) e.ville = "Ce champ est obligatoire";
-  if (!v.rue) e.rue = "Ce champ est obligatoire";
-  if (!v.zipcode) e.zipcode = "Ce champ est obligatoire";
-  else if (!/^[0-9]{4}$/.test(v.zipcode)) e.zipcode = "Exactement 4 chiffres";
+  if (!v.name) e.name = t("form.required");
+  else if (!/^[a-z ,.'-]+$/i.test(v.name)) e.name = t("register.nameFormat");
+  if (!v.displayName) e.displayName = t("form.required");
+  else if (v.displayName.length < 5 || v.displayName.length > 15) e.displayName = t("register.displayNameLength");
+  if (!v.email) e.email = t("form.required");
+  else if (!/^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i.test(v.email)) e.email = t("register.emailInvalid");
+  if (!v.password) e.password = t("form.required");
+  else if (v.password.length < 6) e.password = t("register.passwordMin");
+  if (!v.telephone) e.telephone = t("form.required");
+  else if (!/^[0-9]{8}$/.test(v.telephone)) e.telephone = t("register.phone8");
+  if (!v.birthDate) e.birthDate = t("form.required");
+  else if (new Date(v.birthDate) > new Date()) e.birthDate = t("form.datePast");
+  if (!v.pays) e.pays = t("form.required");
+  if (!v.ville) e.ville = t("form.required");
+  if (!v.rue) e.rue = t("form.required");
+  if (!v.zipcode) e.zipcode = t("form.required");
+  else if (!/^[0-9]{4}$/.test(v.zipcode)) e.zipcode = t("register.zip4");
   return e;
 };
 
 export default function MultiStepRegister() {
+  const { t } = useTranslation();
+  const steps = [t("register.step1"), t("register.step2")];
   const currentUser = useSelector((state) => state.user);
   const [step, setStep] = React.useState(0);
   const [error, setError] = React.useState("");
@@ -45,7 +47,7 @@ export default function MultiStepRegister() {
 
   const formik = useFormik({
     initialValues: { name: "", displayName: "", email: "", password: "", telephone: "", birthDate: "", pays: "Tunisie", ville: "", rue: "", zipcode: "" },
-    validate,
+    validate: makeValidate(t),
     onSubmit: async (v) => {
       setError("");
       setLoading(true);
@@ -68,11 +70,11 @@ export default function MultiStepRegister() {
       } catch (err) {
         setLoading(false);
         const description = err.response && err.response.data && err.response.data["hydra:description"];
-        if (err.response && err.response.status === 409) setError("Cette adresse e-mail est déjà inscrite.");
+        if (err.response && err.response.status === 409) setError(t("register.emailTaken"));
         else if (err.response && err.response.status === 422) {
-          setError(description || "Certaines informations sont invalides.");
+          setError(description || t("register.invalid"));
           setStep(0);
-        } else setError("Erreur interne du serveur, veuillez réessayer.");
+        } else setError(t("login.serverError"));
       }
     },
   });
@@ -96,11 +98,11 @@ export default function MultiStepRegister() {
   return (
     <AuthLayout
       wide
-      title="Créer votre compte"
-      subtitle="Rejoignez la communauté : l'inscription est gratuite."
+      title={t("register.title")}
+      subtitle={t("register.subtitle")}
       footer={
         <>
-          Déjà inscrit ? <Link to={navRoutes.LOGIN} className="font-semibold text-brand-600 hover:underline">Se connecter</Link>
+          {t("register.haveAccount")} <Link to={navRoutes.LOGIN} className="font-semibold text-brand-600 hover:underline">{t("footer.login")}</Link>
         </>
       }
     >
@@ -135,31 +137,31 @@ export default function MultiStepRegister() {
 
         {step === 0 && (
           <div className="grid gap-5 sm:grid-cols-2">
-            <Field label="Nom complet" autoComplete="name" {...fieldProps("name")} />
-            <Field label="Nom d'utilisateur" autoComplete="username" {...fieldProps("displayName")} />
-            <Field label="Adresse e-mail" type="email" autoComplete="email" className="sm:col-span-2" {...fieldProps("email")} />
-            <Field label="Mot de passe" type="password" autoComplete="new-password" {...fieldProps("password")} />
-            <Field label="Téléphone" inputMode="numeric" placeholder="8 chiffres" autoComplete="tel" {...fieldProps("telephone")} />
-            <Field label="Date de naissance" type="date" className="sm:col-span-2" {...fieldProps("birthDate")} />
+            <Field label={t("form.fullName")} autoComplete="name" {...fieldProps("name")} />
+            <Field label={t("form.username")} autoComplete="username" {...fieldProps("displayName")} />
+            <Field label={t("form.email")} type="email" autoComplete="email" className="sm:col-span-2" {...fieldProps("email")} />
+            <Field label={t("form.password")} type="password" autoComplete="new-password" {...fieldProps("password")} />
+            <Field label={t("form.phone")} inputMode="numeric" placeholder={t("register.phonePlaceholder")} autoComplete="tel" {...fieldProps("telephone")} />
+            <Field label={t("form.birthDate")} type="date" className="sm:col-span-2" {...fieldProps("birthDate")} />
           </div>
         )}
 
         {step === 1 && (
           <div className="grid gap-5 sm:grid-cols-2">
-            <Field label="Pays" {...fieldProps("pays")} />
-            <Field label="Ville" autoComplete="address-level2" {...fieldProps("ville")} />
-            <Field label="Rue" autoComplete="street-address" {...fieldProps("rue")} />
-            <Field label="Code postal" inputMode="numeric" placeholder="4 chiffres" autoComplete="postal-code" {...fieldProps("zipcode")} />
+            <Field label={t("form.country")} {...fieldProps("pays")} />
+            <Field label={t("form.city")} autoComplete="address-level2" {...fieldProps("ville")} />
+            <Field label={t("form.street")} autoComplete="street-address" {...fieldProps("rue")} />
+            <Field label={t("form.zip")} inputMode="numeric" placeholder={t("register.zipPlaceholder")} autoComplete="postal-code" {...fieldProps("zipcode")} />
           </div>
         )}
 
         <div className="mt-8 flex items-center justify-between gap-3">
           {step === 1 ? (
-            <button type="button" onClick={() => setStep(0)} className="btn-secondary"><ArrowLeft size={16} /> Retour</button>
+            <button type="button" onClick={() => setStep(0)} className="btn-secondary"><ArrowLeft size={16} /> {t("common.back")}</button>
           ) : <span />}
           <button type="submit" disabled={loading} className="btn-primary !px-6 !py-3">
             {loading && <Loader2 size={16} className="animate-spin" />}
-            {step === 0 ? <>Suivant <ArrowRight size={16} /></> : "Créer mon compte"}
+            {step === 0 ? <>{t("common.next")} <ArrowRight size={16} /></> : t("register.submit")}
           </button>
         </div>
       </form>

@@ -2,6 +2,7 @@ import axios from 'axios'
 import { StatusCodes } from 'http-status-codes'
 import { useHref } from 'react-router-dom'
 import { apiRoutes } from '../../config/routes'
+import i18n from '../../i18n'
 
 
 export const setPrice = (price)=>{
@@ -21,7 +22,7 @@ export function getUserData() {
   .then(function (response) {
     if(response.data.isActive === false){
       localStorage.clear();
-      alert("votre compte est désactivé , veuillez contacter l'administration")
+      alert(i18n.t("account.disabled"))
       document.location.href("/")
     }else{
       const data = response.data

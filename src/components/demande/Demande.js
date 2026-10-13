@@ -2,6 +2,7 @@ import React from "react";
 import axios from "axios";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import { useSelector } from "react-redux";
+import { useTranslation } from "react-i18next";
 import { Check, Search } from "lucide-react";
 import Api from "../../AxiosInstance";
 import { apiRoutes, navRoutes } from "../../config/routes";
@@ -10,6 +11,7 @@ import Avatar from "../ui/Avatar";
 import PageHeader from "../ui/PageHeader";
 
 const Demande = () => {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const myUser = useSelector((state) => state.user);
   const { id } = useParams();
@@ -45,7 +47,7 @@ const Demande = () => {
         Socket.emit("PROPOSITION", res.data);
         navigate("/");
       })
-      .catch(() => setError("L'envoi a échoué, réessayez."));
+      .catch(() => setError(t("profile.sendFailed")));
   };
 
   if (!demande) return <div className="container-page py-10"><div className="h-64 animate-pulse rounded-3xl bg-slate-200" /></div>;
@@ -53,36 +55,36 @@ const Demande = () => {
 
   return (
     <>
-      <PageHeader title="Demande de devis" subtitle="Répondez en proposant l'une de vos enchères." />
+      <PageHeader title={t("quote.title")} subtitle={t("quote.subtitle")} />
       <div className="container-page grid max-w-5xl gap-6 py-8 md:grid-cols-5">
         <div className="card p-6 md:col-span-2">
           <div className="flex items-center gap-4">
             <Avatar name={sender.displayName} image={sender.image} size={64} />
             <div>
-              <p className="text-xs text-slate-400">Demandeur</p>
+              <p className="text-xs text-slate-400">{t("quote.requester")}</p>
               <Link to={`${navRoutes.CONSULTUSER}/${sender.id}`} className="text-lg font-bold text-slate-900 hover:text-brand-700">{sender.displayName}</Link>
             </div>
           </div>
           <dl className="mt-6 space-y-4 border-t border-slate-100 pt-5 text-sm">
             <div>
-              <dt className="text-slate-400">Quantité souhaitée</dt>
+              <dt className="text-slate-400">{t("quote.quantity")}</dt>
               <dd className="mt-0.5 text-lg font-bold text-slate-900">{demande.quantity}</dd>
             </div>
             <div>
-              <dt className="text-slate-400">Description</dt>
+              <dt className="text-slate-400">{t("detail.description")}</dt>
               <dd className="mt-0.5 whitespace-pre-line leading-relaxed text-slate-700">{demande.descriptionArticle}</dd>
             </div>
           </dl>
         </div>
 
         <div className="card p-6 md:col-span-3">
-          <h2 className="text-lg font-bold text-slate-900">Proposer une enchère</h2>
-          <p className="mt-1 text-sm text-slate-500">Recherchez l'enchère qui répond à cette demande.</p>
+          <h2 className="text-lg font-bold text-slate-900">{t("quote.propose")}</h2>
+          <p className="mt-1 text-sm text-slate-500">{t("quote.proposeText")}</p>
           <div className="relative mt-5">
             <Search size={18} className="pointer-events-none absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400" />
             <input
               className="input !pl-10"
-              placeholder="Nom de l'article…"
+              placeholder={t("quote.searchPlaceholder")}
               value={input}
               onChange={(e) => {
                 setInput(e.target.value);
@@ -106,7 +108,7 @@ const Demande = () => {
           )}
           {error && <p className="mt-3 text-sm text-rose-600">{error}</p>}
           <div className="mt-6 flex justify-end">
-            <button disabled={!selected} onClick={submit} className="btn-primary">Envoyer la proposition</button>
+            <button disabled={!selected} onClick={submit} className="btn-primary">{t("quote.send")}</button>
           </div>
         </div>
       </div>

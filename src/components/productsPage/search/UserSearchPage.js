@@ -1,6 +1,7 @@
 import React from "react";
 import axios from "axios";
 import { Link, useParams } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import { apiRoutes, navRoutes } from "../../../config/routes";
 import PageHeader from "../../ui/PageHeader";
 import Pagination from "../../ui/Pagination";
@@ -8,6 +9,7 @@ import Avatar from "../../ui/Avatar";
 import EmptyState from "../../ui/EmptyState";
 
 const UserSearchPage = () => {
+  const { t } = useTranslation();
   const { search } = useParams();
   const [users, setUsers] = React.useState([]);
   const [page, setPage] = React.useState(1);
@@ -28,7 +30,7 @@ const UserSearchPage = () => {
 
   return (
     <>
-      <PageHeader title={`Membres : « ${search} »`} subtitle="Résultats de recherche parmi les membres." />
+      <PageHeader title={t("list.membersTitle", { search })} subtitle={t("list.membersSubtitle")} />
       <div className="container-page py-8">
         <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-5">
           {users.map((u) => (
@@ -37,7 +39,7 @@ const UserSearchPage = () => {
               <p className="mt-3 truncate font-bold text-slate-900">{u.displayName}</p>
             </Link>
           ))}
-          {users.length === 0 && <EmptyState title="Aucun membre trouvé" text="Essayez avec un autre nom." />}
+          {users.length === 0 && <EmptyState title={t("list.noMember")} text={t("list.noMemberText")} />}
         </div>
         <Pagination page={page} count={pages} onChange={setPage} />
       </div>

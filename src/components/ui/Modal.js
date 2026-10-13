@@ -1,8 +1,10 @@
 import React from "react";
+import { useTranslation } from "react-i18next";
 import { X } from "lucide-react";
 
 // Small accessible modal: closes on Escape / backdrop click.
 const Modal = ({ open, onClose, title, children, footer, size = "md" }) => {
+  const { t } = useTranslation();
   React.useEffect(() => {
     if (!open) return undefined;
     const onKey = (e) => e.key === "Escape" && onClose();
@@ -23,7 +25,7 @@ const Modal = ({ open, onClose, title, children, footer, size = "md" }) => {
       <div className={`relative flex max-h-[90vh] w-full ${width} animate-fade-up flex-col rounded-t-3xl bg-white shadow-2xl sm:rounded-3xl`}>
         <div className="flex items-center justify-between border-b border-slate-100 px-6 py-4">
           <h3 className="text-lg font-bold text-slate-900">{title}</h3>
-          <button onClick={onClose} aria-label="Fermer" className="rounded-lg p-1.5 text-slate-400 hover:bg-slate-100 hover:text-slate-700">
+          <button onClick={onClose} aria-label={t("common.close")} className="rounded-lg p-1.5 text-slate-400 hover:bg-slate-100 hover:text-slate-700">
             <X size={20} />
           </button>
         </div>

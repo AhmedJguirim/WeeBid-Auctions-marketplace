@@ -2,11 +2,14 @@ import React from "react";
 import axios from "axios";
 import { Link } from "react-router-dom";
 import { ArrowRight } from "lucide-react";
+import { useTranslation } from "react-i18next";
 import { BACKEND_URL } from "../../../config/env";
 import { apiRoutes, navRoutes } from "../../../config/routes";
 import PageHeader from "../../ui/PageHeader";
 
-export const CategoryTile = ({ category }) => (
+export const CategoryTile = ({ category }) => {
+  const { t } = useTranslation();
+  return (
   <div className="group card overflow-hidden transition duration-300 hover:-translate-y-1 hover:shadow-lift">
     <div className="relative aspect-[16/10] overflow-hidden bg-gradient-to-br from-brand-500 to-brand-800">
       {category.image && (
@@ -22,16 +25,18 @@ export const CategoryTile = ({ category }) => (
     </div>
     <div className="grid grid-cols-2 divide-x divide-slate-100 text-sm font-semibold">
       <Link to={`${navRoutes.ENCHERES}${navRoutes.PERCATEGORY}/${category.id}`} className="flex items-center justify-center gap-1.5 py-3 text-slate-600 transition hover:bg-brand-50 hover:text-brand-700">
-        Enchères <ArrowRight size={14} />
+        {t("nav.auctions")} <ArrowRight size={14} />
       </Link>
       <Link to={`${navRoutes.ENCHERESINVERSES}${navRoutes.PERCATEGORY}/${category.id}`} className="flex items-center justify-center gap-1.5 py-3 text-slate-600 transition hover:bg-brand-50 hover:text-brand-700">
-        Inversées <ArrowRight size={14} />
+        {t("categories.reverseShort")} <ArrowRight size={14} />
       </Link>
     </div>
   </div>
-);
+  );
+};
 
 const CategoriesList = () => {
+  const { t } = useTranslation();
   const [categories, setCategories] = React.useState([]);
 
   React.useEffect(() => {
@@ -43,7 +48,7 @@ const CategoriesList = () => {
 
   return (
     <>
-      <PageHeader title="Catégories" subtitle="Parcourez le catalogue par univers : électronique, mode, maison, sport…" />
+      <PageHeader title={t("nav.categories")} subtitle={t("categories.subtitle")} />
       <div className="container-page grid gap-5 py-8 sm:grid-cols-2 lg:grid-cols-3">
         {categories.map((category) => (
           <CategoryTile key={category.id} category={category} />

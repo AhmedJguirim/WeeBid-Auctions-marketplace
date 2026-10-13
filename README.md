@@ -30,7 +30,7 @@ the initial idea was to create a digital marketplace where people compete over a
 
 ## technologies used:
 
-- ReactJS + Tailwind CSS: the frontend of the application which provides interfaces to interact with the end User
+- ReactJS + Tailwind CSS (+ i18next for the French/English UI): the frontend of the application which provides interfaces to interact with the end User
   
 - Symfony: the backend of the application. Used to create the APIs and the Admin dashboard
   

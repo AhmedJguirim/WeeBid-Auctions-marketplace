@@ -1,8 +1,10 @@
 import React from "react";
+import { useTranslation } from "react-i18next";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 
 // Minimal numbered pagination. `page` is 1-based.
 const Pagination = ({ page, count, onChange }) => {
+  const { t } = useTranslation();
   if (!count || count <= 1) return null;
   const pages = [];
   for (let i = 1; i <= count; i++) {
@@ -11,7 +13,7 @@ const Pagination = ({ page, count, onChange }) => {
   }
   const base = "flex h-10 min-w-[2.5rem] items-center justify-center rounded-xl px-3 text-sm font-semibold transition";
   return (
-    <nav className="mt-10 flex items-center justify-center gap-1.5" aria-label="pagination">
+    <nav className="mt-10 flex items-center justify-center gap-1.5" aria-label={t("pagination.label")}>
       <button className={`${base} text-slate-600 hover:bg-white disabled:opacity-40`} disabled={page <= 1} onClick={() => onChange(page - 1)}>
         <ChevronLeft size={18} />
       </button>

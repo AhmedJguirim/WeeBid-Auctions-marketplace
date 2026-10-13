@@ -16,6 +16,7 @@ use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 
@@ -72,6 +73,34 @@ class SeedDemoCommand extends Command
         ['Montres connectées', '⌚', 0, 'Peu importe', 'Tunis', 600, 5, 36, 6, 'Lot de 5 montres connectées pour une équipe sportive.'],
     ];
 
+    /** English texts, used when the demo is seeded with --locale=en (SEED_LOCALE=en). Same order as the arrays above. */
+    private const EN = [
+        'any' => 'Any',
+        'categories' => ['Electronics', 'Fashion', 'Home', 'Sports', 'Music', 'Collectibles'],
+        'encheres' => [
+            ['Film camera', 'Vintage 80s film SLR, fully working, comes with a 50mm lens and the original strap.'],
+            ['Mech keyboard', 'Wireless 75% mechanical keyboard, brown switches, RGB backlight. Never unboxed.'],
+            ['Road bike', 'Carbon frame, Shimano 105 groupset, very well maintained. About 3,000 km on the clock.'],
+            ['Folk guitar', 'Acoustic guitar with a solid spruce top, brand new strings, gig bag included.'],
+            ['Auto watch', 'Automatic watch, 40mm steel case, leather strap. Box and warranty included.'],
+            ['Gaming laptop', 'RTX 3060, 16 GB of RAM, 1 TB SSD. Barely used, battery in excellent condition.'],
+            ['Leather jacket', 'Genuine leather jacket, size M, modern cut. Tag still attached.'],
+            ['Velvet armchair', 'Emerald green velvet armchair with oak legs. Perfect for a modern living room.'],
+            ['Game console', 'Home console with two controllers and five games, in perfect working order.'],
+            ['Backpack', 'Waterproof 28L hiking backpack, several colours available.'],
+            ['Berber rug', 'Hand-knotted wool rug with traditional patterns, 2m x 1.4m.'],
+            ['Headphones', 'Active noise-cancelling headphones, 30-hour battery life, hard case included.'],
+        ],
+        'inverses' => [
+            ['Laptop', 'Looking for a reliable laptop for studies, 16 GB of RAM minimum. Suppliers, send me your best prices.'],
+            ['Electric bike', 'Looking for a city e-bike with at least 60 km of range.'],
+            ['Camera', 'Recent mirrorless body with kit lens, at least one year of warranty.'],
+            ['3-seater sofa', 'Comfortable light grey fabric sofa, delivery included if possible.'],
+            ['Digital piano', '88 weighted keys, with stand and pedal. New or in very good condition.'],
+            ['Smartwatches', 'Batch of 5 smartwatches for a sports team.'],
+        ],
+    ];
+
     public function __construct(
         private EntityManagerInterface $em,
         private UserPasswordHasherInterface $hasher,
@@ -80,8 +109,14 @@ class SeedDemoCommand extends Command
         parent::__construct();
     }
 
+    protected function configure(): void
+    {
+        $this->addOption('locale', null, InputOption::VALUE_REQUIRED, 'Language of the demo content: fr or en', 'fr');
+    }
+
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
+        $en = $input->getOption('locale') === 'en';
         if ($this->em->getRepository(User::class)->findOneBy(['email' => self::USERS[0][2]])) {
             $this->refreshDates();
             $output->writeln('Demo data already present: auction dates refreshed.');
@@ -96,6 +131,7 @@ class SeedDemoCommand extends Command
         // categories
         $categories = [];
         foreach (self::CATEGORIES as $i => [$name, $emoji, $colors]) {
+            $name = $en ? self::EN['categories'][$i] : $name;
             $file = "category-$i.svg";
             file_put_contents("$dir/public/category/$file", $this->svg($emoji, $colors, 600, 400));
             $c = (new Category())->setName($name)->setImage($file);
@@ -125,6 +161,9 @@ class SeedDemoCommand extends Command
         $minutes = 0;
         // auctions
         foreach (self::ENCHERES as $i => [$name, $emoji, $cat, $state, $brand, $ville, $init, $imm, $qty, $hours, $bids, $desc]) {
+            if ($en) {
+                [$name, $desc] = self::EN['encheres'][$i];
+            }
             $article = $this->article($dir, "e$i", $name, $emoji, $categories[$cat], $state, $brand, $ville, $desc);
             $e = new Enchere();
             $e->setArticle($article)->setCategory($categories[$cat])->setUser($users[$i % count($users)])
@@ -151,7 +190,11 @@ class SeedDemoCommand extends Command
 
         // reverse auctions
         foreach (self::INVERSES as $i => [$name, $emoji, $cat, $brand, $ville, $start, $qty, $hours, $reds, $desc]) {
-            $article = $this->article($dir, "i$i", $name, $emoji, $categories[$cat], 'neuf', $brand === 'Peu importe' ? null : $brand, $ville, $desc);
+            if ($en) {
+                [$name, $desc] = self::EN['inverses'][$i];
+                $brand = $brand === 'Peu importe' ? self::EN['any'] : $brand;
+            }
+            $article = $this->article($dir, "i$i", $name, $emoji, $categories[$cat], 'neuf', in_array($brand, ['Peu importe', self::EN['any']], true) ? null : $brand, $ville, $desc);
             $e = new EnchereInverse();
             $e->setArticle($article)->setCategory($categories[$cat])->setUser($users[($i + 1) % count($users)])
                 ->setQuantity($qty)->setInitPrice($start)->setImmediatePrice((int) ($start * 0.6))->setCurrentPrice($start)

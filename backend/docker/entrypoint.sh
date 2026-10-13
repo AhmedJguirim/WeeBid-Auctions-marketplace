@@ -34,7 +34,7 @@ if [ -n "$ADMIN_EMAIL" ] && [ -n "$ADMIN_PASSWORD" ]; then
 fi
 
 if [ "$SEED_DEMO" = "true" ]; then
-    php bin/console app:seed-demo
+    php bin/console app:seed-demo --locale="${SEED_LOCALE:-fr}"
 fi
 
 chown -R www-data:www-data var public/media public/user public/category config/jwt

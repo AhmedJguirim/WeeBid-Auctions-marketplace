@@ -1,13 +1,10 @@
 import React from "react";
+import { useTranslation } from "react-i18next";
 import AuctionList from "../AuctionList";
 
-const EncheresListing = () => (
-  <AuctionList
-    kind="enchere"
-    tabs
-    title="Toutes les enchères"
-    subtitle="Placez vos offres sur des articles du monde entier, en direct, sans frais de participation."
-  />
-);
+const EncheresListing = () => {
+  const { t } = useTranslation();
+  return <AuctionList kind="enchere" tabs title={t("list.allTitle")} subtitle={t("list.allSubtitle")} />;
+};
 
 export default EncheresListing;

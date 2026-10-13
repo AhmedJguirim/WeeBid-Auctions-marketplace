@@ -1,27 +1,31 @@
 import React from "react";
 import { Link } from "react-router-dom";
 import { Users } from "lucide-react";
+import { useTranslation } from "react-i18next";
 import { BACKEND_URL } from "../../config/env";
 import { navRoutes } from "../../config/routes";
 import demoListImage from "../../media/images/demoListImage.png";
 import Countdown, { useAuctionClock } from "../ui/Countdown";
 import EmptyState from "../ui/EmptyState";
 import Avatar from "../ui/Avatar";
+import { formatNumber } from "../../i18n";
 
 const StatusBadge = ({ startDate, endDate }) => {
+  const { t } = useTranslation();
   const { status } = useAuctionClock(startDate, endDate);
   if (status === "live")
     return (
       <span className="badge bg-white/95 text-emerald-600 shadow-sm backdrop-blur">
         <span className="h-2 w-2 animate-pulse-dot rounded-full bg-emerald-500" />
-        En direct
+        {t("status.live")}
       </span>
     );
-  if (status === "upcoming") return <span className="badge bg-white/95 text-amber-600 shadow-sm">Bientôt</span>;
-  return <span className="badge bg-slate-900/80 text-white">Terminée</span>;
+  if (status === "upcoming") return <span className="badge bg-white/95 text-amber-600 shadow-sm">{t("status.soon")}</span>;
+  return <span className="badge bg-slate-900/80 text-white">{t("status.ended")}</span>;
 };
 
 export const AuctionCard = ({ vente, type }) => {
+  const { t } = useTranslation();
   const reverse = type === navRoutes.ENCHEREINVERSE;
   const doc = vente.article.documents && vente.article.documents[0];
   const image = doc ? `${BACKEND_URL}${doc.contentUrl}` : demoListImage;
@@ -62,14 +66,14 @@ export const AuctionCard = ({ vente, type }) => {
         <div className="mt-4 flex items-end justify-between border-t border-slate-100 pt-3">
           <div>
             <p className="text-[11px] font-medium uppercase tracking-wide text-slate-400">
-              {reverse ? "Meilleur prix" : "Offre actuelle"}
+              {reverse ? t("card.bestPrice") : t("card.currentBid")}
             </p>
             <p className="text-xl font-extrabold tabular-nums text-slate-900">
-              {vente.currentPrice} <span className="text-sm font-semibold text-slate-500">TND</span>
+              {formatNumber(vente.currentPrice)} <span className="text-sm font-semibold text-slate-500">TND</span>
             </p>
           </div>
           <Link to={`${type}/${vente.id}`} className="rounded-lg bg-brand-50 px-3 py-1.5 text-xs font-bold text-brand-700 transition hover:bg-brand-600 hover:text-white">
-            {reverse ? "Proposer" : "Enchérir"}
+            {reverse ? t("card.propose") : t("card.bid")}
           </Link>
         </div>
       </div>
@@ -82,6 +86,7 @@ export const AuctionCard = ({ vente, type }) => {
  * (the layout is now responsive), `ventes` can be an array or an object.
  */
 const ProductsListing = ({ ventes, type, columns = "default", limit }) => {
+  const { t } = useTranslation();
   let list = Object.keys(ventes || {}).map((k) => ventes[k]);
   if (limit) list = list.slice(0, limit);
   const grid =
@@ -95,8 +100,8 @@ const ProductsListing = ({ ventes, type, columns = "default", limit }) => {
       ))}
       {list.length === 0 && (
         <EmptyState
-          title="Aucun article disponible"
-          text="Il n'y a pas d'articles à afficher pour le moment. Revenez bientôt !"
+          title={t("card.emptyTitle")}
+          text={t("card.emptyText")}
         />
       )}
     </div>

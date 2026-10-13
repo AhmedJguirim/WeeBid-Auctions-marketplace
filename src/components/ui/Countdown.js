@@ -1,4 +1,5 @@
 import React from "react";
+import { useTranslation } from "react-i18next";
 
 // Splits a duration in ms into days / hours / minutes / seconds.
 export const splitDuration = (ms) => {
@@ -27,27 +28,27 @@ export const useAuctionClock = (startDate, endDate) => {
 
 const pad = (n) => String(n).padStart(2, "0");
 
-export const formatShort = ({ days, hours, minutes, seconds }) =>
+export const formatShort = ({ days, hours, minutes, seconds }, t) =>
   days > 0
-    ? `${days}j ${pad(hours)}h ${pad(minutes)}m`
+    ? `${days}${t("time.d")} ${pad(hours)}${t("time.h")} ${pad(minutes)}${t("time.m")}`
     : `${pad(hours)}:${pad(minutes)}:${pad(seconds)}`;
-
-const labels = { upcoming: "Début dans", live: "Se termine dans", ended: "Terminée" };
 
 /**
  * Compact countdown. `variant="pill"` for cards, `variant="blocks"` for detail pages.
  * Keeps the legacy props (startDate / endDate) used across the app.
  */
 const Countdown = ({ startDate, endDate, variant = "pill" }) => {
+  const { t } = useTranslation();
+  const labels = { upcoming: t("countdown.startsIn"), live: t("countdown.endsIn"), ended: t("countdown.ended") };
   const { status, remaining } = useAuctionClock(startDate, endDate);
   const d = splitDuration(remaining);
 
   if (variant === "blocks") {
     const cells = [
-      ["Jours", d.days],
-      ["Heures", d.hours],
-      ["Min", d.minutes],
-      ["Sec", d.seconds],
+      [t("time.days"), d.days],
+      [t("time.hours"), d.hours],
+      [t("time.min"), d.minutes],
+      [t("time.sec"), d.seconds],
     ];
     return (
       <div>
@@ -55,7 +56,7 @@ const Countdown = ({ startDate, endDate, variant = "pill" }) => {
           {labels[status]}
         </p>
         {status === "ended" ? (
-          <p className="text-2xl font-bold text-slate-400">Cette enchère est terminée</p>
+          <p className="text-2xl font-bold text-slate-400">{t("countdown.auctionEnded")}</p>
         ) : (
           <div className="grid grid-cols-4 gap-2">
             {cells.map(([label, value]) => (
@@ -81,7 +82,7 @@ const Countdown = ({ startDate, endDate, variant = "pill" }) => {
 
   return (
     <span className={`badge tabular-nums ${tone}`}>
-      {status === "ended" ? "Terminée" : `${status === "upcoming" ? "Début dans " : ""}${formatShort(d)}`}
+      {status === "ended" ? t("countdown.ended") : `${status === "upcoming" ? t("countdown.startsIn") + " " : ""}${formatShort(d, t)}`}
     </span>
   );
 };

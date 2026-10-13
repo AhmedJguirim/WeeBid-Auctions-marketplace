@@ -1,5 +1,6 @@
 import * as React from "react";
 import { useFormik } from "formik";
+import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
 import { useSelector } from "react-redux";
 import { AlertCircle, ArrowLeft, ArrowRight, Check, Gavel, ImagePlus, Loader2, TrendingDown, X } from "lucide-react";
@@ -8,7 +9,6 @@ import { navRoutes } from "../../config/routes";
 import Field from "../ui/Field";
 import PageHeader from "../ui/PageHeader";
 
-const steps = ["L'article", "L'annonce"];
 const stepFields = [["name", "state", "localisation", "brand", "codebar", "description", "date"], ["quantity", "initPrice", "category", "startDate", "endDate"]];
 
 const toLocal = (date) => {
@@ -18,21 +18,21 @@ const toLocal = (date) => {
 };
 
 // mirrors the constraints of the Symfony entities
-const validate = (v) => {
+const makeValidate = (t) => (v) => {
   const e = {};
-  if (!v.name) e.name = "Ce champ est obligatoire";
-  else if (v.name.length < 3 || v.name.length > 15) e.name = "Entre 3 et 15 caractères";
-  if (!v.localisation) e.localisation = "Ce champ est obligatoire";
-  if (v.brand && v.brand.length > 15) e.brand = "15 caractères maximum";
-  if (v.description && v.description.length > 255) e.description = "255 caractères maximum";
-  if (v.date && new Date(v.date) > new Date()) e.date = "La date doit être dans le passé";
-  if (!v.quantity || v.quantity < 1) e.quantity = "Au moins 1";
-  if (!v.initPrice || v.initPrice <= 0) e.initPrice = "Doit être positif";
-  if (!v.category) e.category = "Choisissez une catégorie";
-  if (!v.startDate) e.startDate = "Ce champ est obligatoire";
-  else if (new Date(v.startDate) < new Date(Date.now() - 5 * 60000)) e.startDate = "Le début ne peut pas être dans le passé";
-  if (!v.endDate) e.endDate = "Ce champ est obligatoire";
-  else if (new Date(v.endDate) <= new Date(v.startDate)) e.endDate = "La fin doit être après le début";
+  if (!v.name) e.name = t("form.required");
+  else if (v.name.length < 3 || v.name.length > 15) e.name = t("create.name3_15");
+  if (!v.localisation) e.localisation = t("form.required");
+  if (v.brand && v.brand.length > 15) e.brand = t("create.max15");
+  if (v.description && v.description.length > 255) e.description = t("create.max255");
+  if (v.date && new Date(v.date) > new Date()) e.date = t("form.datePast");
+  if (!v.quantity || v.quantity < 1) e.quantity = t("create.atLeast1");
+  if (!v.initPrice || v.initPrice <= 0) e.initPrice = t("create.positive");
+  if (!v.category) e.category = t("create.chooseCategory");
+  if (!v.startDate) e.startDate = t("form.required");
+  else if (new Date(v.startDate) < new Date(Date.now() - 5 * 60000)) e.startDate = t("create.startPast");
+  if (!v.endDate) e.endDate = t("form.required");
+  else if (new Date(v.endDate) <= new Date(v.startDate)) e.endDate = t("create.endAfterStart");
   return e;
 };
 
@@ -53,6 +53,8 @@ const TypeCard = ({ active, onClick, icon: Icon, title, text }) => (
 );
 
 export default function CreateArticle() {
+  const { t } = useTranslation();
+  const steps = [t("create.step1"), t("create.step2")];
   const navigate = useNavigate();
   const user = useSelector((state) => state.user);
   const [step, setStep] = React.useState(0);
@@ -74,7 +76,7 @@ export default function CreateArticle() {
       quantity: 1, initPrice: "", category: "",
       startDate: toLocal(Date.now() + 10 * 60000), endDate: toLocal(Date.now() + 3 * 86400000),
     },
-    validate,
+    validate: makeValidate(t),
     onSubmit: async (v) => {
       setLoading(true);
       setError("");
@@ -115,7 +117,7 @@ export default function CreateArticle() {
         console.log(err);
         setLoading(false);
         const d = err.response && err.response.data && err.response.data["hydra:description"];
-        setError(d ? d : "Une erreur est survenue, veuillez réessayer.");
+        setError(d ? d : t("create.error"));
       }
     },
   });
@@ -137,16 +139,16 @@ export default function CreateArticle() {
   const addFiles = (list) => {
     const incoming = Array.from(list).filter((f) => f.type.startsWith("image/"));
     const room = 4 - files.length;
-    if (incoming.length > room) alert("4 images maximum");
+    if (incoming.length > room) alert(t("create.max4"));
     setFiles([...files, ...incoming.slice(0, room).map((file) => ({ file, url: URL.createObjectURL(file) }))]);
   };
 
   if (user.id === undefined && !localStorage.getItem("token")) {
     return (
       <div className="container-page flex min-h-[50vh] flex-col items-center justify-center text-center">
-        <h1 className="text-2xl font-extrabold text-slate-900">Connectez-vous pour vendre</h1>
-        <p className="mt-2 text-slate-500">Un compte est nécessaire pour publier une annonce.</p>
-        <a href={navRoutes.LOGIN} className="btn-primary mt-6">Se connecter</a>
+        <h1 className="text-2xl font-extrabold text-slate-900">{t("create.loginTitle")}</h1>
+        <p className="mt-2 text-slate-500">{t("create.loginText")}</p>
+        <a href={navRoutes.LOGIN} className="btn-primary mt-6">{t("footer.login")}</a>
       </div>
     );
   }
@@ -155,7 +157,7 @@ export default function CreateArticle() {
 
   return (
     <>
-      <PageHeader title="Publier une annonce" subtitle="Décrivez votre article, choisissez le type d'enchère et fixez le calendrier." />
+      <PageHeader title={t("create.title")} subtitle={t("create.subtitle")} />
       <div className="container-page max-w-3xl py-8">
         <ol className="mb-8 flex items-center gap-3">
           {steps.map((label, i) => (
@@ -189,25 +191,25 @@ export default function CreateArticle() {
           {step === 0 && (
             <>
               <div className="grid gap-5 sm:grid-cols-2">
-                <Field label="Nom de l'article" placeholder="Ex : Appareil photo" {...fieldProps("name")} />
-                <Field label="État" as="select" {...fieldProps("state")}>
-                  <option value="utilisé">Utilisé</option>
-                  <option value="neuf">Neuf</option>
+                <Field label={t("create.name")} placeholder={t("create.namePlaceholder")} {...fieldProps("name")} />
+                <Field label={t("detail.state")} as="select" {...fieldProps("state")}>
+                  <option value="utilisé">{t("state.utilisé")}</option>
+                  <option value="neuf">{t("state.neuf")}</option>
                 </Field>
-                <Field label="Localisation" placeholder="Ex : Tunis" {...fieldProps("localisation")} />
-                <Field label="Marque (optionnel)" {...fieldProps("brand")} />
-                <Field label="Code barre (optionnel)" {...fieldProps("codebar")} />
-                <Field label="Date de fabrication (optionnel)" type="date" {...fieldProps("date")} />
+                <Field label={t("detail.location")} placeholder={t("create.locationPlaceholder")} {...fieldProps("localisation")} />
+                <Field label={`${t("detail.brand")} ${t("create.optional")}`} {...fieldProps("brand")} />
+                <Field label={`${t("detail.barcode")} ${t("create.optional")}`} {...fieldProps("codebar")} />
+                <Field label={`${t("detail.manufactured")} ${t("create.optional")}`} type="date" {...fieldProps("date")} />
               </div>
-              <Field label="Description" as="textarea" rows={5} placeholder="Décrivez l'état, les accessoires fournis…" hint={`${formik.values.description.length}/255`} {...fieldProps("description")} />
+              <Field label={t("detail.description")} as="textarea" rows={5} placeholder={t("create.descriptionPlaceholder")} hint={`${formik.values.description.length}/255`} {...fieldProps("description")} />
 
               <div>
-                <p className="mb-1.5 text-sm font-semibold text-slate-700">Photos <span className="font-normal text-slate-400">(4 maximum)</span></p>
+                <p className="mb-1.5 text-sm font-semibold text-slate-700">{t("create.photos")} <span className="font-normal text-slate-400">{t("create.photosMax")}</span></p>
                 <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
                   {files.map(({ url }, i) => (
                     <div key={url} className="group relative aspect-square overflow-hidden rounded-xl bg-slate-100">
                       <img src={url} alt="" className="h-full w-full object-cover" />
-                      <button type="button" onClick={() => setFiles(files.filter((_, j) => j !== i))} aria-label="Retirer" className="absolute right-1.5 top-1.5 rounded-full bg-slate-900/70 p-1 text-white opacity-0 transition group-hover:opacity-100">
+                      <button type="button" onClick={() => setFiles(files.filter((_, j) => j !== i))} aria-label={t("create.remove")} className="absolute right-1.5 top-1.5 rounded-full bg-slate-900/70 p-1 text-white opacity-0 transition group-hover:opacity-100">
                         <X size={14} />
                       </button>
                     </div>
@@ -215,7 +217,7 @@ export default function CreateArticle() {
                   {files.length < 4 && (
                     <label className="flex aspect-square cursor-pointer flex-col items-center justify-center gap-1 rounded-xl border-2 border-dashed border-slate-300 text-slate-400 transition hover:border-brand-400 hover:bg-brand-50 hover:text-brand-600">
                       <ImagePlus size={22} />
-                      <span className="text-xs font-semibold">Ajouter</span>
+                      <span className="text-xs font-semibold">{t("create.add")}</span>
                       <input type="file" accept="image/*" multiple className="sr-only" onChange={(e) => { addFiles(e.target.files); e.target.value = ""; }} />
                     </label>
                   )}
@@ -227,32 +229,32 @@ export default function CreateArticle() {
           {step === 1 && (
             <>
               <div className="grid gap-3 sm:grid-cols-2">
-                <TypeCard active={!inverse} onClick={() => setType("encheres")} icon={Gavel} title="Enchère" text="Je vends : les acheteurs surenchérissent." />
-                <TypeCard active={inverse} onClick={() => setType("enchere_inverses")} icon={TrendingDown} title="Enchère inversée" text="Je cherche : les vendeurs baissent leur prix." />
+                <TypeCard active={!inverse} onClick={() => setType("encheres")} icon={Gavel} title={t("create.typeAuction")} text={t("create.typeAuctionText")} />
+                <TypeCard active={inverse} onClick={() => setType("enchere_inverses")} icon={TrendingDown} title={t("create.typeReverse")} text={t("create.typeReverseText")} />
               </div>
               <div className="grid gap-5 sm:grid-cols-2">
-                <Field label="Catégorie" as="select" {...fieldProps("category")}>
-                  <option value="">Choisir…</option>
+                <Field label={t("create.category")} as="select" {...fieldProps("category")}>
+                  <option value="">{t("create.choose")}</option>
                   {categories.map((c) => (
                     <option key={c.id} value={c.id}>{c.name}</option>
                   ))}
                 </Field>
-                <Field label="Quantité" type="number" min="1" {...fieldProps("quantity")} />
-                <Field label={inverse ? "Budget maximum (TND)" : "Prix de départ (TND)"} type="number" min="0" step="0.1" {...fieldProps("initPrice")} />
+                <Field label={t("detail.quantity")} type="number" min="1" {...fieldProps("quantity")} />
+                <Field label={inverse ? t("create.budget") : t("create.startPriceTnd")} type="number" min="0" step="0.1" {...fieldProps("initPrice")} />
                 <span className="hidden sm:block" />
-                <Field label="Début" type="datetime-local" {...fieldProps("startDate")} />
-                <Field label="Fin" type="datetime-local" {...fieldProps("endDate")} />
+                <Field label={t("detail.start")} type="datetime-local" {...fieldProps("startDate")} />
+                <Field label={t("detail.end")} type="datetime-local" {...fieldProps("endDate")} />
               </div>
             </>
           )}
 
           <div className="flex items-center justify-between gap-3 border-t border-slate-100 pt-6">
             {step === 1 ? (
-              <button type="button" onClick={() => setStep(0)} className="btn-secondary"><ArrowLeft size={16} /> Retour</button>
+              <button type="button" onClick={() => setStep(0)} className="btn-secondary"><ArrowLeft size={16} /> {t("common.back")}</button>
             ) : <span />}
             <button type="submit" disabled={loading} className="btn-primary !px-6 !py-3">
               {loading && <Loader2 size={16} className="animate-spin" />}
-              {step === 0 ? <>Suivant <ArrowRight size={16} /></> : "Publier l'annonce"}
+              {step === 0 ? <>{t("common.next")} <ArrowRight size={16} /></> : t("create.publish")}
             </button>
           </div>
         </form>

@@ -34,6 +34,7 @@ services:
       ADMIN_PASSWORD: ${ADMIN_PASSWORD:-admin1234}
       # demo users/categories/auctions (accounts amine@weebid.local ... / demo1234)
       SEED_DEMO: ${SEED_DEMO:-true}
+      SEED_LOCALE: ${SEED_LOCALE:-fr}   # language of the demo content: fr or en
     volumes:
       - jwt-keys:/var/www/html/config/jwt
       - uploads-media:/var/www/html/public/media

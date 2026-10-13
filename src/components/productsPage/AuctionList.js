@@ -1,6 +1,7 @@
 import React from "react";
 import axios from "axios";
 import { Link } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import { apiRoutes, navRoutes } from "../../config/routes";
 import ProductsListing from "../generalComponents/ProductsListing";
 import PageHeader from "../ui/PageHeader";
@@ -20,28 +21,32 @@ const Switch = ({ checked, onChange, label }) => (
   </label>
 );
 
-const Tabs = ({ kind }) => (
+const Tabs = ({ kind }) => {
+  const { t } = useTranslation();
+  return (
   <div className="inline-flex rounded-xl bg-slate-100 p-1 text-sm font-semibold">
     {[
-      ["enchere", "Enchères", navRoutes.ENCHERES],
-      ["inverse", "Enchères inversées", navRoutes.ENCHERESINVERSES],
-    ].map(([k, text, path]) => (
+      ["enchere", "nav.auctions", navRoutes.ENCHERES],
+      ["inverse", "nav.reverseAuctions", navRoutes.ENCHERESINVERSES],
+    ].map(([k, key, path]) => (
       <Link
         key={k}
         to={path}
         className={`rounded-lg px-4 py-1.5 transition ${kind === k ? "bg-white text-brand-700 shadow-sm" : "text-slate-500 hover:text-slate-800"}`}
       >
-        {text}
+        {t(key)}
       </Link>
     ))}
   </div>
-);
+  );
+};
 
 /**
  * Generic paginated auction listing used by every "list of enchères" page
  * (all / per category / per user / search results), for both kinds.
  */
 const AuctionList = ({ kind = "enchere", filters = {}, title, subtitle, tabs = false }) => {
+  const { t } = useTranslation();
   const [items, setItems] = React.useState([]);
   const [page, setPage] = React.useState(1);
   const [pages, setPages] = React.useState(1);
@@ -82,7 +87,7 @@ const AuctionList = ({ kind = "enchere", filters = {}, title, subtitle, tabs = f
       <PageHeader title={title} subtitle={subtitle} actions={tabs && <Tabs kind={kind} />} />
       <div className="container-page py-8">
         <div className="mb-6 flex justify-end">
-          <Switch checked={showExpired} onChange={setShowExpired} label="Afficher les enchères terminées" />
+          <Switch checked={showExpired} onChange={setShowExpired} label={t("list.showEnded")} />
         </div>
         <div className={loading ? "opacity-60 transition" : "transition"}>
           <ProductsListing ventes={items} type={routes[kind]} />

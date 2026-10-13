@@ -2,13 +2,14 @@ import * as React from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import { Search, Loader2 } from "lucide-react";
+import { useTranslation } from "react-i18next";
 import { apiRoutes, navRoutes } from "../../../config/routes";
 import useClickOutside from "../../ui/useClickOutside";
 
 const types = [
-  { value: "/encheres", text: "Enchères" },
-  { value: "/enchere_inverses", text: "Inversées" },
-  { value: "/users", text: "Membres" },
+  { value: "/encheres", key: "search.auctions" },
+  { value: "/enchere_inverses", key: "search.reverse" },
+  { value: "/users", key: "search.members" },
 ];
 
 // route of the full results page for each type
@@ -19,6 +20,7 @@ const searchRoute = {
 };
 
 export default function SearchBar({ className = "", onNavigate }) {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const ref = React.useRef(null);
   const [type, setType] = React.useState("/encheres");
@@ -80,11 +82,11 @@ export default function SearchBar({ className = "", onNavigate }) {
         <select
           value={type}
           onChange={(e) => setType(e.target.value)}
-          aria-label="Type de recherche"
+          aria-label={t("search.type")}
           className="cursor-pointer rounded-l-xl border-0 bg-transparent py-2.5 pl-3 pr-1 text-sm font-medium text-slate-600 outline-none"
         >
-          {types.map((t) => (
-            <option key={t.value} value={t.value}>{t.text}</option>
+          {types.map((o) => (
+            <option key={o.value} value={o.value}>{t(o.key)}</option>
           ))}
         </select>
         <span className="h-5 w-px bg-slate-200" />
@@ -95,17 +97,17 @@ export default function SearchBar({ className = "", onNavigate }) {
             setOpen(true);
           }}
           onFocus={() => setOpen(true)}
-          placeholder="Rechercher…"
-          aria-label="Rechercher"
+          placeholder={t("search.placeholder")}
+          aria-label={t("search.placeholder")}
           className="min-w-0 flex-1 border-0 bg-transparent px-3 py-2.5 text-sm text-slate-800 outline-none placeholder:text-slate-400"
         />
-        <button type="submit" aria-label="Lancer la recherche" className="px-3 text-slate-400 hover:text-brand-600">
+        <button type="submit" aria-label={t("search.submit")} className="px-3 text-slate-400 hover:text-brand-600">
           {loading ? <Loader2 size={18} className="animate-spin" /> : <Search size={18} />}
         </button>
       </form>
       {open && input.trim() && (
         <ul className="absolute left-0 right-0 top-full z-50 mt-2 max-h-72 overflow-auto rounded-xl border border-slate-200 bg-white p-1.5 shadow-lift">
-          {options.length === 0 && !loading && <li className="px-3 py-2 text-sm text-slate-500">Aucun résultat</li>}
+          {options.length === 0 && !loading && <li className="px-3 py-2 text-sm text-slate-500">{t("search.noResult")}</li>}
           {options.map((o) => (
             <li key={o.id}>
               <button onClick={() => go(o.link)} className="w-full rounded-lg px-3 py-2 text-left text-sm text-slate-700 hover:bg-brand-50 hover:text-brand-700">

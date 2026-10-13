@@ -4,6 +4,7 @@ import React from "react";
 import { Provider } from "react-redux";
 import "@fontsource-variable/inter";
 import "./index.css";
+import "./i18n";
 import Base from "./components/base/Base.js";
 import { store } from "./redux/store";
 

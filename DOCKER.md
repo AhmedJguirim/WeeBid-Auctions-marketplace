@@ -15,7 +15,11 @@ docker compose up -d --build
 | Demo members | `amine@weebid.local`, `sarra@weebid.local`, `yassine@weebid.local`, … / `demo1234` |
 
 First start takes a few minutes (image builds). The backend waits for the DB, generates the JWT keys,
-creates the DB schema from the entities (the repo ships no migrations), creates the admin user and, unless `SEED_DEMO=false`, fills the database with demo data (5 members, 6 categories, 12 auctions with bid history, 6 reverse auctions). Restarting the stack refreshes the dates of expired demo auctions so the demo never looks dead.
+creates the DB schema from the entities (the repo ships no migrations), creates the admin user and, unless `SEED_DEMO=false`, fills the database with demo data (5 members, 6 categories, 12 auctions with bid history, 6 reverse auctions). Restarting the stack refreshes the dates of expired demo auctions so the demo never looks dead. The demo content is seeded in French by default; set `SEED_LOCALE=en` for English (use `docker compose down -v` first if the database already exists).
+
+## Languages
+
+The UI is available in French and English (i18next). It picks the language from the browser, remembers the choice in `localStorage` and can be switched with the FR | EN toggle in the navbar. Translations live in `src/i18n/locales/{fr,en}.json`; to add a language, create a JSON file, register it in `src/i18n/index.js` and add it to `languages`. Auction/category texts come from the database, so they stay in the language they were created in (see `SEED_LOCALE`), and validation messages returned by the API are still French.
 
 ## How it is wired
 

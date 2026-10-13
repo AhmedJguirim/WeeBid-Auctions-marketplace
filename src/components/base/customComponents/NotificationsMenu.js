@@ -2,23 +2,25 @@ import * as React from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Link } from "react-router-dom";
 import { Bell, X } from "lucide-react";
+import { useTranslation } from "react-i18next";
 import Socket from "./Socket";
 import { newNotifications } from "../../../redux/actions";
 import { navRoutes } from "../../../config/routes";
 import useClickOutside from "../../ui/useClickOutside";
 
-// "il y a 3 h" style label
-function timeAgo(date) {
+// "3 h ago" style label
+function timeAgo(date, t) {
   const diff = Math.max(0, Date.now() - new Date(date).getTime());
   const m = Math.floor(diff / 60000);
-  if (m < 1) return "à l'instant";
-  if (m < 60) return `il y a ${m} min`;
+  if (m < 1) return t("timeAgo.now");
+  if (m < 60) return t("timeAgo.minutes", { count: m });
   const h = Math.floor(m / 60);
-  if (h < 24) return `il y a ${h} h`;
-  return `il y a ${Math.floor(h / 24)} j`;
+  if (h < 24) return t("timeAgo.hours", { count: h });
+  return t("timeAgo.days", { count: Math.floor(h / 24) });
 }
 
 export default function NotificationsMenu() {
+  const { t } = useTranslation();
   const notifications = useSelector((state) => state.notifications);
   const dispatch = useDispatch();
   const ref = React.useRef(null);
@@ -48,7 +50,7 @@ export default function NotificationsMenu() {
     <div ref={ref} className="relative">
       <button
         onClick={() => setOpen((o) => !o)}
-        aria-label="Notifications"
+        aria-label={t("notifications.title")}
         className="relative flex h-10 w-10 items-center justify-center rounded-xl text-slate-600 transition hover:bg-slate-100"
       >
         <Bell size={20} />
@@ -58,19 +60,19 @@ export default function NotificationsMenu() {
       {open && (
         <div className="absolute right-0 z-50 mt-2 w-80 overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-lift">
           <div className="flex items-center justify-between border-b border-slate-100 px-4 py-3">
-            <h3 className="text-sm font-bold text-slate-900">Notifications</h3>
+            <h3 className="text-sm font-bold text-slate-900">{t("notifications.title")}</h3>
             <Link to={navRoutes.NOTIFICATIONS} onClick={() => setOpen(false)} className="text-xs font-semibold text-brand-600 hover:underline">
-              Tout voir
+              {t("common.seeAll")}
             </Link>
           </div>
           <ul className="max-h-80 divide-y divide-slate-100 overflow-auto">
-            {list.length === 0 && <li className="px-4 py-8 text-center text-sm text-slate-500">Vous n'avez pas de notifications.</li>}
+            {list.length === 0 && <li className="px-4 py-8 text-center text-sm text-slate-500">{t("notifications.empty")}</li>}
             {list.map((n, i) => (
               <li key={n.id || i}>
                 <a href={n.route} className="block px-4 py-3 transition hover:bg-slate-50">
                   <p className="text-sm font-semibold text-slate-900">{n.title}</p>
                   <p className="mt-0.5 line-clamp-2 text-xs text-slate-500">{n.description}</p>
-                  <p className="mt-1 text-[11px] text-slate-400">{timeAgo(n.date)}</p>
+                  <p className="mt-1 text-[11px] text-slate-400">{timeAgo(n.date, t)}</p>
                 </a>
               </li>
             ))}
@@ -82,7 +84,7 @@ export default function NotificationsMenu() {
         <div className="fixed bottom-5 right-5 z-[60] flex max-w-xs animate-fade-up items-start gap-3 rounded-2xl bg-slate-900 px-4 py-3 text-sm text-white shadow-lift">
           <Bell size={16} className="mt-0.5 shrink-0 text-brand-300" />
           <span>{toast}</span>
-          <button onClick={() => setToast("")} aria-label="Fermer"><X size={16} className="text-slate-400" /></button>
+          <button onClick={() => setToast("")} aria-label={t("common.close")}><X size={16} className="text-slate-400" /></button>
         </div>
       )}
     </div>

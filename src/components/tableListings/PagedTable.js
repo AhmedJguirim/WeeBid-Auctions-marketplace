@@ -1,5 +1,7 @@
 import React from "react";
+import { useTranslation } from "react-i18next";
 import Api from "../../AxiosInstance";
+import { formatDateTime } from "../../i18n";
 import PageHeader from "../ui/PageHeader";
 import EmptyState from "../ui/EmptyState";
 
@@ -8,6 +10,7 @@ import EmptyState from "../ui/EmptyState";
  * `columns`: [{ header, cell(row), align }]; `rows` mapping is done by the caller through `map`.
  */
 const PagedTable = ({ title, subtitle, endpoint, params, enabled = true, columns, emptyText }) => {
+  const { t } = useTranslation();
   const [rows, setRows] = React.useState([]);
   const [page, setPage] = React.useState(1);
   const [hasMore, setHasMore] = React.useState(false);
@@ -33,7 +36,7 @@ const PagedTable = ({ title, subtitle, endpoint, params, enabled = true, columns
       <PageHeader title={title} subtitle={subtitle} />
       <div className="container-page py-8">
         {rows.length === 0 && !loading ? (
-          <EmptyState title="Rien pour le moment" text={emptyText} />
+          <EmptyState title={t("empty.nothingYet")} text={emptyText} />
         ) : (
           <div className="card overflow-hidden">
             <div className="overflow-x-auto">
@@ -58,7 +61,7 @@ const PagedTable = ({ title, subtitle, endpoint, params, enabled = true, columns
             </div>
             {hasMore && (
               <button onClick={() => setPage(page + 1)} className="w-full border-t border-slate-100 py-3.5 text-sm font-semibold text-brand-600 transition hover:bg-brand-50">
-                Afficher plus
+                {t("common.showMore")}
               </button>
             )}
           </div>
@@ -68,6 +71,6 @@ const PagedTable = ({ title, subtitle, endpoint, params, enabled = true, columns
   );
 };
 
-export const dateLabel = (d) => new Date(d).toLocaleString("fr-FR", { day: "2-digit", month: "short", year: "numeric", hour: "2-digit", minute: "2-digit" });
+export const dateLabel = (d) => formatDateTime(d, { day: "2-digit", month: "short", year: "numeric", hour: "2-digit", minute: "2-digit" });
 
 export default PagedTable;
