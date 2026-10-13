@@ -1,136 +1,90 @@
 import * as React from "react";
-import Menu from "@mui/material/Menu";
-import MenuItem from "@mui/material/MenuItem";
-import NotificationsNoneTwoToneIcon from "@mui/icons-material/NotificationsNoneTwoTone";
-import { Card, CardContent, IconButton, Slide, Snackbar, Typography } from "@mui/material";
 import { useDispatch, useSelector } from "react-redux";
+import { Link } from "react-router-dom";
+import { Bell, X } from "lucide-react";
 import Socket from "./Socket";
 import { newNotifications } from "../../../redux/actions";
-import { NavLink, useNavigate } from "react-router-dom";
-import TopNavLink from "./TopNavLink";
 import { navRoutes } from "../../../config/routes";
+import useClickOutside from "../../ui/useClickOutside";
 
-
-
-function TransitionUp(props) {
-  return <Slide {...props} direction="up" />;
+// "il y a 3 h" style label
+function timeAgo(date) {
+  const diff = Math.max(0, Date.now() - new Date(date).getTime());
+  const m = Math.floor(diff / 60000);
+  if (m < 1) return "à l'instant";
+  if (m < 60) return `il y a ${m} min`;
+  const h = Math.floor(m / 60);
+  if (h < 24) return `il y a ${h} h`;
+  return `il y a ${Math.floor(h / 24)} j`;
 }
+
 export default function NotificationsMenu() {
   const notifications = useSelector((state) => state.notifications);
-  const navigate = useNavigate();
   const dispatch = useDispatch();
-  const [openSnack, setOpenSnack] = React.useState(false);
-  const [snackText, setSnackText] = React.useState("");
-  const transition = TransitionUp;
-  Socket.on("connect", () => {
-    //not connected ..  
-    console.log("i'm connected ....")
-    Socket.on("NOTIFICATION", (notification) => {
-      console.log("notified");
-      setSnackText(notification.title)
-      setOpenSnack(true)
+  const ref = React.useRef(null);
+  const [open, setOpen] = React.useState(false);
+  const [toast, setToast] = React.useState("");
+  useClickOutside(ref, () => setOpen(false));
+
+  // live notifications pushed by the socket server
+  React.useEffect(() => {
+    const onNotification = (notification) => {
+      setToast(notification.title);
       dispatch(newNotifications(notification));
-    });
-  });
+    };
+    Socket.on("NOTIFICATION", onNotification);
+    return () => Socket.off("NOTIFICATION", onNotification);
+  }, [dispatch]);
 
+  React.useEffect(() => {
+    if (!toast) return undefined;
+    const t = setTimeout(() => setToast(""), 4500);
+    return () => clearTimeout(t);
+  }, [toast]);
 
-
-
-  const handleCloseSnack = () => {
-    setOpenSnack(false);
-  };
-
-
-
-  const [anchorEl, setAnchorEl] = React.useState(null);
-  const open = Boolean(anchorEl);
-  const handleClick = (event) => {
-    setAnchorEl(event.currentTarget);
-  };
-  const handleClose = () => {
-    setAnchorEl(null);
-  };
-  
-  function msToTime(duration) {
-    var milliseconds = Math.floor((duration % 1000) / 100),
-      seconds = Math.floor((duration / 1000) % 60),
-      minutes = Math.floor((duration / (1000 * 60)) % 60),
-      hours = Math.floor((duration / (1000 * 60 * 60)) % 24),
-      days = Math.floor(duration / (1000 * 60 * 60) / 24);
-    days = days < 1 ? "" : days + "j, ";
-    hours = (hours-2) < 1 ? "" : (hours-2) + "h, ";
-    minutes = minutes < 1 ? "" : minutes + "m ";
-    if(days<1 && hours <1 &&minutes < 1){
-      return "maintenant"
-    }
-
-    return days + hours + minutes;
-  }
+  const list = Object.keys(notifications || {}).map((k) => notifications[k]);
 
   return (
-    <div>
-{/* TODO MAKE A PROMISE THAT WAITS 4 SECONDS THEN REMOVES THE SNACK AND MAKE IT REDIRECT USER ON CLICK */}
-        <Snackbar
-        open={openSnack}
-        onClick={handleCloseSnack}
-        message={snackText}
-        key={transition ? transition.name : ''}
-      />
-      <IconButton
-        size="large"
-        edge="end"
-        sx={{ ml: "0.5%" }}
-        id="basic-button"
-        aria-controls={open ? "basic-menu" : undefined}
-        aria-haspopup="true"
-        aria-expanded={open ? "true" : undefined}
-        onClick={handleClick}
+    <div ref={ref} className="relative">
+      <button
+        onClick={() => setOpen((o) => !o)}
+        aria-label="Notifications"
+        className="relative flex h-10 w-10 items-center justify-center rounded-xl text-slate-600 transition hover:bg-slate-100"
       >
-        <NotificationsNoneTwoToneIcon />
-      </IconButton>
-      <Menu
-        id="basic-menu"
-        anchorEl={anchorEl}
-        open={open}
-        onClose={handleClose}
-        MenuListProps={{
-          "aria-labelledby": "basic-button",
-        }}
-      >
-        
-        {Object.keys(notifications).map((key, index) => (
-          <MenuItem value={notifications[key].id} key={index} >
-            <Card variant="outlined" sx={{width:"100%"}} onClick={()=>document.location.href=`${notifications[key].route}`}>
-              <CardContent>
-                <Typography variant="h6" color="secondary">
-                  {notifications[key].title}
-                </Typography>
-                <Typography>{notifications[key].description}</Typography>
-                <Typography sx={{fontSize:12, mt:"3%"}}>
-                  {msToTime(
-                    Math.abs(new Date() - new Date(notifications[key].date))
-                  )}
-                </Typography>
-              </CardContent>
-            </Card>
-          </MenuItem>
-        ))}
-        {!notifications[0] ? (<Card variant="outlined">
-              <CardContent>
-                <Typography variant="h6" color="secondary">
-                  vous n'avez pas de notifications a afficher
-                </Typography>
-              </CardContent>
-              {/* DO THIS: notifications listing */}
-            </Card>):(
-              <Card variant="outlined">
-              <CardContent sx={{textAlign:"center"}}>
-              <TopNavLink path={navRoutes.NOTIFICATIONS} text="afficher tous"/>
-              </CardContent>
-            </Card>
-              
-            )}
-      </Menu>
+        <Bell size={20} />
+        {list.length > 0 && <span className="absolute right-2 top-2 h-2.5 w-2.5 rounded-full bg-rose-500 ring-2 ring-white" />}
+      </button>
+
+      {open && (
+        <div className="absolute right-0 z-50 mt-2 w-80 overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-lift">
+          <div className="flex items-center justify-between border-b border-slate-100 px-4 py-3">
+            <h3 className="text-sm font-bold text-slate-900">Notifications</h3>
+            <Link to={navRoutes.NOTIFICATIONS} onClick={() => setOpen(false)} className="text-xs font-semibold text-brand-600 hover:underline">
+              Tout voir
+            </Link>
+          </div>
+          <ul className="max-h-80 divide-y divide-slate-100 overflow-auto">
+            {list.length === 0 && <li className="px-4 py-8 text-center text-sm text-slate-500">Vous n'avez pas de notifications.</li>}
+            {list.map((n, i) => (
+              <li key={n.id || i}>
+                <a href={n.route} className="block px-4 py-3 transition hover:bg-slate-50">
+                  <p className="text-sm font-semibold text-slate-900">{n.title}</p>
+                  <p className="mt-0.5 line-clamp-2 text-xs text-slate-500">{n.description}</p>
+                  <p className="mt-1 text-[11px] text-slate-400">{timeAgo(n.date)}</p>
+                </a>
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
+
+      {toast && (
+        <div className="fixed bottom-5 right-5 z-[60] flex max-w-xs animate-fade-up items-start gap-3 rounded-2xl bg-slate-900 px-4 py-3 text-sm text-white shadow-lift">
+          <Bell size={16} className="mt-0.5 shrink-0 text-brand-300" />
+          <span>{toast}</span>
+          <button onClick={() => setToast("")} aria-label="Fermer"><X size={16} className="text-slate-400" /></button>
+        </div>
+      )}
     </div>
   );
 }

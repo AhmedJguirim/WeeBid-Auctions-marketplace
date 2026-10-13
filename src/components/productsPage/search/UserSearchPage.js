@@ -1,99 +1,48 @@
-import { BACKEND_URL } from "../../../config/env";
-import { Avatar, Card, CardContent, Checkbox, Grid, Pagination, Typography } from '@mui/material';
-import React from 'react'
-import ProductsListing from '../../generalComponents/ProductsListing';
-import axios from 'axios';
-import { apiRoutes, navRoutes } from '../../../config/routes';
-import { useParams } from 'react-router-dom';
-import { Box } from '@mui/system';
-import { CategoryLink } from '../../base/customComponents/TopNavLink';
+import React from "react";
+import axios from "axios";
+import { Link, useParams } from "react-router-dom";
+import { apiRoutes, navRoutes } from "../../../config/routes";
+import PageHeader from "../../ui/PageHeader";
+import Pagination from "../../ui/Pagination";
+import Avatar from "../../ui/Avatar";
+import EmptyState from "../../ui/EmptyState";
 
 const UserSearchPage = () => {
-  const [users, setUsers] = React.useState({});
+  const { search } = useParams();
+  const [users, setUsers] = React.useState([]);
   const [page, setPage] = React.useState(1);
-  const [pagesNumber, setPageNumber] = React.useState(1);
+  const [pages, setPages] = React.useState(1);
 
-  const styles = {
-    usersGrid: { 
-      backgroundColor: "primary.main" , 
-      padding: 3,
-      mt: 2
-    },
-  }
-
-  let { search } = useParams();
-  function getPagesNumber() {
-      axios
-      .get(`${apiRoutes.API}/users/pages`, {
-        params: {
-            "displayName": search,
-          "endDate[after]": new Date(),
-        },
-      })
-      .then((res) => {
-        if (res["data"]["hydra:member"].length / 12 < 1) {
-          setPageNumber(1);
-        } else {
-          setPageNumber(Math.ceil(res["data"]["hydra:member"].length / 12));
-        }
-      });}
-  
-  function getUsers() {
-
-    axios.get(`${apiRoutes.API}/users`, {
-      params: {
-        "displayName": search,
-        page: page,
-        "endDate[after]": new Date(),
-      }
-    })
-    .then(function (response) {
-      setUsers(response["data"]["hydra:member"]);
-    }).catch(error=>console.log(error))
-
-  }
-
-  const handlePagination = (event, value) => {
-    setPage(value);
-  };
-
-
-  React.useEffect(()=>{
-    getUsers()
-    getPagesNumber();
-  },[])
+  React.useEffect(() => setPage(1), [search]);
   React.useEffect(() => {
-    getUsers();
-  }, [page]);
+    axios
+      .get(`${apiRoutes.API}/users`, { params: { displayName: search, page } })
+      .then((response) => {
+        setUsers(response["data"]["hydra:member"]);
+        const last = response["data"]["hydra:view"] && response["data"]["hydra:view"]["hydra:last"];
+        const match = last && last.match(/page=(\d+)/);
+        setPages(match ? parseInt(match[1], 10) : 1);
+      })
+      .catch((error) => console.log(error));
+  }, [search, page]);
 
-      return (
-        <Grid container>
-          <Grid container>
-        <Grid item xs={7}>
-        <Typography variant='h3'>resultat de recherche "{search}"</Typography>
-        </Grid>
-        
-      </Grid>
-      <Grid container spacing={3} sx={styles.usersGrid}>
-      {Object.keys(users).map((key, index) => (<Grid item xs={2.4} sx={{ textAlign: "left"}}>
-        <Card >
-              <CardContent>
-                <Box >
-              <Avatar sx={{ width: "100%", height: "100%" }} alt="avatar" src={`${BACKEND_URL}/user/${users[key].image}`}/>
-              </Box>
-               <Box sx={{ textAlign: "center"}}><CategoryLink to={`${navRoutes.CONSULTUSER}/${users[key].id}`}>{users[key].displayName}</CategoryLink>{" "}</Box>
-                
-              </CardContent></Card>
-        </Grid>))}
-        </Grid>
+  return (
+    <>
+      <PageHeader title={`Membres : « ${search} »`} subtitle="Résultats de recherche parmi les membres." />
+      <div className="container-page py-8">
+        <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-5">
+          {users.map((u) => (
+            <Link key={u.id} to={`${navRoutes.CONSULTUSER}/${u.id}`} className="card flex flex-col items-center p-6 text-center transition hover:-translate-y-1 hover:shadow-lift">
+              <Avatar name={u.displayName} image={u.image} size={72} />
+              <p className="mt-3 truncate font-bold text-slate-900">{u.displayName}</p>
+            </Link>
+          ))}
+          {users.length === 0 && <EmptyState title="Aucun membre trouvé" text="Essayez avec un autre nom." />}
+        </div>
+        <Pagination page={page} count={pages} onChange={setPage} />
+      </div>
+    </>
+  );
+};
 
-            <Pagination
-        count={pagesNumber}
-        onChange={handlePagination}
-        color="secondary"
-      />
-        </Grid>
-      )
-}
-
-export default UserSearchPage
+export default UserSearchPage;

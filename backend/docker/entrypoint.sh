@@ -33,6 +33,10 @@ if [ -n "$ADMIN_EMAIL" ] && [ -n "$ADMIN_PASSWORD" ]; then
     php bin/console app:create-admin "$ADMIN_EMAIL" "$ADMIN_PASSWORD"
 fi
 
+if [ "$SEED_DEMO" = "true" ]; then
+    php bin/console app:seed-demo
+fi
+
 chown -R www-data:www-data var public/media public/user public/category config/jwt
 chmod 640 config/jwt/*.pem
 

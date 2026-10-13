@@ -1,210 +1,121 @@
 import * as React from "react";
-import MenuIcon from "@mui/icons-material/Menu";
-import logoPath from "../../../media/images/dotItLogo.png";
-import TopNavLink from "../customComponents/TopNavLink";
-import { TopNavGrid, TopAppBar } from "../customComponents/general";
-import {
-  Box,
-  Select,
-  MenuItem,
-  IconButton,
-  FormControl,
-  InputLabel,
-  Grid,
-} from "@mui/material";
-import MyDrawer from "./Drawer";
-import { useDispatch, useSelector } from "react-redux";
-import { Link } from "react-router-dom";
+import { useSelector } from "react-redux";
+import { Link, NavLink, useLocation } from "react-router-dom";
+import { ChevronDown, Eye, Gavel, Inbox, LogOut, Menu, Package, PlusCircle, Send, User as UserIcon, X } from "lucide-react";
 import { navRoutes } from "../../../config/routes";
+import Logo from "../../ui/Logo";
+import Avatar from "../../ui/Avatar";
+import useClickOutside from "../../ui/useClickOutside";
 import SearchBar from "./SearchBar";
-
-import NotificationsNoneTwoToneIcon from '@mui/icons-material/NotificationsNoneTwoTone';
 import NotificationsMenu from "../customComponents/NotificationsMenu";
-import Socket from "../customComponents/Socket";
-import { newNotifications } from "../../../redux/actions";
 
+const mainLinks = [
+  { text: "Enchères", path: navRoutes.ENCHERES },
+  { text: "Enchères inversées", path: navRoutes.ENCHERESINVERSES },
+  { text: "Catégories", path: navRoutes.CATEGORIES },
+];
 
+const navClass = ({ isActive }) =>
+  `rounded-lg px-3 py-2 text-sm font-semibold transition ${isActive ? "bg-brand-50 text-brand-700" : "text-slate-600 hover:bg-slate-100 hover:text-slate-900"}`;
 
+const UserMenu = ({ user }) => {
+  const ref = React.useRef(null);
+  const [open, setOpen] = React.useState(false);
+  useClickOutside(ref, () => setOpen(false));
+  const items = [
+    { icon: UserIcon, text: "Mon profil", path: navRoutes.USERPROFILE },
+    { icon: Eye, text: "Ma liste de surveillance", path: navRoutes.WATCHLIST },
+    { icon: Gavel, text: "Mes enchères", path: `${navRoutes.ENCHERES}${navRoutes.PERUSER}/${user.id}` },
+    { icon: Package, text: "Mes enchères inversées", path: `${navRoutes.ENCHERESINVERSES}${navRoutes.PERUSER}/${user.id}` },
+    { icon: Inbox, text: "Demandes de devis reçues", path: navRoutes.DEMANDESLISTING },
+    { icon: Send, text: "Propositions reçues", path: navRoutes.PROPOSITIONSLISTING },
+  ];
+  return (
+    <div ref={ref} className="relative">
+      <button onClick={() => setOpen((o) => !o)} className="flex items-center gap-2 rounded-xl py-1 pl-1 pr-2 transition hover:bg-slate-100">
+        <Avatar name={user.displayName || "?"} size={32} />
+        <span className="hidden text-sm font-semibold text-slate-700 xl:block">{user.displayName}</span>
+        <ChevronDown size={16} className="text-slate-400" />
+      </button>
+      {open && (
+        <div className="absolute right-0 z-50 mt-2 w-64 overflow-hidden rounded-2xl border border-slate-200 bg-white p-1.5 shadow-lift">
+          <div className="px-3 py-2">
+            <p className="text-xs text-slate-400">Connecté en tant que</p>
+            <p className="truncate text-sm font-bold text-slate-900">{user.displayName}</p>
+          </div>
+          <div className="my-1 h-px bg-slate-100" />
+          {items.map(({ icon: Icon, text, path }) => (
+            <Link key={path} to={path} onClick={() => setOpen(false)} className="flex items-center gap-3 rounded-lg px-3 py-2 text-sm text-slate-700 hover:bg-slate-50">
+              <Icon size={16} className="text-slate-400" /> {text}
+            </Link>
+          ))}
+          <div className="my-1 h-px bg-slate-100" />
+          <Link to={navRoutes.LOGOUT} className="flex items-center gap-3 rounded-lg px-3 py-2 text-sm text-rose-600 hover:bg-rose-50">
+            <LogOut size={16} /> Se déconnecter
+          </Link>
+        </div>
+      )}
+    </div>
+  );
+};
 
 const TopNavBar = () => {
-
-  // Socket.on("connect",()=>{
-  //   console.log(`you're connected to socket.io`)})
-  //#region type of search (default "enchere" to avoid unnecessary headache))
-  const dispatch = useDispatch();
-  const [openSnack, setOpenSnack] = React.useState(false);
-  const [snackText, setSnackText] = React.useState("");
-
-  // Socket.on("connect", () => {
-  //   //not connected ..  
-  //   console.log("i'm connected ....")
-  //   Socket.on("NOTIFICATION", (notification) => {
-  //     console.log("notified");
-  //     alert("it worked")
-  //     dispatch(newNotifications(notification));
-  //   });
-  // });
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  const [type, setType] = React.useState("/encheres");
-  const typesOptions  = {
-    0 : {
-      value:"/encheres",
-      text: "enchères"
-    },
-    1 : {
-      value:"/enchere_inverses",
-      text: "enchères inversées"
-    },
-    2 : {
-      value:"/users",
-      text: "utilisateurs"
-    },
-  }
-  const handleType = (event) => {
-    setType(event.target.value);
-  };  
-
-  //#endregion
-  const styles = {
-    topBox: {
-      height: 70,
-    },
-    secondGrid: {
-      justifyContent: "flex-end",
-      paddingRight: 2,
-    },
-  };
   const user = useSelector((state) => state.user);
-  
-  let variableLinks = {};
-  if (user.id === undefined) {
-    variableLinks = {
-      0: {
-        text: "connection",
-        path: navRoutes.LOGIN,
-      },
-      1: {
-        text: "inscription",
-        path: navRoutes.REGISTER,
-      }
-    };
+  const loggedIn = user.id !== undefined;
+  const [mobileOpen, setMobileOpen] = React.useState(false);
+  const location = useLocation();
 
-  }
-  else {
-    
-    variableLinks = {
-      0: {
-        text: "se déconnecter",
-        path: navRoutes.LOGOUT,
-      },
-      1: {
-        text: "profile",
-        path: navRoutes.USERPROFILE,
-      },
-    };
-  }
-  const constLinks = {
-    0: {
-      text: "catégories",
-      path: navRoutes.CATEGORIES,
-    },
-    1: {
-      text: "enchères",
-      path: navRoutes.ENCHERES,
-    },
-  };
-
-  const [open, setOpen] = React.useState(false);
-
-  const handleDrawerOpen = () => {
-    setOpen(true);
-  };
-
-  
-  //#region search bar
-  
-
-  //#endregion
+  // close the mobile menu on navigation
+  React.useEffect(() => setMobileOpen(false), [location.pathname]);
 
   return (
-    <Box sx={styles.topBox}>
-      
-      <TopAppBar position="static" sx={{backgroundColor:"primary.main"}} >
-        <Grid container >
-          <TopNavGrid md={8} sm={11} item>
-            <IconButton
-              size="large"
-              edge="start"
-              aria-label="open drawer"
-              onClick={handleDrawerOpen}
-              sx={{ mr: 2, ...(open && { display: "none" }) }}
-            >
-              <MenuIcon />
-            </IconButton>
-            <Link to="/">
-              <img src={logoPath} alt="logo" className="logo" />
-            </Link>
-            {Object.keys(constLinks).map((key, index) => (
-              <TopNavLink
-                key={index}
-                text={constLinks[key].text}
-                path={constLinks[key].path}
-              ></TopNavLink>
-            ))}
-            <Box sx={{ minWidth: 120 }}>
-              <FormControl  fullWidth>
-                <InputLabel sx={{mt:0 ,color: "secondary.main"}}>type</InputLabel>
-                <Select sx={{mt:0, color:"secondary.main"}} value={type} onChange={handleType}>
-                {Object.keys(typesOptions).map((key, index) => (
-                    <MenuItem value={typesOptions[key].value} key={index}>{typesOptions[key].text}</MenuItem>))}
-                </Select>
-              </FormControl>
-            </Box>
-              {/* my searchBar */}
-            <Box>
-            {/* <TextField
-              id="outlined-basic"
-              variant="outlined"
-              fullWidth
-              label="Search"
-            /> */}
-            <SearchBar type={type} />
+    <header className="sticky top-0 z-40 border-b border-slate-200/80 bg-white/85 backdrop-blur-lg">
+      <div className="container-page flex h-16 items-center gap-3">
+        <button className="-ml-2 flex h-10 w-10 items-center justify-center rounded-xl text-slate-600 hover:bg-slate-100 lg:hidden" onClick={() => setMobileOpen((o) => !o)} aria-label="Menu">
+          {mobileOpen ? <X size={22} /> : <Menu size={22} />}
+        </button>
+        <Logo />
 
-            </Box>
-          </TopNavGrid>
-          <TopNavGrid md={4} sm={1} item sx={styles.secondGrid}>
-            {Object.keys(variableLinks).map((key, index) => (
-              <TopNavLink
-                key={index}
-                text={variableLinks[key].text}
-                path={variableLinks[key].path}
-              ></TopNavLink>
+        <nav className="ml-4 hidden items-center gap-1 lg:flex">
+          {mainLinks.map((l) => (
+            <NavLink key={l.path} to={l.path} className={navClass}>{l.text}</NavLink>
+          ))}
+        </nav>
+
+        <div className="mx-auto hidden max-w-md flex-1 md:block"><SearchBar /></div>
+
+        <div className="ml-auto flex items-center gap-1.5 md:ml-0">
+          {loggedIn ? (
+            <>
+              <Link to={navRoutes.MAKE_ARTICLE} className="btn-primary hidden !py-2 sm:inline-flex">
+                <PlusCircle size={16} /> Vendre
+              </Link>
+              <NotificationsMenu />
+              <UserMenu user={user} />
+            </>
+          ) : (
+            <>
+              <Link to={navRoutes.LOGIN} className="btn-ghost !py-2">Connexion</Link>
+              <Link to={navRoutes.REGISTER} className="btn-primary !py-2">Inscription</Link>
+            </>
+          )}
+        </div>
+      </div>
+
+      {mobileOpen && (
+        <div className="border-t border-slate-100 bg-white px-4 pb-5 pt-3 lg:hidden">
+          <SearchBar className="md:hidden" onNavigate={() => setMobileOpen(false)} />
+          <nav className="mt-3 flex flex-col gap-1">
+            {mainLinks.map((l) => (
+              <NavLink key={l.path} to={l.path} className={navClass}>{l.text}</NavLink>
             ))}
-           <NotificationsMenu />
-            
-            {/* <IconButton
-              size="large"
-              edge="end"
-              aria-label="open drawer"
-              sx={{ ml: "0.5%" }}
-            >
-              <NotificationsNoneTwoToneIcon />
-            </IconButton> */}
-          </TopNavGrid>
-        </Grid>
-      </TopAppBar>
-      <MyDrawer open={open} setOpen={setOpen} />
-    </Box>
+            {loggedIn && (
+              <NavLink to={navRoutes.MAKE_ARTICLE} className={navClass}>Vendre un article</NavLink>
+            )}
+          </nav>
+        </div>
+      )}
+    </header>
   );
 };
 

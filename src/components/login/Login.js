@@ -1,146 +1,74 @@
 import React from "react";
-import {
-  Grid,
-  Box,
-  TextField,
-  Button,
-  Typography,
-  Dialog,
-  DialogTitle,
-  DialogContent,
-} from "@mui/material";
-import image from "../../media/images/dotItLogo.png";
-import { ButtonStyles, formBox } from "../base/customComponents/general";
 import axios from "axios";
-// import { useDispatch } from 'react-redux'
-import { apiRoutes } from "../../config/routes";
-// import { useNavigate } from "react-router-dom";
+import { Link, Navigate } from "react-router-dom";
+import { useSelector } from "react-redux";
+import { AlertCircle, Eye, EyeOff, Loader2 } from "lucide-react";
+import { apiRoutes, navRoutes } from "../../config/routes";
+import AuthLayout from "../ui/AuthLayout";
 
 const Login = () => {
+  const currentUser = useSelector((state) => state.user);
   const [error, setError] = React.useState("");
-  // const navigate = useNavigate()
-  //#region form data state
   const [email, setEmail] = React.useState("");
   const [password, setPassword] = React.useState("");
-  //#endregion
-
-  //#region state manipulation mathods
-  const handleEmail = (event) => {
-    setEmail(event.target.value);
-  };
-  const handlePassword = (event) => {
-    setPassword(event.target.value);
-  };
-  //#endregion
+  const [show, setShow] = React.useState(false);
+  const [loading, setLoading] = React.useState(false);
 
   const onSubmit = (event) => {
     event.preventDefault();
+    setError("");
+    setLoading(true);
     axios
-      .post(`${apiRoutes.API}/login_check`, {
-        username: email,
-        password: password,
-      })
-      .then(function (response) {
+      .post(`${apiRoutes.API}/login_check`, { username: email, password })
+      .then((response) => {
         localStorage.setItem("token", response.data.token);
         localStorage.setItem("refresh", response.data.refresh_token);
         document.location.href = "/";
       })
-      .catch(function (error) {
-        if (error.response) {
-          if (error.response.status === 401) {
-            setError("Utilisateur untrouvable");
-            handleClickOpen();
-          } else if (error.response.status >= 500) {
-            setError("Erreur Interne du Serveur");
-            handleClickOpen();
-          }
-        }
+      .catch((err) => {
+        setLoading(false);
+        if (err.response && err.response.status === 401) setError("Email ou mot de passe incorrect.");
+        else setError("Erreur interne du serveur, veuillez réessayer.");
       });
   };
-  const [open, setOpen] = React.useState(false);
-  const handleClickOpen = () => {
-    setOpen(true);
-  };
 
-  const handleClose = () => {
-    setOpen(false);
-  };
+  if (currentUser.id !== undefined) return <Navigate to="/" replace />;
 
   return (
-    <Grid
-      container
-      spacing={0}
-      sx={{ minHeight: "100%", backgroundColor: "primary.main" }}
+    <AuthLayout
+      title="Bon retour parmi nous"
+      subtitle="Connectez-vous pour suivre vos enchères et enchérir en direct."
+      footer={
+        <>
+          Pas encore de compte ?{" "}
+          <Link to={navRoutes.REGISTER} className="font-semibold text-brand-600 hover:underline">Créer un compte</Link>
+        </>
+      }
     >
-      <Dialog
-        open={open}
-        onClose={handleClose}
-        aria-labelledby="alert-dialog-title"
-        aria-describedby="alert-dialog-description"
-      >
-        <DialogTitle id="alert-dialog-title">{error}</DialogTitle>
-        <DialogContent>
-          {error === "Erreur Interne du Serveur" ? (
-            <Typography>veuillez réessayer ultérieurement</Typography>
-          ) : (
-            <Typography>
-              veuillez vérifier les coordonnées données et réessayer
-            </Typography>
-          )}
-          <Button
-            onClick={() => handleClose()}
-            sx={{ ...ButtonStyles, mt: "5%", float: "right" }}
-          >
-            Retourner
-          </Button>
-        </DialogContent>
-      </Dialog>
-      <Grid item xs={6} textAlign={"center"} marginTop={"5%"}>
-        <img src={image} className={"loginImage"} alt=""></img>
-        <Typography variant="h5" marginTop={"5%"}>
-          Dot-IT vous permet de trouver l'offre de vos rèves
-        </Typography>
-      </Grid>
-      <Grid item xs={6}>
-        <Box component="form" onSubmit={onSubmit} sx={formBox}>
-          <Grid
-            container
-            direction="column"
-            alignItems="center"
-            justifyContent="center"
-          >
-            <Typography variant="h2" marginBottom={"5%"} marginTop={"12%"}>
-              Se connecter
-            </Typography>
-            <Grid item xs={12}>
-              <TextField
-                required
-                id="email"
-                label="Adresse Email"
-                value={email}
-                onChange={handleEmail}
-              />
-            </Grid>
-            <Grid item xs={12} sx={{ mt: "3%" }}>
-              <TextField
-                required
-                id="password"
-                label="mot de passe"
-                type="password"
-                value={password}
-                onChange={handlePassword}
-              />
-            </Grid>
-            <Grid item xs={12} sx={{ mt: "3%" }}>
-              <Button type="submit" sx={{ ...ButtonStyles }}>
-                se connercter
-              </Button>
-            </Grid>
-            {/* <Button onClick={getUser} sx={ButtonStyles}>get infos</Button> */}
-          </Grid>
-        </Box>
-      </Grid>
-    </Grid>
+      <form onSubmit={onSubmit} className="space-y-5">
+        {error && (
+          <div role="alert" className="flex items-start gap-2 rounded-xl border border-rose-200 bg-rose-50 px-4 py-3 text-sm text-rose-700">
+            <AlertCircle size={18} className="mt-0.5 shrink-0" /> {error}
+          </div>
+        )}
+        <div>
+          <label htmlFor="email" className="mb-1.5 block text-sm font-semibold text-slate-700">Adresse e-mail</label>
+          <input id="email" type="email" required autoComplete="email" className="input" placeholder="vous@exemple.com" value={email} onChange={(e) => setEmail(e.target.value)} />
+        </div>
+        <div>
+          <label htmlFor="password" className="mb-1.5 block text-sm font-semibold text-slate-700">Mot de passe</label>
+          <div className="relative">
+            <input id="password" type={show ? "text" : "password"} required autoComplete="current-password" className="input pr-11" placeholder="••••••••" value={password} onChange={(e) => setPassword(e.target.value)} />
+            <button type="button" onClick={() => setShow((s) => !s)} aria-label="Afficher le mot de passe" className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600">
+              {show ? <EyeOff size={18} /> : <Eye size={18} />}
+            </button>
+          </div>
+        </div>
+        <button type="submit" disabled={loading} className="btn-primary w-full !py-3">
+          {loading && <Loader2 size={16} className="animate-spin" />} Se connecter
+        </button>
+      </form>
+    </AuthLayout>
   );
 };
 

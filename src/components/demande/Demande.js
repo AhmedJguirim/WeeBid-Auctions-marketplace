@@ -1,240 +1,116 @@
-import { BACKEND_URL } from "../../config/env";
 import React from "react";
-import TextField from "@mui/material/TextField";
-import Autocomplete from "@mui/material/Autocomplete";
-import CircularProgress from "@mui/material/CircularProgress";
-import { apiRoutes, navRoutes } from "../../config/routes";
 import axios from "axios";
-import { useNavigate, useParams } from "react-router-dom";
+import { Link, useNavigate, useParams } from "react-router-dom";
 import { useSelector } from "react-redux";
+import { Check, Search } from "lucide-react";
 import Api from "../../AxiosInstance";
-import {
-  Avatar,
-  Box,
-  Button,
-  Card,
-  CardContent,
-  Grid,
-  Typography,
-} from "@mui/material";
-import { ButtonStyles } from "../base/customComponents/general";
+import { apiRoutes, navRoutes } from "../../config/routes";
 import Socket from "../base/customComponents/Socket";
-import { CategoryLink, CustomLink } from "../base/customComponents/TopNavLink";
-
-let cancelToken;
+import Avatar from "../ui/Avatar";
+import PageHeader from "../ui/PageHeader";
 
 const Demande = () => {
-
   const navigate = useNavigate();
-
   const myUser = useSelector((state) => state.user);
-  //id of demande
-  let { id } = useParams();
+  const { id } = useParams();
 
-  //name and photo of transmitter
-  const [transmitter, setTransmitter] = React.useState({});
-  const [demande, setDemande] = React.useState({});
-
-
-
-  async function getDemande() {
-    try {
-      const response = await axios.get(`${apiRoutes.API}/demande_devis/${id}`);
-      console.log(response["data"]);
-      setDemande(response["data"]);
-      let path = BACKEND_URL + "/user/";
-      const myImg = path.concat(response["data"].transmitter.image);
-      console.log(response["data"])
-      setTransmitter({
-        id:response["data"].transmitter.id,
-        displayName: response["data"].transmitter.displayName,
-        avatar: myImg,
-      });
-    } catch (error) {
-      console.error(error);
-    }
-  }
-  const styles = {
-    mainContainer : { backgroundColor: "primary.main" , width: "90%", margin:"5% auto"},
-    submitButton: {...ButtonStyles,float:"right", mr:"5%", mt:"1%"}
-  }
-
-
-  //#region form data state
-  //l'enchere proposé
-  const [enchere, setEnchere] = React.useState("");
-  //#endregion
-
-  //#region search bar code
-  const [open, setOpen] = React.useState(false);
-  const [options, setOptions] = React.useState([]);
+  const [demande, setDemande] = React.useState(null);
   const [input, setInput] = React.useState("");
-  const [loading, setLoading] = React.useState(false);
-
-  const handleInput = async (event) => {
-    setOptions([]);
-    setInput(event.target.value);
-    setLoading(true);
-    //Check if there are any previous pending requests
-    if (cancelToken !== undefined) {
-      cancelToken.cancel("Operation canceled due to new request.");
-    }
-    //Save the cancel token for the current request
-    cancelToken = axios.CancelToken.source();
-    try {
-      const response = await axios.get(`${apiRoutes.API}/encheres/search`, {
-        params: {
-          page: "1",
-          "article.name": input,
-        },
-        cancelToken: cancelToken.token,
-      });
-      console.log("requested");
-      preparation(response["data"]["hydra:member"]);
-    } catch (error) {
-      console.log(error);
-    }
-  };
-
-  function preparation(data) {
-    let searchResult = [];
-    data.map((value, index) => {
-      searchResult.push({
-        id: value.id,
-        enchere: `api/encheres/${value.id}`,
-        name: value.article.name,
-      });
-    });
-    setOptions(searchResult);
-    setLoading(false);
-  }
-
-  //#endregion
-
-  const handleSubmit = () => {
-    Api.post(`${apiRoutes.API}/propositions`, {
-      enchere: enchere,
-      transmitter: `/api/users/${myUser.id}`,
-      transmittedTo: demande.transmitter["@id"],
-    })
-      .then((res) => {
-        console.log(`demande ${res["data"]["@id"]} transmitted`);
-        console.log(res["data"]);
-        //send notification
-        Socket.emit("PROPOSITION", res["data"]);
-        navigate('/');
-
-      })
-      .catch((err) => console.log(demande.transmitter["@id"]));
-  };
+  const [options, setOptions] = React.useState([]);
+  const [selected, setSelected] = React.useState(null);
+  const [error, setError] = React.useState("");
 
   React.useEffect(() => {
-    getDemande();
+    Api.get(`/demande_devis/${id}`).then((r) => setDemande(r.data)).catch(console.error);
   }, [id]);
+
+  // search among the auctions to attach to the proposal
+  React.useEffect(() => {
+    if (!input.trim() || (selected && selected.name === input)) {
+      setOptions([]);
+      return undefined;
+    }
+    const t = setTimeout(() => {
+      axios
+        .get(`${apiRoutes.API}/encheres/search`, { params: { page: "1", "article.name": input } })
+        .then((r) => setOptions(r.data["hydra:member"].map((v) => ({ id: v.id, iri: `/api/encheres/${v.id}`, name: v.article.name }))))
+        .catch(console.log);
+    }, 250);
+    return () => clearTimeout(t);
+  }, [input, selected]);
+
+  const submit = () => {
+    Api.post("/propositions", { enchere: selected.iri, transmitter: `/api/users/${myUser.id}`, transmittedTo: demande.transmitter["@id"] })
+      .then((res) => {
+        Socket.emit("PROPOSITION", res.data);
+        navigate("/");
+      })
+      .catch(() => setError("L'envoi a échoué, réessayez."));
+  };
+
+  if (!demande) return <div className="container-page py-10"><div className="h-64 animate-pulse rounded-3xl bg-slate-200" /></div>;
+  const sender = demande.transmitter;
+
   return (
-    <Grid container sx={styles.mainContainer}>
+    <>
+      <PageHeader title="Demande de devis" subtitle="Répondez en proposant l'une de vos enchères." />
+      <div className="container-page grid max-w-5xl gap-6 py-8 md:grid-cols-5">
+        <div className="card p-6 md:col-span-2">
+          <div className="flex items-center gap-4">
+            <Avatar name={sender.displayName} image={sender.image} size={64} />
+            <div>
+              <p className="text-xs text-slate-400">Demandeur</p>
+              <Link to={`${navRoutes.CONSULTUSER}/${sender.id}`} className="text-lg font-bold text-slate-900 hover:text-brand-700">{sender.displayName}</Link>
+            </div>
+          </div>
+          <dl className="mt-6 space-y-4 border-t border-slate-100 pt-5 text-sm">
+            <div>
+              <dt className="text-slate-400">Quantité souhaitée</dt>
+              <dd className="mt-0.5 text-lg font-bold text-slate-900">{demande.quantity}</dd>
+            </div>
+            <div>
+              <dt className="text-slate-400">Description</dt>
+              <dd className="mt-0.5 whitespace-pre-line leading-relaxed text-slate-700">{demande.descriptionArticle}</dd>
+            </div>
+          </dl>
+        </div>
 
-      {/* USER CARD */}
-      <Grid item xs={4}>
-        <Grid container>
-          <Grid item xs={12} sx={{ textAlign: "left" }}>
-            <Card sx={{ width: "80%", height: "100%" }}>
-              <CardContent>
-                <Box>
-                  <Avatar
-                    sx={{ width: "100%", height: "100%" }}
-                    alt="avatar"
-                    src={transmitter.avatar}
-                  />
-                </Box>
-                <Box sx={{ textAlign: "center" }}>
-                  <CustomLink to={`${navRoutes.CONSULTUSER}/${transmitter.id}`}>{transmitter.displayName}</CustomLink>
-                </Box>
-              </CardContent>
-            </Card>
-          </Grid>
-        </Grid>
-        </Grid>
-
-          {/* DEMANDE DATA SECTION */}
-          <Grid item xs={4}>
-            <Grid container sx={{mt:"30%"}}>
-              <Grid item xs={6}>
-                <Typography variant="h4" color={"secondary.main"}>quantité:</Typography>
-              </Grid>
-              <Grid item xs={6}>
-                <Typography variant="h5">{demande.quantity}</Typography>
-              </Grid>
-              <Grid item xs={6}>
-                <Typography variant="h4" color={"secondary.main"}>description:</Typography>
-              </Grid>
-              <Grid item xs={6} mt={0.5}>
-                <Typography>
-                  {demande.descriptionArticle}
-                </Typography>
-              </Grid>
-            </Grid>
-          </Grid>
-
-      
-      <Grid item xs={4}>
-        {/* TODO: add the option to reject and an "are you sure dialog" */}
-        <Box sx={{mt:"30%"}}>
-        <Typography>proposez un enchère pour le transmetteur</Typography>
-        {/* search */}
-        <Autocomplete
-          id="seachBar"
-          sx={{ width: "95%", mt:"1%" }}
-          filterOptions={(x) => x}
-          open={open}
-          onOpen={() => {
-            setOpen(true);
-          }}
-          onClose={() => {
-            setOpen(false);
-          }}
-          isOptionEqualToValue={(option, value) => true}
-          getOptionLabel={(option) => option.name}
-          renderOption={(props, option) => {
-            return (
-              <li {...props} key={option.id}>
-                {option.name}
-              </li>
-            );
-          }}
-          options={options}
-          loading={loading}
-          onChange={(event, option) => {
-            setEnchere(option.enchere);
-            console.log(option);
-            setEnchere(option.enchere);
-          }}
-          renderInput={(params) => (
-            <TextField
-              {...params}
-              label="cherchez"
+        <div className="card p-6 md:col-span-3">
+          <h2 className="text-lg font-bold text-slate-900">Proposer une enchère</h2>
+          <p className="mt-1 text-sm text-slate-500">Recherchez l'enchère qui répond à cette demande.</p>
+          <div className="relative mt-5">
+            <Search size={18} className="pointer-events-none absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400" />
+            <input
+              className="input !pl-10"
+              placeholder="Nom de l'article…"
               value={input}
-              onChange={handleInput}
-              InputProps={{
-                ...params.InputProps,
-                endAdornment: (
-                  <React.Fragment>
-                    {loading ? (
-                      <CircularProgress color="inherit" size={20} />
-                    ) : null}
-                    {params.InputProps.endAdornment}
-                  </React.Fragment>
-                ),
+              onChange={(e) => {
+                setInput(e.target.value);
+                setSelected(null);
               }}
             />
+            {options.length > 0 && (
+              <ul className="absolute left-0 right-0 top-full z-10 mt-2 max-h-60 overflow-auto rounded-xl border border-slate-200 bg-white p-1.5 shadow-lift">
+                {options.map((o) => (
+                  <li key={o.id}>
+                    <button className="w-full rounded-lg px-3 py-2 text-left text-sm hover:bg-brand-50 hover:text-brand-700" onClick={() => { setSelected(o); setInput(o.name); setOptions([]); }}>
+                      {o.name}
+                    </button>
+                  </li>
+                ))}
+              </ul>
+            )}
+          </div>
+          {selected && (
+            <p className="mt-3 inline-flex items-center gap-1.5 rounded-lg bg-emerald-50 px-3 py-1.5 text-sm font-medium text-emerald-700"><Check size={15} /> {selected.name}</p>
           )}
-        />
-        <Button onClick={handleSubmit} sx={styles.submitButton}>
-          Sousmettre
-        </Button>
-        </Box>
-      </Grid>
-    </Grid>
+          {error && <p className="mt-3 text-sm text-rose-600">{error}</p>}
+          <div className="mt-6 flex justify-end">
+            <button disabled={!selected} onClick={submit} className="btn-primary">Envoyer la proposition</button>
+          </div>
+        </div>
+      </div>
+    </>
   );
 };
 

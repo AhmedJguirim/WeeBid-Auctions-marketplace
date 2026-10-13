@@ -30,7 +30,7 @@ the initial idea was to create a digital marketplace where people compete over a
 
 ## technologies used:
 
-- ReactJS: the frontend of the application which provides interfaces to interact with the end User
+- ReactJS + Tailwind CSS: the frontend of the application which provides interfaces to interact with the end User
   
 - Symfony: the backend of the application. Used to create the APIs and the Admin dashboard
   
@@ -40,7 +40,7 @@ the initial idea was to create a digital marketplace where people compete over a
 
 ## Run it with Docker
 
-See [DOCKER.md](DOCKER.md): `docker compose up -d --build`.
+See [DOCKER.md](DOCKER.md): `docker compose up -d --build`, then open http://localhost:18080 (demo data included).
 
 ## how to use (manual setup)
 

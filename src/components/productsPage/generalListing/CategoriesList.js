@@ -1,75 +1,55 @@
-import { BACKEND_URL } from "../../../config/env";
-import { Card, CardContent, Divider, Grid, Typography } from "@mui/material";
 import React from "react";
 import axios from "axios";
-import { CategoryLink } from "../../base/customComponents/TopNavLink";
-import { apiRoutes, navRoutes } from "../../../config/routes";
 import { Link } from "react-router-dom";
+import { ArrowRight } from "lucide-react";
+import { BACKEND_URL } from "../../../config/env";
+import { apiRoutes, navRoutes } from "../../../config/routes";
+import PageHeader from "../../ui/PageHeader";
+
+export const CategoryTile = ({ category }) => (
+  <div className="group card overflow-hidden transition duration-300 hover:-translate-y-1 hover:shadow-lift">
+    <div className="relative aspect-[16/10] overflow-hidden bg-gradient-to-br from-brand-500 to-brand-800">
+      {category.image && (
+        <img
+          src={`${BACKEND_URL}/category/${category.image}`}
+          alt={category.name}
+          loading="lazy"
+          className="h-full w-full object-cover transition duration-500 group-hover:scale-105"
+        />
+      )}
+      <div className="absolute inset-0 bg-gradient-to-t from-slate-900/60 to-transparent" />
+      <h3 className="absolute bottom-3 left-4 text-xl font-extrabold text-white drop-shadow">{category.name}</h3>
+    </div>
+    <div className="grid grid-cols-2 divide-x divide-slate-100 text-sm font-semibold">
+      <Link to={`${navRoutes.ENCHERES}${navRoutes.PERCATEGORY}/${category.id}`} className="flex items-center justify-center gap-1.5 py-3 text-slate-600 transition hover:bg-brand-50 hover:text-brand-700">
+        Enchères <ArrowRight size={14} />
+      </Link>
+      <Link to={`${navRoutes.ENCHERESINVERSES}${navRoutes.PERCATEGORY}/${category.id}`} className="flex items-center justify-center gap-1.5 py-3 text-slate-600 transition hover:bg-brand-50 hover:text-brand-700">
+        Inversées <ArrowRight size={14} />
+      </Link>
+    </div>
+  </div>
+);
 
 const CategoriesList = () => {
-  //#region getting categories
-  //TODO: this code is duplicated from productslisting.js , declare it somewhere else then import it
-  const [categories, setCategories] = React.useState({});
-  const imageLinkPrefix = BACKEND_URL + "/category/"
-  async function getCategories() {
-    try {
-      const response = await axios.get(`${apiRoutes.API}/categories`);
+  const [categories, setCategories] = React.useState([]);
 
-      setCategories(response["data"]["hydra:member"]);
-    } catch (error) {
-      console.error(error);
-    }
-  }
   React.useEffect(() => {
-    getCategories();
+    axios
+      .get(`${apiRoutes.API}/categories`)
+      .then((response) => setCategories(response["data"]["hydra:member"]))
+      .catch((error) => console.error(error));
   }, []);
-  //#endregion
-
-  const styles = {
-    productsGrid: {
-      backgroundColor: "primary.main",
-      padding: 3,
-      mt: 2,
-    },
-  };
 
   return (
-    <Grid
-      container
-      sx={{ ...styles.productsGrid, textAlign: "center" }}
-      spacing={3}
-    >
-      <Grid item xs={12}><Typography variant="h2">Nos catégories</Typography></Grid>
-      
-      {Object.keys(categories).map((key, index) => (
-        <Grid item xs={4} key={index}>
-          {/* TODO:make a relation between document and category 1to1 */}
-          <Card variant="outlined" sx={{minWidth:"30%", minHeight:"50%"}}>
-            <CardContent>
-            {categories[key].image?(<img src={`${imageLinkPrefix}${categories[key].image}`} className="categoryImage" />):(<></>)}
-              <Typography variant="h4">{categories[key].name}</Typography>
-              <br />
-              <br />
-              <Grid container>
-                <Grid item xs={6}>
-                  <CategoryLink
-                    to={`${navRoutes.ENCHERES}${navRoutes.PERCATEGORY}/${categories[key].id}`}
-                  >
-                    enchères
-                  </CategoryLink>
-                </Grid>
-                <Grid item xs={6}>
-                  <CategoryLink to={`${navRoutes.ENCHERESINVERSES}${navRoutes.PERCATEGORY}/${categories[key].id}`}
-                  >
-                    enchères inversés
-                  </CategoryLink>
-                </Grid>
-              </Grid>
-            </CardContent>
-          </Card>
-        </Grid>
-      ))}
-    </Grid>
+    <>
+      <PageHeader title="Catégories" subtitle="Parcourez le catalogue par univers : électronique, mode, maison, sport…" />
+      <div className="container-page grid gap-5 py-8 sm:grid-cols-2 lg:grid-cols-3">
+        {categories.map((category) => (
+          <CategoryTile key={category.id} category={category} />
+        ))}
+      </div>
+    </>
   );
 };
 

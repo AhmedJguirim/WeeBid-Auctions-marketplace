@@ -12,9 +12,10 @@ docker compose up -d --build
 | The app | `http://<host>:18080/` (`WEB_PORT`) |
 | Admin dashboard (EasyAdmin) | `http://<host>:18000/admin` (`ADMIN_PORT`) |
 | Default admin login | `admin@weebid.local` / `admin1234` (`ADMIN_EMAIL` / `ADMIN_PASSWORD`) |
+| Demo members | `amine@weebid.local`, `sarra@weebid.local`, `yassine@weebid.local`, … / `demo1234` |
 
 First start takes a few minutes (image builds). The backend waits for the DB, generates the JWT keys,
-creates the DB schema from the entities (the repo ships no migrations) and creates the admin user.
+creates the DB schema from the entities (the repo ships no migrations), creates the admin user and, unless `SEED_DEMO=false`, fills the database with demo data (5 members, 6 categories, 12 auctions with bid history, 6 reverse auctions). Restarting the stack refreshes the dates of expired demo auctions so the demo never looks dead.
 
 ## How it is wired
 
@@ -51,6 +52,6 @@ docker compose exec backend php bin/console app:create-admin me@x.com secret
 
 ## Known limitations (inherited from the original project)
 
-- Category images and the default avatar (`defaultAvatar.jpg`) were never committed, so upload them through the admin or they show as broken images.
+- Real avatars are only supported for demo users; new members get a coloured initial.
 - The Symfony `/login` page (admin) clashes with the React `/login` route, hence the separate admin port.
-- Data is created through the UI/admin only; there are no fixtures.
+- Public member profiles still expose e-mail/phone through the API (the UI only shows them to the member themself).

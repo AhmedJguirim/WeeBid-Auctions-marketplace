@@ -32,6 +32,8 @@ services:
       CORS_ALLOW_ORIGIN: '^https?://.*$'
       ADMIN_EMAIL: ${ADMIN_EMAIL:-admin@weebid.local}
       ADMIN_PASSWORD: ${ADMIN_PASSWORD:-admin1234}
+      # demo users/categories/auctions (accounts amine@weebid.local ... / demo1234)
+      SEED_DEMO: ${SEED_DEMO:-true}
     volumes:
       - jwt-keys:/var/www/html/config/jwt
       - uploads-media:/var/www/html/public/media

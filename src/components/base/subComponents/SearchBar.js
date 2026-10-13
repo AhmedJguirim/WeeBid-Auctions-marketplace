@@ -1,173 +1,120 @@
 import * as React from "react";
-import TextField from "@mui/material/TextField";
-import Autocomplete from "@mui/material/Autocomplete";
-import CircularProgress from "@mui/material/CircularProgress";
-import { apiRoutes, navRoutes } from "../../../config/routes";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
-import { Box, Grid, IconButton } from "@mui/material";
-import SearchIcon from '@mui/icons-material/Search';
+import { Search, Loader2 } from "lucide-react";
+import { apiRoutes, navRoutes } from "../../../config/routes";
+import useClickOutside from "../../ui/useClickOutside";
 
+const types = [
+  { value: "/encheres", text: "Enchères" },
+  { value: "/enchere_inverses", text: "Inversées" },
+  { value: "/users", text: "Membres" },
+];
 
-let cancelToken;
-export default function SearchBar({ type }) {
-  const [open, setOpen] = React.useState(false);
-  const [options, setOptions] = React.useState([]);
+// route of the full results page for each type
+const searchRoute = {
+  "/encheres": navRoutes.ENCHERESEARCH,
+  "/enchere_inverses": navRoutes.ENCHEREINVERSESEARCH,
+  "/users": navRoutes.USERSEARCH,
+};
+
+export default function SearchBar({ className = "", onNavigate }) {
+  const navigate = useNavigate();
+  const ref = React.useRef(null);
+  const [type, setType] = React.useState("/encheres");
   const [input, setInput] = React.useState("");
+  const [options, setOptions] = React.useState([]);
   const [loading, setLoading] = React.useState(false);
-  
+  const [open, setOpen] = React.useState(false);
+  const cancelRef = React.useRef(null);
+  useClickOutside(ref, () => setOpen(false));
 
-  let navigate = useNavigate();
-  
-  const handleInput = async (event) => {
-    setOptions([]);
-    setInput(event.target.value);
-    setLoading(true);
-    //Check if there are any previous pending requests
-    if (cancelToken !== undefined) {
-      cancelToken.cancel("Operation canceled due to new request.");
+  const toOption = React.useCallback(
+    (value) => {
+      if (type === "/enchere_inverses") return { id: value.id, link: `${navRoutes.ENCHEREINVERSE}/${value.id}`, name: value.article.name };
+      if (type === "/encheres") return { id: value.id, link: `${navRoutes.ENCHERE}/${value.id}`, name: value.article.name };
+      return { id: value.id, link: `${navRoutes.CONSULTUSER}/${value.id}`, name: value.displayName };
+    },
+    [type]
+  );
+
+  // debounced search while typing
+  React.useEffect(() => {
+    if (!input.trim()) {
+      setOptions([]);
+      return undefined;
     }
-      //Save the cancel token for the current request
-      cancelToken = axios.CancelToken.source();
-
-      if(type==="/users"){
-        try {
-          const response = await axios.get(
-            `${apiRoutes.API}/users/search`, {
-              params: {
-                page: "1",
-                displayName: input,
-              },
-              cancelToken: cancelToken.token,
-            }
-          );
-          console.log("requested");
-          preparation(response["data"]["hydra:member"]);
-        } catch (error) {
-          console.log(error);
-        }
-      }
-      else{
-        try {
-          const response = await axios.get(
-            `${apiRoutes.API}${type}/search`, {
-              params: {
-                page: "1",
-                "article.name": input,
-              },
-              cancelToken: cancelToken.token,
-            }
-          );
-          console.log("requested");
-          preparation(response["data"]["hydra:member"]);
-        } catch (error) {
-          console.log(error);
-        }
-      };
-      }
-      
-
-
-  function preparation(data) {
-    let searchResult = [];
-
-    data.map((value, index) => {
-      if (type === "/enchere_inverses")
-        searchResult.push({
-          id: value.id,
-          link: `${navRoutes.ENCHEREINVERSE}/${value.id}`,
-          name: value.article.name,
+    const timer = setTimeout(async () => {
+      if (cancelRef.current) cancelRef.current.cancel();
+      cancelRef.current = axios.CancelToken.source();
+      setLoading(true);
+      try {
+        const response = await axios.get(`${apiRoutes.API}${type}/search`, {
+          params: type === "/users" ? { page: "1", displayName: input } : { page: "1", "article.name": input },
+          cancelToken: cancelRef.current.token,
         });
-      else if(type === "/encheres"){
-        searchResult.push({
-          id: value.id,
-          link: `${navRoutes.ENCHERE}/${value.id}`,
-          name: value.article.name,
-        });
-      }else{
-        searchResult.push({
-          id: value.id,
-          link: `${navRoutes.CONSULTUSER}/${value.id}`,
-          name: value.displayName,
-        });
+        setOptions(response["data"]["hydra:member"].map(toOption));
+        setLoading(false);
+      } catch (error) {
+        if (!axios.isCancel(error)) setLoading(false);
       }
-      
-    });
+    }, 250);
+    return () => clearTimeout(timer);
+  }, [input, type, toOption]);
 
-    setOptions(searchResult);
-    setLoading(false);
-  }
+  const go = (link) => {
+    setOpen(false);
+    setInput("");
+    if (onNavigate) onNavigate();
+    navigate(link);
+  };
+
+  const submit = (e) => {
+    e.preventDefault();
+    if (input.trim()) go(`${searchRoute[type]}/${encodeURIComponent(input.trim())}`);
+  };
 
   return (
-    <Grid container>
-      <Grid item xs={11.8}>
-    <Autocomplete
-      id="seachBar"
-      sx={{ width: 300  }}
-      filterOptions={(x) => x}
-      open={open}
-      onOpen={() => {
-        setOpen(true);
-      }}
-      onClose={() => {
-        setOpen(false);
-      }}
-      isOptionEqualToValue={(option, value) => true}
-      getOptionLabel={(option) => option.name}
-      renderOption={(props, option) => {
-        return (
-          <li {...props} key={option.id}>
-            {option.name}
-          </li>
-        );
-      }}
-      options={options}
-      loading={loading}
-      onChange={(event, option) => {
-        console.log(option.link);
-        navigate(option.link);
-      }}
-      renderInput={(params) => (
-        <TextField
-          {...params}
-          label="cherchez"
+    <div ref={ref} className={`relative ${className}`}>
+      <form onSubmit={submit} className="flex items-center rounded-xl border border-slate-200 bg-slate-50 transition focus-within:border-brand-500 focus-within:bg-white focus-within:ring-4 focus-within:ring-brand-100">
+        <select
+          value={type}
+          onChange={(e) => setType(e.target.value)}
+          aria-label="Type de recherche"
+          className="cursor-pointer rounded-l-xl border-0 bg-transparent py-2.5 pl-3 pr-1 text-sm font-medium text-slate-600 outline-none"
+        >
+          {types.map((t) => (
+            <option key={t.value} value={t.value}>{t.text}</option>
+          ))}
+        </select>
+        <span className="h-5 w-px bg-slate-200" />
+        <input
           value={input}
-          onChange={handleInput}
-          InputProps={{
-            ...params.InputProps,
-            endAdornment: (
-              <React.Fragment>
-                {loading ? (
-                  <CircularProgress color="inherit" size={20} />
-                ) : null}
-                {params.InputProps.endAdornment}
-              </React.Fragment>
-            ),
+          onChange={(e) => {
+            setInput(e.target.value);
+            setOpen(true);
           }}
+          onFocus={() => setOpen(true)}
+          placeholder="Rechercher…"
+          aria-label="Rechercher"
+          className="min-w-0 flex-1 border-0 bg-transparent px-3 py-2.5 text-sm text-slate-800 outline-none placeholder:text-slate-400"
         />
+        <button type="submit" aria-label="Lancer la recherche" className="px-3 text-slate-400 hover:text-brand-600">
+          {loading ? <Loader2 size={18} className="animate-spin" /> : <Search size={18} />}
+        </button>
+      </form>
+      {open && input.trim() && (
+        <ul className="absolute left-0 right-0 top-full z-50 mt-2 max-h-72 overflow-auto rounded-xl border border-slate-200 bg-white p-1.5 shadow-lift">
+          {options.length === 0 && !loading && <li className="px-3 py-2 text-sm text-slate-500">Aucun résultat</li>}
+          {options.map((o) => (
+            <li key={o.id}>
+              <button onClick={() => go(o.link)} className="w-full rounded-lg px-3 py-2 text-left text-sm text-slate-700 hover:bg-brand-50 hover:text-brand-700">
+                {o.name}
+              </button>
+            </li>
+          ))}
+        </ul>
       )}
-    /></Grid>
-
-    <Grid item xs={0.2}>
-
-      {type === "/enchere_inverses" && (<IconButton  onClick={()=>navigate(`${navRoutes.ENCHEREINVERSESEARCH}/${input}`)}
-       disabled={input===""} sx={{mt:1, ml:2}}>
-        <SearchIcon/>
-        </IconButton>)
-      }
-      {type === "/encheres" && (
-        <IconButton disabled={input===""}  onClick={()=>navigate(`${navRoutes.ENCHERESEARCH}/${input}`)}
-        sx={{mt:1}}>
-          <SearchIcon/>
-      </IconButton>)}
-      {type === "/users" && (
-        <IconButton disabled={input===""}  onClick={()=>navigate(`${navRoutes.USERSEARCH}/${input}`)}
-        sx={{mt:1, ml:2}}>
-          <SearchIcon/>
-      </IconButton>)}
-
-    </Grid>
-    </Grid>
+    </div>
   );
-        
-        }
+}

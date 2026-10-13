@@ -1,11 +1,6 @@
-import { Box, Typography } from '@mui/material'
-import React from 'react'
-import { pinkish } from './general'
+import React from "react";
+import EmptyState from "../../ui/EmptyState";
 
-const NoListing = ({text}) => {
-  return (
-    <Box sx={{...pinkish, width:"98%",pt:"3%",pb:"3%", textAlign:"center"}}  > <Typography variant="h2">{text}</Typography></Box>
-  )
-}
+const NoListing = ({ text }) => <EmptyState title="Rien à afficher" text={text} />;
 
-export default NoListing
+export default NoListing;

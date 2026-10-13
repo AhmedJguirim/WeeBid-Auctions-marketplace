@@ -1,702 +1,262 @@
-import { BACKEND_URL } from "../../config/env";
-import DateAdapter from "@mui/lab/AdapterDateFns";
-import Api from "../../AxiosInstance";
-import { ButtonStyles, formBox , formContainer, FormTextField, lightContainer} from "../base/customComponents/general";
-import {
-  DateTimePicker,
-  DesktopDatePicker,
-  LocalizationProvider,
-} from "@mui/lab";
 import * as React from "react";
-import {
-  FormControl,
-  FormLabel,
-  Input,
-  InputLabel,
-  MenuItem,
-  Radio,
-  RadioGroup,
-  Select,
-  Container,
-  Typography,
-  Box,
-  Grid,
-  Checkbox,
-  FormControlLabel,
-  TextField,
-  CssBaseline,
-  Button,
-  IconButton,
-} from "@mui/material";
-import { useSelector } from "react-redux";
-import { navRoutes } from "../../config/routes";
-import Stepper from "@mui/material/Stepper";
-import Step from "@mui/material/Step";
-import StepLabel from "@mui/material/StepLabel";
-import { useNavigate } from "react-router-dom";
-import CancelIcon from "@mui/icons-material/Cancel";
 import { useFormik } from "formik";
-import image from "../../media/images/auctionCreate.png"
+import { useNavigate } from "react-router-dom";
+import { useSelector } from "react-redux";
+import { AlertCircle, ArrowLeft, ArrowRight, Check, Gavel, ImagePlus, Loader2, TrendingDown, X } from "lucide-react";
+import Api from "../../AxiosInstance";
+import { navRoutes } from "../../config/routes";
+import Field from "../ui/Field";
+import PageHeader from "../ui/PageHeader";
 
-const steps = [
-  "enregistrer un article",
-  "enregistrer l'offre",
-];
-var someDate = new Date();
-const stateOptions = ["utilisé", "neuf"];
+const steps = ["L'article", "L'annonce"];
+const stepFields = [["name", "state", "localisation", "brand", "codebar", "description", "date"], ["quantity", "initPrice", "category", "startDate", "endDate"]];
 
+const toLocal = (date) => {
+  const d = new Date(date);
+  d.setMinutes(d.getMinutes() - d.getTimezoneOffset());
+  return d.toISOString().slice(0, 16);
+};
 
+// mirrors the constraints of the Symfony entities
+const validate = (v) => {
+  const e = {};
+  if (!v.name) e.name = "Ce champ est obligatoire";
+  else if (v.name.length < 3 || v.name.length > 15) e.name = "Entre 3 et 15 caractères";
+  if (!v.localisation) e.localisation = "Ce champ est obligatoire";
+  if (v.brand && v.brand.length > 15) e.brand = "15 caractères maximum";
+  if (v.description && v.description.length > 255) e.description = "255 caractères maximum";
+  if (v.date && new Date(v.date) > new Date()) e.date = "La date doit être dans le passé";
+  if (!v.quantity || v.quantity < 1) e.quantity = "Au moins 1";
+  if (!v.initPrice || v.initPrice <= 0) e.initPrice = "Doit être positif";
+  if (!v.category) e.category = "Choisissez une catégorie";
+  if (!v.startDate) e.startDate = "Ce champ est obligatoire";
+  else if (new Date(v.startDate) < new Date(Date.now() - 5 * 60000)) e.startDate = "Le début ne peut pas être dans le passé";
+  if (!v.endDate) e.endDate = "Ce champ est obligatoire";
+  else if (new Date(v.endDate) <= new Date(v.startDate)) e.endDate = "La fin doit être après le début";
+  return e;
+};
+
+const TypeCard = ({ active, onClick, icon: Icon, title, text }) => (
+  <button
+    type="button"
+    onClick={onClick}
+    className={`flex items-start gap-3 rounded-2xl border-2 p-4 text-left transition ${active ? "border-brand-600 bg-brand-50" : "border-slate-200 bg-white hover:border-slate-300"}`}
+  >
+    <span className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-xl ${active ? "bg-brand-600 text-white" : "bg-slate-100 text-slate-500"}`}>
+      <Icon size={20} />
+    </span>
+    <span>
+      <span className="block font-bold text-slate-900">{title}</span>
+      <span className="mt-0.5 block text-sm text-slate-500">{text}</span>
+    </span>
+  </button>
+);
 
 export default function CreateArticle() {
-    const validate = (values) => {
-        const errors = {};
-        const currentDate = new Date();
-        //fabricationDate/localisation/brand/description/codebar are optional
-        
-        //name validation
-        if (!values.name) {
-          errors.name = "champ obligatoir";
-        } else if (values.name.length > 15) {
-          errors.name = "doit contenir 15 caractères au maximum";
-        } else if (values.name.length < 4) {
-          errors.name = "doit contenir 4 caractères au minimum";
-        }
-      
-        //localisation validation
-        if (!values.localisation) {
-          errors.localisation = "champ obligatoir";
-        } else if (values.localisation.length > 15) {
-          errors.localisation = "doit contenir 15 caractères au maximum";
-        } else if (values.localisation.length < 3) {
-          errors.localisation = "doit contenir 4 caractères au minimum";
-        }
-      
-        //brand validation
-        if (!values.brand) {
-        } else if (values.brand.length > 10) {
-          errors.brand = "doit contenir 15 caractères au maximum";
-        }
-      
-        //description validation
-        if (!values.description) {
-        } else if (values.description.length > 255) {
-          errors.description = "doit contenir 255 caractères au maximum";
-        }
-      
-        //quantity validation
-        if (!values.quantity) {
-          errors.quantity = "champ obligatoir";
-        } else if (values.quantity < 0) {
-          errors.quantity = "la quantité doit être positive";
-        }
-      
-        //initPrice validation
-        if (!values.initPrice) {
-          errors.initPrice = "champ obligatoir";
-        } else if (values.initPrice < 0) {
-          errors.initPrice = "le prix initial doit être positif";
-        }
-
-
-
-        //fabrication date validation
-        if (!values.date) {
-            errors.date = "champ obligatoir";
-          } else if (values.date > currentDate) {
-            errors.date = "la date de fabrication ne peut pas etre superieur a la date actuelle";
-          }
-          else{
-            delete errors.date
-          }
-
-          //start date validation
-          if (!values.startDate) {
-            errors.startDate = "champ obligatoir";
-          } else if (values.startDate < currentDate) {
-            errors.startDate = "la date de debut ne peut pas etre inferieur a la date actuelle";
-          }else{
-            delete errors.startDate
-          }
-
-          //end date validation
-          if (!values.endDate) {
-            errors.endDate = "champ obligatoir";
-          } else if (values.endDate < currentDate) {
-            errors.endDate = "la date de fin ne peut pas etre inferieur a la date actuelle";
-          }else if (values.endDate < values.startDate) {
-            errors.endDate = "la date de debut ne peut pas etre inferieur a la date de debut";
-          }else{
-            delete values.startDate
-          }
-
-      if(Object.keys(errors).length === 0){
-          setContainsError(false)
-      }
-      if(errors.name === undefined && errors.localisation=== undefined && errors.brand=== undefined && errors.description=== undefined 
-        && errors.state=== undefined && errors.date=== undefined){
-        setStepOne(true)      
-      }else{
-        setStepOne(false)
-      }
-      if(errors.quantity === undefined && errors.endDate === undefined && errors.startDate=== undefined 
-        && errors.initPrice=== undefined && errors.immediatePrice=== undefined && category !==""){
-        setStepTwo(true)      
-        
-      }else{
-        setStepTwo(false)
-      }
-      
-
-        return errors;
-      };
-
-
-  const navigate = new useNavigate();
-  const styles = {
-    error:{
-      fontSize:12,
-      color:"error.main",
-    }
-  }
-  //#region stepper part
-  const [activeStep, setActiveStep] = React.useState(0);
-
-  const handleNext = () => {
-    setActiveStep((prevActiveStep) => prevActiveStep + 1);
- 
-  };
-
-  const handleBack = () => {
-    setActiveStep((prevActiveStep) => prevActiveStep - 1);
-  };
-
-  //#endregion
-
-  //#region form part
-
-  //#region form data state
+  const navigate = useNavigate();
+  const user = useSelector((state) => state.user);
+  const [step, setStep] = React.useState(0);
   const [type, setType] = React.useState("encheres");
-  const [state, setState] = React.useState("utilisé");
-  const [containsError , setContainsError] = React.useState(true)
-  const [images, setImages] = React.useState([]);
+  const [categories, setCategories] = React.useState([]);
+  const [files, setFiles] = React.useState([]); // { file, url }
+  const [loading, setLoading] = React.useState(false);
+  const [error, setError] = React.useState("");
 
-  const [stepOne, setStepOne] = React.useState(false);
-  const [stepTwo, setStepTwo] = React.useState(false);
-const handleState = (event) => {
-    setState(event.target.value);
-  };
-const handleType = (event) => {
-    setType(event.target.value);
-  };
+  React.useEffect(() => {
+    Api.get("/categories")
+      .then((r) => setCategories(r.data["hydra:member"]))
+      .catch(console.error);
+  }, []);
 
   const formik = useFormik({
     initialValues: {
-      type: "encheres",
-      name: "",
-      localisation: "",
-      codebar: "",
-      brand: "",
-      description: "",
-      quantity: 1,
-      initPrice: 1,
-      immediatePrice: 2,
-      date: Date.now(),
-      startDate: Date.now(),
-      endDate: Date.now(),
+      name: "", state: "utilisé", localisation: "", brand: "", codebar: "", description: "", date: "",
+      quantity: 1, initPrice: "", category: "",
+      startDate: toLocal(Date.now() + 10 * 60000), endDate: toLocal(Date.now() + 3 * 86400000),
     },
     validate,
+    onSubmit: async (v) => {
+      setLoading(true);
+      setError("");
+      try {
+        const article = await Api.post("/articles", {
+          name: v.name,
+          state: v.state,
+          fabricationDate: v.date ? new Date(v.date) : new Date(),
+          localisation: v.localisation,
+          codebar: v.codebar,
+          brand: v.brand,
+          description: v.description,
+        });
+        await Promise.all(
+          files.map(({ file }) => {
+            const data = new FormData();
+            data.append("file", file, file.name);
+            data.append("article", article.data.id);
+            return Api.post("documents", data, { headers: { "Content-Type": "multipart/form-data" } });
+          })
+        );
+        const price = parseFloat(v.initPrice);
+        const listing = await Api.post(`/${type}`, {
+          quantity: parseInt(v.quantity, 10),
+          initPrice: price,
+          currentPrice: price,
+          immediatePrice: price * 2,
+          startDate: new Date(v.startDate),
+          endDate: new Date(v.endDate),
+          category: `/api/categories/${v.category}`,
+          article: article.data["@id"],
+          user: `/api/users/${user.id}`,
+        });
+        const inverse = type === "enchere_inverses";
+        await Api.post("/surveilles", { user: `/api/users/${user.id}`, [inverse ? "enchereInverse" : "enchere"]: listing.data["@id"] });
+        navigate(`${inverse ? navRoutes.ENCHEREINVERSE : navRoutes.ENCHERE}/${listing.data.id}`);
+      } catch (err) {
+        console.log(err);
+        setLoading(false);
+        const d = err.response && err.response.data && err.response.data["hydra:description"];
+        setError(d ? d : "Une erreur est survenue, veuillez réessayer.");
+      }
+    },
   });
 
+  const fieldProps = (name) => ({
+    id: name,
+    value: formik.values[name],
+    onChange: formik.handleChange,
+    onBlur: formik.handleBlur,
+    error: formik.touched[name] && formik.errors[name],
+  });
 
-  const handleImageDelete = (imageName) => {
-    setImages(images.filter((item) => item.get("file").name !== imageName));
+  const goNext = async () => {
+    formik.setTouched(Object.fromEntries(stepFields[0].map((f) => [f, true])), true);
+    const errors = await formik.validateForm();
+    if (!stepFields[0].some((f) => errors[f])) setStep(1);
   };
 
-  //#endregion
-
-  //#region categories for form
-  const [categories, setCategories] = React.useState({});
-  const [category, setCategory] = React.useState("")
-  const handleCategory = (event) => {
-    setCategory(event.target.value);
+  const addFiles = (list) => {
+    const incoming = Array.from(list).filter((f) => f.type.startsWith("image/"));
+    const room = 4 - files.length;
+    if (incoming.length > room) alert("4 images maximum");
+    setFiles([...files, ...incoming.slice(0, room).map((file) => ({ file, url: URL.createObjectURL(file) }))]);
   };
-  //categories GET request
-  async function getCategories() {
-    try {
-      const response = await Api.get(BACKEND_URL + "/api/categories");
 
-      setCategories(response["data"]["hydra:member"]);
-    } catch (error) {
-      console.error(error);
-    }
+  if (user.id === undefined && !localStorage.getItem("token")) {
+    return (
+      <div className="container-page flex min-h-[50vh] flex-col items-center justify-center text-center">
+        <h1 className="text-2xl font-extrabold text-slate-900">Connectez-vous pour vendre</h1>
+        <p className="mt-2 text-slate-500">Un compte est nécessaire pour publier une annonce.</p>
+        <a href={navRoutes.LOGIN} className="btn-primary mt-6">Se connecter</a>
+      </div>
+    );
   }
 
-  //this makes getCategory run on render
-  React.useEffect(() => {
-    getCategories();
-  }, []);
-  //#endregion
+  const inverse = type === "enchere_inverses";
 
-  //to get the state of the user from store
-  const user = useSelector((state) => state.user);
-
-  //calling the api to post
-  const submitHandler = (event ) => {
-    const endDate= new Date(formik.values.endDate)
-    const date= new Date(formik.values.date)
-    const startDate= new Date(formik.values.startDate)
-    event.preventDefault();
-    Api.post("/articles", {
-      name: formik.values.name,
-      state: state,
-      fabricationDate: date,
-      localisation: formik.values.localisation,
-      codebar: formik.values.codebar,
-      brand: formik.values.brand,
-      description: formik.values.description,
-    })
-      .then((response) => {
-        if (images.length > 0) {
-          images.map((image) => {
-            image.append("article", response["data"]["id"]);
-            Api.post("documents", image, {
-              headers: {
-                "Content-Type": "multipart/form-data",
-              },
-            });
-          });
-        }
-        Api.post(`/${type}`, {
-          quantity: parseInt(formik.values.quantity),
-          initPrice: parseFloat(formik.values.initPrice),
-          currentPrice: parseFloat(formik.values.initPrice),
-          immediatePrice: parseFloat(formik.values.immediatePrice),
-          startDate: startDate,
-          endDate: endDate,
-          category: `/api/categories/${category}`,
-          article: `${response["data"]["@id"]}`,
-          //change this hardcoded line with user from store
-          user: `/api/users/${user.id}`,
-        })
-          .then((response) => {
-            console.log(response["data"]["@id"], "created successfully!");
-            if (type === "enchere_inverses") {
-              const enchereInverseId = response["data"]["id"];
-              Api.post("/surveilles", {
-                user: `/api/users/${user.id}`,
-                enchereInverse: `${response["data"]["@id"]}`,
-              })
-                .then((response) => {
-                  console.log(response["data"]["@id"], "created successfully!");
-                  navigate(`${navRoutes.ENCHEREINVERSE}/${enchereInverseId}`);
-                })
-                .catch((error) => {
-                  console.log(error);
-                });
-            } else {
-              const enchereId = response["data"]["id"];
-              Api.post("/surveilles", {
-                user: `/api/users/${user.id}`,
-                enchere: `${response["data"]["@id"]}`,
-              })
-                .then((response) => {
-                  console.log(response["data"]["@id"], "created successfully!");
-                  navigate(`${navRoutes.ENCHERE}/${enchereId}`);
-                })
-                .catch((error) => console.log(error));
-            }
-          })
-          .catch((error) => console.log(error));
-      })
-      .catch((error) => console.log(error));
-  };
-
-  //#endregion
   return (
-    
-    <Grid container sx={{backgroundColor:"primary.main"}}>
-      <Grid item xs={6} mt="10%">
-        <Box
-          component="img"
-          src={image}
-          sx={{maxWidth:"100%"}}
-        ></Box>
-        <Typography variant="h5" textAlign={"center"}>Créez un événement et maximisez vos profits</Typography>
-      </Grid>
-      <Grid item xs={6} sx={{mt:"2%"}}>
-      <Stepper activeStep={activeStep}>
-        {steps.map((label, index) => {
-          const stepProps = {};
-          const labelProps = {};
-          return (
-            <Step key={label} {...stepProps}>
-              <StepLabel {...labelProps}>{label}</StepLabel>
-            </Step>
-          );
-        })}
-      </Stepper>
+    <>
+      <PageHeader title="Publier une annonce" subtitle="Décrivez votre article, choisissez le type d'enchère et fixez le calendrier." />
+      <div className="container-page max-w-3xl py-8">
+        <ol className="mb-8 flex items-center gap-3">
+          {steps.map((label, i) => (
+            <React.Fragment key={label}>
+              <li className="flex items-center gap-2.5">
+                <span className={`flex h-8 w-8 items-center justify-center rounded-full text-sm font-bold ${i < step ? "bg-brand-600 text-white" : i === step ? "bg-brand-600 text-white ring-4 ring-brand-100" : "bg-slate-200 text-slate-500"}`}>
+                  {i < step ? <Check size={16} /> : i + 1}
+                </span>
+                <span className={`text-sm font-semibold ${i <= step ? "text-slate-900" : "text-slate-400"}`}>{label}</span>
+              </li>
+              {i < steps.length - 1 && <span className={`h-px flex-1 ${i < step ? "bg-brand-600" : "bg-slate-200"}`} />}
+            </React.Fragment>
+          ))}
+        </ol>
 
-        <CssBaseline />
-        <Box sx={{...formBox, width:"90%", margin:"0 auto"}}>
-          <Box component="form" onSubmit={submitHandler} sx={{ mt: 3 }}>
-            
-              {activeStep === 0 && (
-                <Grid container spacing={2}
-                alignItems="center"
-                justifyContent="center">
-                  <Grid item xs={12}>
-                  <Typography variant="h2" sx={{ mb: 2 }}>
-                    {steps[0]}
-                  </Typography>
-                  </Grid>
-                  <Grid item xs={6}>
-                    <FormTextField
-                      fullWidth
-                      required
-                      id="name"
-                      label="Nom"
-                      value={formik.values.name}
-                      error={formik.errors.name && formik.touched.name}
-                      onBlur={formik.handleBlur}
-                      onChange={formik.handleChange}
-                    />{formik.errors.name && formik.touched.name ? (
-                      <Typography sx={styles.error}>{formik.errors.name }</Typography>
-                    ) : null}
-                  </Grid>
-                  <Grid item xs={6}>
+        <form
+          noValidate
+          className="card space-y-6 p-6 sm:p-8"
+          onSubmit={(e) => {
+            e.preventDefault();
+            if (step === 0) goNext();
+            else formik.handleSubmit(e);
+          }}
+        >
+          {error && (
+            <div role="alert" className="flex items-start gap-2 rounded-xl border border-rose-200 bg-rose-50 px-4 py-3 text-sm text-rose-700">
+              <AlertCircle size={18} className="mt-0.5 shrink-0" /> <span className="whitespace-pre-line">{error}</span>
+            </div>
+          )}
 
-                    <FormTextField
-                      fullWidth
-                      id="brand"
-                      label="marque"
-                      error={formik.errors.brand && formik.touched.brand}
-                      value={formik.values.brand}
-                      onBlur={formik.handleBlur}
-                      onChange={formik.handleChange}
-                    />{formik.errors.brand && formik.touched.brand ? (
-                      <Typography sx={styles.error}>{formik.errors.brand}</Typography>
-                    ) : null}
-                  </Grid>
-                  <Grid item xs={6}>
+          {step === 0 && (
+            <>
+              <div className="grid gap-5 sm:grid-cols-2">
+                <Field label="Nom de l'article" placeholder="Ex : Appareil photo" {...fieldProps("name")} />
+                <Field label="État" as="select" {...fieldProps("state")}>
+                  <option value="utilisé">Utilisé</option>
+                  <option value="neuf">Neuf</option>
+                </Field>
+                <Field label="Localisation" placeholder="Ex : Tunis" {...fieldProps("localisation")} />
+                <Field label="Marque (optionnel)" {...fieldProps("brand")} />
+                <Field label="Code barre (optionnel)" {...fieldProps("codebar")} />
+                <Field label="Date de fabrication (optionnel)" type="date" {...fieldProps("date")} />
+              </div>
+              <Field label="Description" as="textarea" rows={5} placeholder="Décrivez l'état, les accessoires fournis…" hint={`${formik.values.description.length}/255`} {...fieldProps("description")} />
 
-                    <FormTextField
-                      fullWidth
-                      required
-                      id="localisation"
-                      label="localisation"
-                      error={formik.errors.localisation && formik.touched.localisation}
-                      value={formik.values.localisation}
-                      onBlur={formik.handleBlur}
-                      onChange={formik.handleChange}
-                    />{formik.errors.localisation && formik.touched.localisation ? (
-                      <Typography sx={styles.error}>{formik.errors.localisation}</Typography>
-                    ) : null}
-                  </Grid>
-
-                  <Grid item xs={6}>
-                    <FormTextField
-                    fullWidth
-                      id="codebar"
-                      label="code a barre"
-                      value={formik.values.codebar}
-                      error={formik.errors.codebar && formik.touched.codebar}
-                      onBlur={formik.handleBlur}
-                      onChange={formik.handleChange}
-                    />{formik.errors.codebar && formik.touched.codebar ? (
-                      <Typography sx={styles.error}>{formik.errors.codebar}</Typography>
-                    ) : null}
-                  </Grid>
-                  <Grid item xs={6}>
-                    {/* TODO: date stays as default , fix it */}
-                    <LocalizationProvider dateAdapter={DateAdapter}>
-                      <DesktopDatePicker
-                        label="date de fabrication"
-                        inputFormat="MM/dd/yyyy"
-                        error={formik.errors.date && formik.touched.date}
-                        value={formik.values.date}
-                        onBlur={formik.handleBlur}
-                        name="date"
-                        onChange={(value) => {
-                          formik.setFieldValue('date', Date.parse(value));
-                          }}
-                        renderInput={(params) => <FormTextField fullWidth {...params} />}
-                      />{formik.errors.date && formik.touched.date ? (
-                        <Typography sx={styles.error}>{formik.errors.date}</Typography>
-                      ) : null}
-                    </LocalizationProvider>
-                  </Grid>
-                  <Grid item xs={6}>
-                    <FormControl sx={{marginTop:"8px"}} fullWidth>
-                      <InputLabel id="demo-simple-select-label">
-                        état
-                      </InputLabel>
-                      <Select
-                        labelId="demo-simple-select-label"
-                        id="demo-simple-select"
-                        label="etat"
-                        error={formik.errors.state && formik.touched.state}
-                        onBlur={formik.handleBlur}
-                        onChange={handleState}
-                        value={state}
-                      >
-                        <MenuItem value="neuf">neuf</MenuItem>
-                        <MenuItem value="utilisé">utilisé</MenuItem>
-                      </Select>
-                    </FormControl>
-                  </Grid>{formik.errors.state && formik.touched.state ? (
-                        <Typography sx={styles.error}>{formik.errors.state}</Typography>
-                      ) : null}
-                  <Grid item xs={6}>
-                    <TextField
-                    fullWidth
-                    multiline
-                    name="description"
-                    id="description"
-                    error={formik.errors.description && formik.touched.description}
-                    onBlur={formik.handleBlur}
-                    value={formik.values.description}
-                    onChange={formik.handleChange}
-                    placeholder="description"
-                    cols={35}
-                    rows={9}
-                    />
-                    {formik.errors.description && formik.touched.description ? (
-                        <Typography sx={styles.error}>{formik.errors.description}</Typography>
-                      ) : null}</Grid>
-                    <Grid item xs={6}>
-                    <label htmlFor="contained-button-file">
-                      <Input
-                        accept="image/*"
-                        id="contained-button-file"
-                        multiple
-                        type="file"
-                        onChange={(event) => {
-                          if (images.length < 4) {
-                            const data = new FormData();
-                            data.append(
-                              "file",
-                              event.target.files[0],
-                              event.target.files[0].name
-                            );
-
-                            setImages([...images, data]);
-                            console.log(data.get("file").name);
-                          } else {
-                            alert("max 4 images");
-                          }
-                        }}
-                      />
-                      <Button
-                        sx={{ ...ButtonStyles, margin: 2, display: "none" }}
-                        component="span"
-                      >
-                        Upload
-                      </Button>
+              <div>
+                <p className="mb-1.5 text-sm font-semibold text-slate-700">Photos <span className="font-normal text-slate-400">(4 maximum)</span></p>
+                <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
+                  {files.map(({ url }, i) => (
+                    <div key={url} className="group relative aspect-square overflow-hidden rounded-xl bg-slate-100">
+                      <img src={url} alt="" className="h-full w-full object-cover" />
+                      <button type="button" onClick={() => setFiles(files.filter((_, j) => j !== i))} aria-label="Retirer" className="absolute right-1.5 top-1.5 rounded-full bg-slate-900/70 p-1 text-white opacity-0 transition group-hover:opacity-100">
+                        <X size={14} />
+                      </button>
+                    </div>
+                  ))}
+                  {files.length < 4 && (
+                    <label className="flex aspect-square cursor-pointer flex-col items-center justify-center gap-1 rounded-xl border-2 border-dashed border-slate-300 text-slate-400 transition hover:border-brand-400 hover:bg-brand-50 hover:text-brand-600">
+                      <ImagePlus size={22} />
+                      <span className="text-xs font-semibold">Ajouter</span>
+                      <input type="file" accept="image/*" multiple className="sr-only" onChange={(e) => { addFiles(e.target.files); e.target.value = ""; }} />
                     </label>
-                    {images.map((image) => (
-                      <MenuItem value={image} key={image.get("file").name}>
-                        <Typography>{image.get("file").name}</Typography>
-                        <IconButton
-                          onClick={() =>
-                            handleImageDelete(image.get("file").name)
-                          }
-                        >
-                          <CancelIcon color="warning" />
-                        </IconButton>
-                      </MenuItem>
-                    ))}
-                  </Grid>
-                  <Grid item xs={12}>
-                      
-                    <FormControlLabel
-                      control={<Checkbox value="validation" />}
-                      label="vous guarentissez la validité de ces informations"
-                    />
-                  </Grid>
-                 
-                  <Grid item xs={12}>
-                  <Box sx={{ display: "flex", flexDirection: "row", pt: 2 }}>
+                  )}
+                </div>
+              </div>
+            </>
+          )}
 
-                      <Box sx={{ flex: "1 1 auto" }} />
- 
-                        <Button sx={ButtonStyles} disabled={!stepOne} onClick={handleNext}>
-                          Suivant
-                        </Button>
-                    </Box>
-                  </Grid>
-                  </Grid>
+          {step === 1 && (
+            <>
+              <div className="grid gap-3 sm:grid-cols-2">
+                <TypeCard active={!inverse} onClick={() => setType("encheres")} icon={Gavel} title="Enchère" text="Je vends : les acheteurs surenchérissent." />
+                <TypeCard active={inverse} onClick={() => setType("enchere_inverses")} icon={TrendingDown} title="Enchère inversée" text="Je cherche : les vendeurs baissent leur prix." />
+              </div>
+              <div className="grid gap-5 sm:grid-cols-2">
+                <Field label="Catégorie" as="select" {...fieldProps("category")}>
+                  <option value="">Choisir…</option>
+                  {categories.map((c) => (
+                    <option key={c.id} value={c.id}>{c.name}</option>
+                  ))}
+                </Field>
+                <Field label="Quantité" type="number" min="1" {...fieldProps("quantity")} />
+                <Field label={inverse ? "Budget maximum (TND)" : "Prix de départ (TND)"} type="number" min="0" step="0.1" {...fieldProps("initPrice")} />
+                <span className="hidden sm:block" />
+                <Field label="Début" type="datetime-local" {...fieldProps("startDate")} />
+                <Field label="Fin" type="datetime-local" {...fieldProps("endDate")} />
+              </div>
+            </>
+          )}
 
-              )}
-              {/* TODO: make an optional step for documents */}
-              {activeStep === 1 && (
-                <Grid container spacing={2}
-                alignItems="center"
-                justifyContent="center">
-                  <Grid item xs={12} textAlign={"center"}>
-                  <Typography variant="h2" sx={{ mb: 2 }}>
-                    {steps[1]}
-                  </Typography>
-                  </Grid>
-                  <Grid item></Grid>
-                  <FormControl>
-                    <FormLabel sx={{ml:"2%"}} id="demo-controlled-radio-buttons-group">
-                      Type :
-                    </FormLabel>
-                    <RadioGroup
-                      aria-labelledby="demo-controlled-radio-buttons-group"
-                      name="controlled-radio-buttons-group"
-                      value={type}
-                      onChange={handleType}
-                    >
-                      <Grid container margin="0 auto" spacing={2}><Grid item xs={6}>
-                      <FormControlLabel
-                        value="encheres"
-                        control={<Radio />}
-                        label="Enchère"
-                      />
-                      <Typography fontSize={12}>commancer une enchère ou les autres utilisateurs peuvent
-                      enchérir compétitivement pour acquirir l'article que vous avez décrit dans l'étape
-                      précédente </Typography>
-                      </Grid>
-                      <Grid item xs={6}>
-                      <FormControlLabel
-                        value="enchere_inverses"
-                        control={<Radio />}
-                        label="Enchère inversée"
-                      />
-                      <Typography fontSize={12}>commancer une enchère inversée ou les autres utilisateurs donnent
-                      leurs meilleurs prix sur l'article que vous avez décrit dans l'étape
-                      précédente
-                      </Typography>
-                      </Grid>
-                      </Grid>
-                    </RadioGroup>
-                  </FormControl>
-
-                  <Grid item xs={12}>
-                    <FormControl fullWidth>
-                      <InputLabel id="demo-simple-select-label">
-                        categorie
-                      </InputLabel>
-                      <Select
-                        labelId="demo-simple-select-label"
-                        id="demo-simple-select"
-                        
-                        onChange={handleCategory}
-                        label="category"
-                        value={category}
-                      >
-                        {Object.keys(categories).map((key, index) => (
-                          <MenuItem value={categories[key].id} key={index}>
-                            {categories[key].name}
-                          </MenuItem>
-                        ))}
-                      </Select>
-                    </FormControl>
-                  </Grid>
-                  <Grid item xs={6}>
-
-                    <FormTextField
-                      fullWidth
-                      required
-                      type="number"
-                      id="quantity"
-                      label="quantité"
-                      error={formik.errors.quantity && formik.touched.quantity}
-                      onBlur={formik.handleBlur}
-                      value={formik.values.quantity}
-                      onChange={formik.handleChange}
-                    />
-                    {formik.errors.quantity && formik.touched.quantity ? (
-                        <Typography sx={styles.error}>{formik.errors.quantity}</Typography>
-                      ) : null}
-                  </Grid>
-
-                  <Grid item xs={6}>
-                    <FormTextField
-                      required
-                      fullWidth
-                      type="number"
-                      id="initPrice"
-                      label="prix initial"
-                      onBlur={formik.handleBlur}
-                      error={formik.errors.initPrice && formik.touched.initPrice}
-                      value={formik.values.initPrice}
-                      onChange={formik.handleChange}
-                    />{formik.errors.initPrice && formik.touched.initPrice ? (
-                      <Typography sx={styles.error}>{formik.errors.initPrice}</Typography>
-                    ) : null}
-                  </Grid>
-                  <Grid item xs={6}>
-
-                    <LocalizationProvider dateAdapter={DateAdapter}>
-                      <DateTimePicker
-                        label="date de debut"
-                        name="startDate"
-                        inputFormat="MM/dd/yyyy"
-                        error={formik.errors.startDate && formik.touched.startDate}
-                        onBlur={formik.handleBlur}
-                        value={formik.values.startDate}
-                        onChange={(value) => {
-                          formik.setFieldValue('startDate', Date.parse(value));
-                          }}
-                        renderInput={(params) => <FormTextField {...params} />}
-                      />
-                    </LocalizationProvider>
-                    {formik.errors.startDate && formik.touched.startDate ? (
-                      <Typography sx={styles.error}>{formik.errors.startDate}</Typography>
-                    ) : null}
-                  </Grid>
-                  <Grid item xs={6}>
-                    <LocalizationProvider dateAdapter={DateAdapter}>
-                      <DateTimePicker
-                        label="date de fin"
-                        inputFormat="MM/dd/yyyy"
-                        name="endDate"
-                        error={formik.errors.endDate && formik.touched.endDate}
-                        onBlur={formik.handleBlur}
-                        value={formik.values.endDate}
-                        onChange={(value) => {
-                          formik.setFieldValue('endDate',Date.parse(value));
-                          }}
-                        renderInput={(params) => <FormTextField {...params} />}
-                      />
-                    </LocalizationProvider>
-                    {formik.errors.endDate && formik.touched.endDate ? (
-                      <Typography sx={styles.error}>{formik.errors.endDate}</Typography>
-                    ) : null}
-                  </Grid>
-                  
-                  <Grid item xs={12}>
-                    <Box sx={{ display: "flex", flexDirection: "row", pt: 2 }}>
-                      <Button
-                        color="inherit"
-                        disabled={activeStep === 0}
-                        onClick={handleBack}
-                        sx={{ ...ButtonStyles, mr: 1 }}
-                      >
-                        Retourner
-                      </Button>
-                      <Box sx={{ flex: "1 1 auto" }} />
-
-                      {activeStep === steps.length ? (
-                          <></>
-                      ) : (
-                        <Button sx={ButtonStyles} disabled={!stepTwo}  type="submit">
-                         Soumettre
-                        </Button>
-                      )}
-                    </Box>
-                  </Grid>
-              </Grid>
-              )}
-              
-             
-
-          </Box>
-        </Box>
-
-      </Grid>
-    </Grid>
+          <div className="flex items-center justify-between gap-3 border-t border-slate-100 pt-6">
+            {step === 1 ? (
+              <button type="button" onClick={() => setStep(0)} className="btn-secondary"><ArrowLeft size={16} /> Retour</button>
+            ) : <span />}
+            <button type="submit" disabled={loading} className="btn-primary !px-6 !py-3">
+              {loading && <Loader2 size={16} className="animate-spin" />}
+              {step === 0 ? <>Suivant <ArrowRight size={16} /></> : "Publier l'annonce"}
+            </button>
+          </div>
+        </form>
+      </div>
+    </>
   );
 }

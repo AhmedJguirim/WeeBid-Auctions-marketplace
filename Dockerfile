@@ -3,6 +3,7 @@ FROM node:18-alpine AS build
 WORKDIR /app
 COPY package.json package-lock.json ./
 RUN npm ci --legacy-peer-deps
+COPY tailwind.config.js postcss.config.js ./
 COPY public ./public
 COPY src ./src
 # Empty = same origin: nginx proxies /api, /media, /socket.io ...

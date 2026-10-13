@@ -1,13 +1,12 @@
 import React from 'react'
 
 import TopNavBar from './subComponents/TopNavBar'
-import { Box } from '@mui/material'
 import Login from '../login/Login.js'
 import Homepage from '../homepage/Homepage.js'
 import VentesListing from '../productsPage/VentesListing.js'
 import UserProfile from '../UserProfile';
 import EncheresHistory from '../userHistory/EncheresHistory'
-import {BrowserRouter as Router,  Route,Routes} from 'react-router-dom';
+import {BrowserRouter as Router,  Route,Routes, useLocation} from 'react-router-dom';
 import DemandesListing from '../tableListings/DemandesListing'
 import { useDispatch, useSelector } from 'react-redux'
 import { checkUser, getUserData } from '../../redux/actions'
@@ -43,6 +42,13 @@ import Footer from './subComponents/Footer'
 
 
 
+// scroll back to the top on every page change
+const ScrollToTop = () => {
+  const { pathname } = useLocation()
+  React.useEffect(() => { window.scrollTo(0, 0) }, [pathname])
+  return null
+}
+
 const Base = () => {
   const watchList = useSelector((state) => state.watchList)
   const user = useSelector((state) => state.user)
@@ -65,25 +71,19 @@ const Base = () => {
 ,[watchList])
 
 
-  const dispatch = useDispatch();  
-    window.addEventListener('storage', () => {
-      dispatch(getUserData())
-    });
-    React.useEffect(()=>{
-      dispatch(getUserData())
-      
-    },[])
-    
-    const styles = {
-      body:{
-        backgroundColor: "primary.main",
-        height:630
-      }
-    }
+  const dispatch = useDispatch();
+  React.useEffect(()=>{
+    const onStorage = () => dispatch(getUserData())
+    window.addEventListener('storage', onStorage)
+    dispatch(getUserData())
+    return () => window.removeEventListener('storage', onStorage)
+  },[])
   return (
     <Router>
-      <Box sx={styles.body}>
+      <div className="flex min-h-screen flex-col">
+        <ScrollToTop />
         <TopNavBar />
+        <main className="flex-1">
         <Routes>
           {/* TODO: declare the routes in config/route.js */}
           <Route path={`${navRoutes.USERSEARCH}/:search`} element={<UserSearchPage /> }></Route>
@@ -120,8 +120,9 @@ const Base = () => {
 
           
         </Routes>
+        </main>
         <Footer />
-      </Box>
+      </div>
     </Router>
   )
 }

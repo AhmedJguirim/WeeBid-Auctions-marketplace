@@ -1,88 +1,106 @@
+import React from "react";
+import { Link } from "react-router-dom";
+import { Users } from "lucide-react";
 import { BACKEND_URL } from "../../config/env";
-import { Card, CardContent, CardMedia, Grid, Typography } from '@mui/material'
-import React from 'react'
-import { Link } from 'react-router-dom';
-import { date } from 'yup';
-import { navRoutes } from '../../config/routes';
+import { navRoutes } from "../../config/routes";
 import demoListImage from "../../media/images/demoListImage.png";
-import Countdown from '../base/customComponents/Countdown';
-import NoListing from '../base/customComponents/NoListing';
+import Countdown, { useAuctionClock } from "../ui/Countdown";
+import EmptyState from "../ui/EmptyState";
+import Avatar from "../ui/Avatar";
 
+const StatusBadge = ({ startDate, endDate }) => {
+  const { status } = useAuctionClock(startDate, endDate);
+  if (status === "live")
+    return (
+      <span className="badge bg-white/95 text-emerald-600 shadow-sm backdrop-blur">
+        <span className="h-2 w-2 animate-pulse-dot rounded-full bg-emerald-500" />
+        En direct
+      </span>
+    );
+  if (status === "upcoming") return <span className="badge bg-white/95 text-amber-600 shadow-sm">Bientôt</span>;
+  return <span className="badge bg-slate-900/80 text-white">Terminée</span>;
+};
 
+export const AuctionCard = ({ vente, type }) => {
+  const reverse = type === navRoutes.ENCHEREINVERSE;
+  const doc = vente.article.documents && vente.article.documents[0];
+  const image = doc ? `${BACKEND_URL}${doc.contentUrl}` : demoListImage;
 
-
-
-const ProductsListing = ({ventes ,elemsPerLine , type}) => {
-    // TODO: create links that don't get invisible in small screens like topnav ones
-   
-    const styles = {
-      productsTypography:{
-        fontSize:15
-      },
-      cardImage:{maxWidth:"90%" ,maxHeight:"90%" , display:"blocks", ml:"auto", mr:"auto", mt:"5%"},
-        productsGrid: { 
-            backgroundColor: "primary.main" , 
-            padding: 3,
-            mt: 2
-          },
-        productLink:{
-          marginTop:"25%",
-          textDecoration: "none",
-          fontWeight: "bold",
-          color: "secondary.main",
-          fontSize:15,
-          fontFamily: `"Roboto","Helvetica","Arial",sans-serif`,
-        }
-    }
   return (
-    <Grid container sx={{...styles.productsGrid, textAlign:"center"}} spacing={3}>
-          {Object.keys(ventes).map((key, index) => (
-            <Grid item xs={12/elemsPerLine} key={key}>
-            <Card key={index}  >
-            
-              
-              {ventes[key].article.documents[0]?(
-              <CardMedia 
-              component="img"
-              sx={styles.cardImage}
-              image={`${BACKEND_URL}${ventes[key].article.documents[0].contentUrl}`}
-              />)
-              :  (<CardMedia 
-              component="img"
-              sx={styles.cardImage}
-              image={demoListImage}
-              />)}
-              <CardContent>
-                
-                
-                <br />
-                  <a style={styles.productLink} href={`${type}/${ventes[key].id}`} >{ventes[key].article.name}</a>
-                  <Typography sx={{...styles.productsTypography,mt:"2%"}}>
-                    quantité: {ventes[key].quantity}
-                  </Typography> 
-                  <Typography sx={{...styles.productsTypography,mt:"10%"}}>
-                    {ventes[key].currentPrice} TND
-                  </Typography>
-                    <Typography sx={{...styles.productsTypography}}>
-                      {/* TODO: make a link to user profile */}
-                    par:<Link style={styles.productLink} to={`${navRoutes.CONSULTUSER}/${ventes[key].user.id}`} >{ventes[key].user.displayName}</Link> 
-                  </Typography>
-                  
-                  {new Date(ventes[key].startDate) < new Date() && new Date(ventes[key].endDate) > new Date() && 
-                  (<Typography variant='h5' sx={{mt:"10%"}}>
-                  live
-                </Typography>)}
-                 
-                    <Countdown endDate={ventes[key].endDate} startDate={ventes[key].startDate} />
+    <article className="group card overflow-hidden transition duration-300 hover:-translate-y-1 hover:shadow-lift">
+      <Link to={`${type}/${vente.id}`} className="block">
+        <div className="relative aspect-[4/3] overflow-hidden bg-slate-100">
+          <img
+            src={image}
+            alt={vente.article.name}
+            loading="lazy"
+            className="h-full w-full object-cover transition duration-500 group-hover:scale-105"
+          />
+          <div className="absolute left-3 top-3">
+            <StatusBadge startDate={vente.startDate} endDate={vente.endDate} />
+          </div>
+          <div className="absolute right-3 top-3">
+            <Countdown startDate={vente.startDate} endDate={vente.endDate} />
+          </div>
+        </div>
+      </Link>
+      <div className="p-4">
+        <Link to={`${type}/${vente.id}`}>
+          <h3 className="truncate text-base font-bold text-slate-900 group-hover:text-brand-700">{vente.article.name}</h3>
+        </Link>
+        <div className="mt-1 flex items-center justify-between text-xs text-slate-500">
+          <Link to={`${navRoutes.CONSULTUSER}/${vente.user.id}`} className="flex min-w-0 items-center gap-1.5 hover:text-brand-700">
+            <Avatar name={vente.user.displayName} image={vente.user.image} size={20} />
+            <span className="truncate">{vente.user.displayName}</span>
+          </Link>
+          {vente.quantity > 1 && (
+            <span className="inline-flex items-center gap-1">
+              <Users size={13} /> ×{vente.quantity}
+            </span>
+          )}
+        </div>
+        <div className="mt-4 flex items-end justify-between border-t border-slate-100 pt-3">
+          <div>
+            <p className="text-[11px] font-medium uppercase tracking-wide text-slate-400">
+              {reverse ? "Meilleur prix" : "Offre actuelle"}
+            </p>
+            <p className="text-xl font-extrabold tabular-nums text-slate-900">
+              {vente.currentPrice} <span className="text-sm font-semibold text-slate-500">TND</span>
+            </p>
+          </div>
+          <Link to={`${type}/${vente.id}`} className="rounded-lg bg-brand-50 px-3 py-1.5 text-xs font-bold text-brand-700 transition hover:bg-brand-600 hover:text-white">
+            {reverse ? "Proposer" : "Enchérir"}
+          </Link>
+        </div>
+      </div>
+    </article>
+  );
+};
 
-                
-              </CardContent>
-            </Card>
-            </Grid>
-          ))}
-          {!ventes[0] && <NoListing text={`il n y a pas d'articles disponibles pour le moment`}/>}
-        </Grid>
-  )
-}
+/**
+ * Grid of auction cards. `elemsPerLine` is kept for backwards compatibility
+ * (the layout is now responsive), `ventes` can be an array or an object.
+ */
+const ProductsListing = ({ ventes, type, columns = "default", limit }) => {
+  let list = Object.keys(ventes || {}).map((k) => ventes[k]);
+  if (limit) list = list.slice(0, limit);
+  const grid =
+    columns === "wide"
+      ? "grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4"
+      : "grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4";
+  return (
+    <div className={`grid ${grid}`}>
+      {list.map((vente) => (
+        <AuctionCard key={vente.id} vente={vente} type={type} />
+      ))}
+      {list.length === 0 && (
+        <EmptyState
+          title="Aucun article disponible"
+          text="Il n'y a pas d'articles à afficher pour le moment. Revenez bientôt !"
+        />
+      )}
+    </div>
+  );
+};
 
-export default ProductsListing
+export default ProductsListing;

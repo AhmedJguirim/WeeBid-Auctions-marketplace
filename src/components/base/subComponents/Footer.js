@@ -1,118 +1,72 @@
-import {
-  Box,
-  Container,
-  Grid,
-  List,
-  ListItem,
-  ListItemText,
-  Typography,
-} from "@mui/material";
 import React from "react";
-import { Link, useNavigate } from "react-router-dom";
-import { pinkish } from "../customComponents/general";
-import { CustomLink } from "../customComponents/TopNavLink";
-
-import { FooterLink } from "../customComponents/general";
+import { Link } from "react-router-dom";
 import { useSelector } from "react-redux";
+import { Github, Mail } from "lucide-react";
 import { navRoutes } from "../../../config/routes";
-import { Facebook, Instagram, Twitter } from "@mui/icons-material";
-import { FooterMediaLink } from "./FooterStyles";
+import Logo from "../../ui/Logo";
+
+const FooterColumn = ({ title, links }) => (
+  <div>
+    <h4 className="text-sm font-bold uppercase tracking-wider text-white">{title}</h4>
+    <ul className="mt-4 space-y-2.5">
+      {links.map(([text, path]) => (
+        <li key={path}>
+          <Link to={path} className="text-sm text-slate-400 transition hover:text-white">{text}</Link>
+        </li>
+      ))}
+    </ul>
+  </div>
+);
 
 const Footer = () => {
   const user = useSelector((state) => state.user);
-  const navigate = useNavigate();
-  const listeElems1 = {
-    "tous les encheres": navRoutes.ENCHERES,
-    "nos enchères inversées": navRoutes.ENCHERESINVERSES,
-    categories: navRoutes.CATEGORIES,
-  };
+  const loggedIn = user.id !== undefined;
 
-  let listeElems2 = {};
-  if (user.id === undefined) {
-    listeElems2 = {
-      "page d'accueil": "/",
-      "créer un compte": navRoutes.REGISTER,
-      "se connecter": navRoutes.LOGIN,
-    };
-  } else {
-    listeElems2 = {
-      "commancer un enchère ou enchere inversé": navRoutes.MAKE_ARTICLE,
-      "votre profile": navRoutes.USERPROFILE,
-      "liste de surveilles": navRoutes.WATCHLIST,
-    };
-  }
+  const explore = [
+    ["Toutes les enchères", navRoutes.ENCHERES],
+    ["Enchères inversées", navRoutes.ENCHERESINVERSES],
+    ["Catégories", navRoutes.CATEGORIES],
+  ];
+  const account = loggedIn
+    ? [
+        ["Vendre un article", navRoutes.MAKE_ARTICLE],
+        ["Mon profil", navRoutes.USERPROFILE],
+        ["Ma liste de surveillance", navRoutes.WATCHLIST],
+      ]
+    : [
+        ["Créer un compte", navRoutes.REGISTER],
+        ["Se connecter", navRoutes.LOGIN],
+        ["Accueil", "/"],
+      ];
 
   return (
-    <Box
-      component="footer"
-      sx={{
-        py: 3,
-        px: 2,
-        mt: "5%",
-        ...pinkish,
-        color: "black",
-      }}
-    >
-      <Grid container>
-        <Grid item xs={4}>
-          <Typography variant="h4" ml={"3%"}>
-            Compte
-          </Typography>
-          <List dense={true}>
-            {Object.keys(listeElems1).map((key, index) => (
-              <ListItem button key={index} id={listeElems1[key]}>
-                <ListItemText>
-                  <FooterLink to={listeElems1[key]}>{key}</FooterLink>
-                </ListItemText>
-              </ListItem>
-            ))}
-          </List>
-        </Grid>
-        <Grid item xs={4}>
-          <Typography variant="h4" ml={"3%"}>
-            Offres
-          </Typography>
-          <List dense={true}>
-            {Object.keys(listeElems2).map((key, index) => (
-              <ListItem button key={index} id={listeElems2[key]}>
-                <ListItemText>
-                  <FooterLink to={listeElems2[key]}>{key}</FooterLink>
-                </ListItemText>
-              </ListItem>
-            ))}
-          </List>
-        </Grid>
-        <Grid item xs={4}>
-          <Typography variant="h4" ml={"3%"}>
-            test
-          </Typography>
-          <List dense={true}>
-            <ListItem id="facebook">
-            <Facebook />
-              <ListItemText>
-                  
-                <FooterMediaLink href={"https://www.facebook.com"}>Facebook </FooterMediaLink>
-              </ListItemText>
-            </ListItem>
-            <ListItem button id="instagram">
-            <Instagram />
-              <ListItemText>
-              
-              <FooterMediaLink href={"https://www.instagram.com"}>Instagram </FooterMediaLink>
-              </ListItemText>
-            </ListItem>
-            <ListItem id="twitter">
-
-            <Twitter />
-            <ListItemText>
-            <FooterMediaLink href={"https://www.Twitter.com"}>Twitter </FooterMediaLink>
-                </ListItemText>
-            </ListItem>
-        
-          </List>
-        </Grid>
-      </Grid>
-    </Box>
+    <footer className="mt-20 bg-slate-950">
+      <div className="container-page grid gap-10 py-14 md:grid-cols-4">
+        <div className="md:col-span-2">
+          <Logo light />
+          <p className="mt-4 max-w-sm text-sm leading-relaxed text-slate-400">
+            La place de marché où chacun fixe le prix. Enchères classiques, enchères inversées et demandes de devis, sans frais de mise en vente.
+          </p>
+          <div className="mt-5 flex gap-2">
+            <a href="https://github.com/AhmedJguirim/WeeBid-Auctions-marketplace" target="_blank" rel="noreferrer" aria-label="GitHub" className="flex h-9 w-9 items-center justify-center rounded-lg bg-slate-800 text-slate-300 transition hover:bg-brand-600 hover:text-white">
+              <Github size={17} />
+            </a>
+            <a href="mailto:jguirimahmed112@gmail.com" aria-label="Email" className="flex h-9 w-9 items-center justify-center rounded-lg bg-slate-800 text-slate-300 transition hover:bg-brand-600 hover:text-white">
+              <Mail size={17} />
+            </a>
+          </div>
+        </div>
+        <FooterColumn title="Explorer" links={explore} />
+        <FooterColumn title="Compte" links={account} />
+      </div>
+      <div className="border-t border-slate-800">
+        <div className="container-page flex flex-col items-center justify-between gap-2 py-5 text-xs text-slate-500 sm:flex-row">
+          <p>© {new Date().getFullYear()} WeeBid — projet de fin d'études.</p>
+          <p>React · Symfony · Socket.io · MariaDB</p>
+        </div>
+      </div>
+    </footer>
   );
 };
+
 export default Footer;

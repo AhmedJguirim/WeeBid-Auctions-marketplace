@@ -143,7 +143,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface{
     private $telephone;
 
     #[ORM\Column(type: 'json')]
-    #[Groups(['write:user', 'read:user:collection'])]
+    #[Groups(['read:user:collection'])] // not writable through the API: it would allow privilege escalation
     private $roles = [];
 
     #[ORM\Column(type: 'boolean')]
