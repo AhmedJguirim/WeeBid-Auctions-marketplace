@@ -45,6 +45,37 @@ The socket server reads `PORT`, `API_URL`, `CORS_ORIGIN`.
 HTTPS: put Caddy/Traefik/Cloudflare in front of port 18080 (shared reverse proxy for several apps) (nginx already forwards `X-Forwarded-Proto`).
 Update `PUBLIC_URL` to the `https://` address.
 
+## Updating the server
+
+There is no CI/CD: you update the server by running a script on it.
+
+```console
+cd ~/WeeBid-Auctions-marketplace
+scripts/deploy.sh
+```
+
+It fetches the branch you are on, backs up the database, fast-forwards the code, builds the new images while the old version keeps serving, restarts the stack and waits until the site and the API answer. If the new version does not become healthy it **goes back to the previous commit by itself**, and puts deploys on hold so nothing retries the broken commit.
+
+| Command | What it does |
+|---------|--------------|
+| `scripts/deploy.sh` | update if there is something new (does nothing otherwise) |
+| `scripts/deploy.sh --force` | rebuild and restart even if nothing changed (e.g. after editing `.env`) |
+| `scripts/deploy.sh --branch main` | switch the server to another branch |
+| `scripts/deploy.sh --resume` | lift the hold left by a rollback and deploy the latest code |
+| `scripts/rollback.sh [commit]` | go back to the previous (or a given) version and hold deploys |
+| `scripts/backup.sh` | dump the database and archive the uploads into `./backups` (last 10 kept) |
+| `scripts/restore.sh <db.sql.gz> [files.tar.gz]` | restore a backup (asks for confirmation) |
+
+Notes:
+- The backend runs `doctrine:schema:update --force` at every start, which can drop columns that were removed from an entity. That is why `deploy.sh` always takes a backup first.
+- A rollback restores the code only. Restore the database with `scripts/restore.sh` if a bad release changed data.
+- Optional automation with `crontab -e` (replace the path): deploy whatever is pushed every 5 minutes, and back up every night.
+  ```
+  */5 * * * * /home/ubuntu/WeeBid-Auctions-marketplace/scripts/deploy.sh -q >> /home/ubuntu/deploy.log 2>&1
+  0 3 * * *   /home/ubuntu/WeeBid-Auctions-marketplace/scripts/backup.sh -q >> /home/ubuntu/backup.log 2>&1
+  ```
+  `-q` keeps the logs empty unless something was actually deployed or went wrong.
+
 ## Useful commands
 
 ```console
