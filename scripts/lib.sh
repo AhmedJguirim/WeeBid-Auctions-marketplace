@@ -32,7 +32,22 @@ require_docker() {
   command -v curl >/dev/null 2>&1 || die "curl is not installed (sudo apt install curl)"
   docker compose version >/dev/null 2>&1 || die "the 'docker compose' plugin is missing (sudo apt install docker-compose-v2)"
   docker info >/dev/null 2>&1 || die "cannot talk to docker. Is your user in the docker group? (sudo usermod -aG docker \$USER, then log in again)"
-  [[ -f .env ]] || die ".env not found in $ROOT: create it first (see DOCKER.md, section 'On a VPS')"
+  [[ -f .env ]] || die ".env not found in $ROOT: create it with scripts/init-env.sh"
+  check_env
+}
+
+# every secret/name must be set in the private .env and must not be a placeholder
+check_env() {
+  local missing=() key val
+  for key in APP_SECRET JWT_PASSPHRASE DB_NAME DB_USER DB_PASSWORD DB_ROOT_PASSWORD SOCKET_PASSWORD ADMIN_EMAIL ADMIN_PASSWORD; do
+    val="$(env_value "$key" "")"
+    if [[ -z "$val" ]]; then missing+=("$key (missing)")
+    elif [[ "$val" == *CHANGE_ME* || "$val" == *change-me* ]]; then missing+=("$key (still a placeholder)"); fi
+  done
+  if [[ ${#missing[@]} -gt 0 ]]; then
+    printf '%s! .env is not ready: %s%s\n' "$YELLOW" "${missing[*]}" "$RESET" >&2
+    die "fill them in, or run: scripts/init-env.sh --upgrade --email you@example.com (adds the missing keys, never touches the others)"
+  fi
 }
 
 # true when the database container is up

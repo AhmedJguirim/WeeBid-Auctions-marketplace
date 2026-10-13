@@ -22,3 +22,8 @@ yarn-error.log
 ###> lexik/jwt-authentication-bundle ###
 /config/jwt/*.pem
 ###< lexik/jwt-authentication-bundle ###
+
+###> secrets (never commit) ###
+/.env
+/.env.*.local
+###< secrets ###

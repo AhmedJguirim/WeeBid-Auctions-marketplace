@@ -2,6 +2,9 @@
 set -e
 cd /var/www/html
 
+# never run with missing / placeholder / public secrets
+sh /usr/local/bin/check-secrets.sh || exit 1
+
 echo "[entrypoint] waiting for the database..."
 i=0
 until php bin/console dbal:run-sql "SELECT 1" >/dev/null 2>&1; do

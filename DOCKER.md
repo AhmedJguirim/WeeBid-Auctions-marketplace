@@ -3,16 +3,41 @@
 Everything (React app, Symfony API, socket.io server, MariaDB) runs from one command:
 
 ```console
-cp .env.example .env     # optional locally, edit it on a VPS (see below)
+scripts/init-env.sh              # creates YOUR private .env with random secrets (git-ignored)
 docker compose up -d --build
 ```
 
 | What | URL |
 |------|-----|
 | The app | `http://<host>:18080/` (`WEB_PORT`) |
-| Admin dashboard (EasyAdmin) | `http://<host>:18000/admin` (`ADMIN_PORT`) |
-| Default admin login | `admin@weebid.local` / `admin1234` (`ADMIN_EMAIL` / `ADMIN_PASSWORD`) |
-| Demo members | `amine@weebid.local`, `sarra@weebid.local`, `yassine@weebid.local`, … / `demo1234` |
+| Admin dashboard (EasyAdmin) | `http://localhost:18000/admin` (`ADMIN_PORT`); login = the e-mail and password printed by `init-env.sh` (`ADMIN_EMAIL` / `ADMIN_PASSWORD` in `.env`) |
+| Demo members | `amine@weebid.local`, `sarra@weebid.local`, `yassine@weebid.local`, … / `demo1234` (public on purpose, see `SEED_DEMO`) |
+
+## Secrets and configuration
+
+**Nothing secret is stored in the repository or in a Docker image.** The repository only contains templates
+(`.env.example`, `backend/.env.example`) with `CHANGE_ME` placeholders. Everything you must keep private lives in the
+`.env` at the root of the project, which is git-ignored and exists only on your machine / your server:
+
+| Variable | What it is |
+|----------|-----------|
+| `APP_SECRET`, `JWT_PASSPHRASE` | signing secrets of the API (sessions, login tokens) |
+| `DB_NAME`, `DB_USER`, `DB_PASSWORD`, `DB_ROOT_PASSWORD` | the database: names and passwords |
+| `ADMIN_EMAIL`, `ADMIN_PASSWORD` | the administrator account of the dashboard |
+| `SOCKET_PASSWORD` | password of the internal account used by the real-time server |
+
+`scripts/init-env.sh` generates all of them randomly (file mode 600). Docker Compose passes them to the containers when
+they **start**; images are built without them, so they can be rebuilt, shared or published safely. There is no default
+value: Compose stops if one is missing, and the backend refuses to start if one is still a `CHANGE_ME`, too short, or
+one of the values that used to be published in the repository.
+
+- **Back up your `.env`** (a password manager is fine): without it you cannot reach your database again.
+- The database name, user and passwords are used the first time the database starts. To change them later you need
+  `docker compose down -v`, which **erases the data**. Everything else can be changed any time: edit `.env` and run `scripts/deploy.sh --force`.
+- Use letters and digits only in passwords (they end up in a URL); the generated ones are hexadecimal.
+- **Existing server** created before this change? `git pull`, then `scripts/init-env.sh --upgrade` (adds the missing keys,
+  keeps the database names that already exist and never touches your other values), then `scripts/deploy.sh --force`.
+- The old `backend/.env` that used to be committed contained a development `APP_SECRET` and `JWT_PASSPHRASE`. They are still in the git history, so never use them anywhere (the backend rejects them).
 
 First start takes a few minutes (image builds). The backend waits for the DB, generates the JWT keys,
 creates the DB schema from the entities (the repo ships no migrations), creates the admin user and, unless `SEED_DEMO=false`, fills the database with demo data (5 members, 6 categories, 12 auctions with bid history, 6 reverse auctions). Restarting the stack refreshes the dates of expired demo auctions so the demo never looks dead. The demo content is seeded in French by default; set `SEED_LOCALE=en` for English (use `docker compose down -v` first if the database already exists).
@@ -37,10 +62,10 @@ The socket server reads `PORT`, `API_URL`, `CORS_ORIGIN`.
 ## On a VPS
 
 1. Install Docker + the compose plugin, clone the repo.
-2. `cp .env.example .env` and **change** `APP_SECRET`, `JWT_PASSPHRASE`, `DB_PASSWORD`, `DB_ROOT_PASSWORD`, `ADMIN_PASSWORD`, `SOCKET_PASSWORD`,
-   and set `PUBLIC_URL` to what users type in the browser (e.g. `http://203.0.113.10:18080`; it must match the browser URL exactly, port included).
+2. `scripts/init-env.sh --email you@example.com --url http://203.0.113.10:18080` creates the private `.env` **on the server**
+   (the URL is what users type in the browser, port included). Note the admin password it prints. Set `SEED_DEMO=false` in `.env` for a private installation without demo members.
 3. `docker compose up -d --build`
-4. Open ports 18080 (and 18000 for the admin, or set `ADMIN_PORT=127.0.0.1:18000` and use an SSH tunnel).
+4. Open port 18080 in the firewall. The admin dashboard is only bound to the server itself (`ADMIN_PORT=127.0.0.1:18000`): reach it through an SSH tunnel (`ssh -L 18000:127.0.0.1:18000 user@server`, then http://localhost:18000/admin).
 
 HTTPS: put Caddy/Traefik/Cloudflare in front of port 18080 (shared reverse proxy for several apps) (nginx already forwards `X-Forwarded-Proto`).
 Update `PUBLIC_URL` to the `https://` address.

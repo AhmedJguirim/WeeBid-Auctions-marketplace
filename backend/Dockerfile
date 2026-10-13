@@ -23,10 +23,13 @@ COPY composer.json composer.lock symfony.lock ./
 RUN composer install --no-dev --no-scripts --no-autoloader --prefer-dist --no-interaction
 
 COPY . .
+# Symfony wants a .env file to exist. The template only holds placeholders: the real values come from the
+# environment given to the container at runtime (docker-compose.yml <- the private .env), never from the image.
+RUN cp .env.example .env
 RUN composer dump-autoload --no-dev --optimize --classmap-authoritative \
     && mkdir -p var public/media public/user public/category config/jwt
 
-COPY docker/entrypoint.sh /usr/local/bin/entrypoint.sh
-RUN chmod +x /usr/local/bin/entrypoint.sh
+COPY docker/entrypoint.sh docker/check-secrets.sh /usr/local/bin/
+RUN chmod +x /usr/local/bin/entrypoint.sh /usr/local/bin/check-secrets.sh
 ENTRYPOINT ["entrypoint.sh"]
 CMD ["apache2-foreground"]

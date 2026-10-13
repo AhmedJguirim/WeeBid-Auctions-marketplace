@@ -74,15 +74,17 @@ You need [Docker](https://docs.docker.com/get-docker/) with the Compose plugin.
 ```bash
 git clone https://github.com/AhmedJguirim/WeeBid-Auctions-marketplace.git
 cd WeeBid-Auctions-marketplace
-cp .env.example .env
+scripts/init-env.sh              # creates your private .env (random secrets, git-ignored) and prints the admin login
 docker compose up -d --build
 ```
 
 The first start takes a few minutes. Then open:
 
 - **The app:** http://localhost:18080
-- **Admin dashboard:** http://localhost:18000/admin (`admin@weebid.local` / `admin1234`)
+- **Admin dashboard:** http://localhost:18000/admin (the admin e-mail and password printed by `init-env.sh`)
 - **Demo members** (the database is filled with sample auctions): `amine@weebid.local`, `sarra@weebid.local`… with password `demo1234`
+
+No secret is ever stored in the repository or in an image: they all live in your private `.env`.
 
 Putting it on a server, updates and backups: see [DOCKER.md](DOCKER.md).
 
@@ -94,7 +96,8 @@ Requirements: PHP 8.1, Composer, Node 18+, MariaDB or MySQL.
 # 1. Backend (http://127.0.0.1:8000)
 cd backend
 composer install
-#   set DATABASE_URL in backend/.env.local, then:
+cp .env.example .env             # git-ignored: set DATABASE_URL, APP_SECRET and JWT_PASSPHRASE in it
+#   then:
 php bin/console doctrine:database:create
 php bin/console doctrine:schema:update --force
 php bin/console lexik:jwt:generate-keypair
@@ -129,6 +132,10 @@ Contributions, bug reports and ideas are welcome.
 2. Run the app locally (see above) and keep the style of the surrounding code.
 3. Make sure `npm run build` passes. Add every new UI text to **both** `src/i18n/locales/fr.json` and `en.json`.
 4. Commit with a short, clear message and open a pull request describing what changed and why.
+
+## License
+
+[MIT](LICENSE) © Ahmed Jguirim
 
 ## Contact
 

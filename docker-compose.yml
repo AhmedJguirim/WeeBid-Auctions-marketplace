@@ -1,5 +1,8 @@
-# WeeBid demo stack:  docker compose up -d --build
-# Public entrypoint: http://<host>:${WEB_PORT:-18080}   Admin: http://<host>:${ADMIN_PORT:-18000}/admin
+# WeeBid stack:  scripts/init-env.sh   then   docker compose up -d --build
+# Public entrypoint: http://<host>:${WEB_PORT:-18080}   Admin: http://<host>:${ADMIN_PORT:-127.0.0.1:18000}/admin
+#
+# Every secret and every name comes from the private `.env` (git-ignored). There is deliberately NO default for them:
+# compose stops with an error if one is missing.
 name: weebid
 
 # every container: rotate logs (a chatty or attacked container must not fill the disk)
@@ -20,10 +23,10 @@ services:
     pids_limit: 200
     logging: *default-logging
     environment:
-      MARIADB_DATABASE: auctionHouse
-      MARIADB_USER: weebid
-      MARIADB_PASSWORD: ${DB_PASSWORD:-weebid_db_pass}
-      MARIADB_ROOT_PASSWORD: ${DB_ROOT_PASSWORD:-weebid_root_pass}
+      MARIADB_DATABASE: ${DB_NAME:?DB_NAME is missing in .env (run scripts/init-env.sh)}
+      MARIADB_USER: ${DB_USER:?DB_USER is missing in .env (run scripts/init-env.sh)}
+      MARIADB_PASSWORD: ${DB_PASSWORD:?DB_PASSWORD is missing in .env (run scripts/init-env.sh)}
+      MARIADB_ROOT_PASSWORD: ${DB_ROOT_PASSWORD:?DB_ROOT_PASSWORD is missing in .env (run scripts/init-env.sh)}
     volumes:
       - db-data:/var/lib/mysql
     healthcheck:
@@ -44,18 +47,18 @@ services:
         condition: service_healthy
     environment:
       APP_ENV: prod
-      APP_SECRET: ${APP_SECRET:-change-me-to-a-long-random-string}
-      DATABASE_URL: mysql://weebid:${DB_PASSWORD:-weebid_db_pass}@db:3306/auctionHouse?serverVersion=mariadb-10.11.0
-      JWT_PASSPHRASE: ${JWT_PASSPHRASE:-change-me-jwt-passphrase}
+      APP_SECRET: ${APP_SECRET:?APP_SECRET is missing in .env (run scripts/init-env.sh)}
+      DATABASE_URL: mysql://${DB_USER:?}:${DB_PASSWORD:?}@db:3306/${DB_NAME:?}?serverVersion=mariadb-10.11.0
+      JWT_PASSPHRASE: ${JWT_PASSPHRASE:?JWT_PASSPHRASE is missing in .env (run scripts/init-env.sh)}
       CORS_ALLOW_ORIGIN: '^https?://.*$'
-      ADMIN_EMAIL: ${ADMIN_EMAIL:-admin@weebid.local}
-      ADMIN_PASSWORD: ${ADMIN_PASSWORD:-admin1234}
+      ADMIN_EMAIL: ${ADMIN_EMAIL:?ADMIN_EMAIL is missing in .env (run scripts/init-env.sh)}
+      ADMIN_PASSWORD: ${ADMIN_PASSWORD:?ADMIN_PASSWORD is missing in .env (run scripts/init-env.sh)}
       # demo users/categories/auctions (accounts amine@weebid.local ... / demo1234)
       SEED_DEMO: ${SEED_DEMO:-true}
       SEED_LOCALE: ${SEED_LOCALE:-fr}   # language of the demo content: fr or en
       # service account of the socket server
       SOCKET_USER: socket@weebid.internal
-      SOCKET_PASSWORD: ${SOCKET_PASSWORD:-change-me-socket-password}
+      SOCKET_PASSWORD: ${SOCKET_PASSWORD:?SOCKET_PASSWORD is missing in .env (run scripts/init-env.sh)}
     volumes:
       - jwt-keys:/var/www/html/config/jwt
       - uploads-media:/var/www/html/public/media
@@ -64,7 +67,7 @@ services:
     ports:
       # Symfony directly: EasyAdmin dashboard at http://<host>:8000/admin
       # (its /login would clash with the React /login route behind nginx)
-      - "${ADMIN_PORT:-18000}:80"
+      - "${ADMIN_PORT:-127.0.0.1:18000}:80"
 
   socket:
     build: ./socket
@@ -80,7 +83,7 @@ services:
       API_URL: http://backend
       CORS_ORIGIN: ${PUBLIC_URL:-http://localhost:18080}
       SOCKET_USER: socket@weebid.internal
-      SOCKET_PASSWORD: ${SOCKET_PASSWORD:-change-me-socket-password}
+      SOCKET_PASSWORD: ${SOCKET_PASSWORD:?SOCKET_PASSWORD is missing in .env (run scripts/init-env.sh)}
       NOTIFICATION_LANG: ${SEED_LOCALE:-fr}
 
   web:
