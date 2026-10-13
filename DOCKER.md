@@ -37,7 +37,7 @@ The socket server reads `PORT`, `API_URL`, `CORS_ORIGIN`.
 ## On a VPS
 
 1. Install Docker + the compose plugin, clone the repo.
-2. `cp .env.example .env` and **change** `APP_SECRET`, `JWT_PASSPHRASE`, `DB_PASSWORD`, `DB_ROOT_PASSWORD`, `ADMIN_PASSWORD`,
+2. `cp .env.example .env` and **change** `APP_SECRET`, `JWT_PASSPHRASE`, `DB_PASSWORD`, `DB_ROOT_PASSWORD`, `ADMIN_PASSWORD`, `SOCKET_PASSWORD`,
    and set `PUBLIC_URL` to what users type in the browser (e.g. `http://203.0.113.10:18080`; it must match the browser URL exactly, port included).
 3. `docker compose up -d --build`
 4. Open ports 18080 (and 18000 for the admin, or set `ADMIN_PORT=127.0.0.1:18000` and use an SSH tunnel).
@@ -75,6 +75,20 @@ Notes:
   0 3 * * *   /home/ubuntu/WeeBid-Auctions-marketplace/scripts/backup.sh -q >> /home/ubuntu/backup.log 2>&1
   ```
   `-q` keeps the logs empty unless something was actually deployed or went wrong.
+
+## Limits and protection
+
+The stack is meant to run on a small public VPS, so every layer has limits:
+
+| Layer | Protection |
+|-------|-----------|
+| **nginx** (`docker/nginx/default.conf`) | per-IP rate limits: 30 req/s overall, 15 req/s on the API, 1 write/s, 10 logins/min, 1 sign-up/min (+ small bursts), 10 uploads/min; 40 connections per IP; JSON bodies capped at 64 KB, uploads at 6 MB; short timeouts. Over the limit the answer is a JSON `429` / `413` and the UI shows a message. Behind Caddy/another proxy it reads the real IP from `X-Forwarded-For` (private ranges only). |
+| **Uploads** | JPEG / PNG / WebP / GIF only (checked on the content, not the file name), 5 MB, 6000 px max, 4 images per article, only while the article is not published yet, random file names, and PHP/HTML execution disabled in the upload folders. |
+| **API** | reading is public, every write needs a logged-in member; a member can have at most 30 running auctions and 30 running reverse auctions; length limits on text fields. |
+| **Socket server** | per-IP connection cap, per-connection event rate limit (then disconnection), 100 KB messages, every bid/request is verified against the API before being announced, personal notification rooms need the member's token. |
+| **Containers** | memory / CPU / process caps on every service, log rotation, Apache limited to 20 workers, MariaDB to 60 connections. |
+
+To tune a limit, edit the file and run `scripts/deploy.sh --force`.
 
 ## Useful commands
 

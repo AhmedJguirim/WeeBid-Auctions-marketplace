@@ -69,6 +69,7 @@ class Article
 // TODO: add a user property for the put and delete !
     #[ORM\Column(type: 'string', length: 255)]
     #[Groups(['read:vente:item', 'read:enchere:item', 'read:article:collection', 'read:enchereInverse:item', 'write:article'])]
+    #[Assert\Length(max: 100)]
     private $localisation;
 
 
@@ -86,6 +87,7 @@ class Article
 
     #[ORM\Column(type: 'string', length: 255, nullable: true)]
     #[Groups(['read:vente:item', 'read:enchere:item', 'read:article:collection', 'read:enchereInverse:item', 'write:article'])]
+    #[Assert\Length(max: 50)]
     private $codebar;
 
     #[ORM\OneToMany(mappedBy: 'article', targetEntity: Document::class, orphanRemoval: true)]
@@ -96,6 +98,7 @@ class Article
 
     #[ORM\Column(type: 'text', nullable: true)]
     #[Groups(['read:vente:item', 'read:enchere:item', 'read:article:collection', 'read:enchereInverse:item', 'write:article'])]
+    #[Assert\Length(max: 1000)]
     private $description;
 
     public function __construct()

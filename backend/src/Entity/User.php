@@ -95,6 +95,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface{
         message: "le nom ne doit pas contenir des characteres speciaux et ça doit etre entre 2 et 5 mots"
     )]
     #[Assert\NotNull]
+    #[Assert\Length(max: 100)]
     private $name;
 
     #[ORM\Column(type: 'string', length: 20)]
@@ -118,6 +119,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface{
         message: "l'email :{{ value }} n'est pas un email valide.",
     )]
     #[Assert\NotNull]
+    #[Assert\Length(max: 180)]
     private $email;
 
    

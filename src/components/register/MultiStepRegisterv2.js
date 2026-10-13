@@ -6,6 +6,7 @@ import { Link, Navigate } from "react-router-dom";
 import { useSelector } from "react-redux";
 import { AlertCircle, ArrowLeft, ArrowRight, Check, Loader2 } from "lucide-react";
 import { apiRoutes, navRoutes } from "../../config/routes";
+import Api from "../../AxiosInstance";
 import AuthLayout from "../ui/AuthLayout";
 import Field from "../ui/Field";
 
@@ -65,7 +66,7 @@ export default function MultiStepRegister() {
         localStorage.setItem("token", login.data.token);
         localStorage.setItem("refresh", login.data.refresh_token);
         const me = await axios.get(`${apiRoutes.API}/userdata`, { headers: { Authorization: `Bearer ${login.data.token}` } });
-        await axios.post(`${apiRoutes.API}/adresses`, { pays: v.pays, ville: v.ville, rue: v.rue, zipcode: v.zipcode, user: `/api/users/${me.data.id}` });
+        await Api.post("/adresses", { pays: v.pays, ville: v.ville, rue: v.rue, zipcode: v.zipcode, user: `/api/users/${me.data.id}` });
         document.location.href = "/";
       } catch (err) {
         setLoading(false);
@@ -137,21 +138,21 @@ export default function MultiStepRegister() {
 
         {step === 0 && (
           <div className="grid gap-5 sm:grid-cols-2">
-            <Field label={t("form.fullName")} autoComplete="name" {...fieldProps("name")} />
-            <Field label={t("form.username")} autoComplete="username" {...fieldProps("displayName")} />
-            <Field label={t("form.email")} type="email" autoComplete="email" className="sm:col-span-2" {...fieldProps("email")} />
-            <Field label={t("form.password")} type="password" autoComplete="new-password" {...fieldProps("password")} />
-            <Field label={t("form.phone")} inputMode="numeric" placeholder={t("register.phonePlaceholder")} autoComplete="tel" {...fieldProps("telephone")} />
+            <Field label={t("form.fullName")} maxLength={100} autoComplete="name" {...fieldProps("name")} />
+            <Field label={t("form.username")} maxLength={15} autoComplete="username" {...fieldProps("displayName")} />
+            <Field label={t("form.email")} type="email" maxLength={180} autoComplete="email" className="sm:col-span-2" {...fieldProps("email")} />
+            <Field label={t("form.password")} type="password" maxLength={128} autoComplete="new-password" {...fieldProps("password")} />
+            <Field label={t("form.phone")} inputMode="numeric" maxLength={8} placeholder={t("register.phonePlaceholder")} autoComplete="tel" {...fieldProps("telephone")} />
             <Field label={t("form.birthDate")} type="date" className="sm:col-span-2" {...fieldProps("birthDate")} />
           </div>
         )}
 
         {step === 1 && (
           <div className="grid gap-5 sm:grid-cols-2">
-            <Field label={t("form.country")} {...fieldProps("pays")} />
-            <Field label={t("form.city")} autoComplete="address-level2" {...fieldProps("ville")} />
-            <Field label={t("form.street")} autoComplete="street-address" {...fieldProps("rue")} />
-            <Field label={t("form.zip")} inputMode="numeric" placeholder={t("register.zipPlaceholder")} autoComplete="postal-code" {...fieldProps("zipcode")} />
+            <Field label={t("form.country")} maxLength={60} {...fieldProps("pays")} />
+            <Field label={t("form.city")} maxLength={60} autoComplete="address-level2" {...fieldProps("ville")} />
+            <Field label={t("form.street")} maxLength={120} autoComplete="street-address" {...fieldProps("rue")} />
+            <Field label={t("form.zip")} inputMode="numeric" maxLength={4} placeholder={t("register.zipPlaceholder")} autoComplete="postal-code" {...fieldProps("zipcode")} />
           </div>
         )}
 

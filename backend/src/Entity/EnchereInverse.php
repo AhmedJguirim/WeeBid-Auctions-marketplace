@@ -75,6 +75,7 @@ class EnchereInverse
     #[ORM\Column(type: 'integer')]
     #[Groups(['read:enchereInverse:collection','write:enchereInverse','read:enchereInverse:search'])]
     #[Assert\Positive]
+    #[Assert\LessThanOrEqual(100000)]
     private $quantity;
 
     #[ORM\Column(type: 'float')]

@@ -2,12 +2,30 @@
 
 namespace App\Security\Voter;
 
+use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Authorization\Voter\Voter;
 use Symfony\Component\Security\Core\User\UserInterface;
 
 class EnchereVoter extends Voter
 {
+    /** a member cannot have more than this many running listings of this kind (keeps the database from being flooded) */
+    private const MAX_ACTIVE_LISTINGS = 30;
+
+    public function __construct(private EntityManagerInterface $em)
+    {
+    }
+
+    private function activeListings($user): int
+    {
+        return (int) $this->em->createQueryBuilder()
+            ->select('COUNT(e.id)')
+            ->from(\App\Entity\Enchere::class, 'e')
+            ->where('e.user = :user')->andWhere('e.endDate > :now')
+            ->setParameter('user', $user)->setParameter('now', new \DateTime())
+            ->getQuery()->getSingleScalarResult();
+    }
+
     protected function supports(string $attribute, $subject): bool
     {
         // replace with your own logic
@@ -30,6 +48,9 @@ class EnchereVoter extends Voter
                 // logic to determine if the user can EDIT
                 // return true or false
                 
+                if ($this->activeListings($user) >= self::MAX_ACTIVE_LISTINGS) {                
+                    return false;                
+                }                
                 if ($subject->getUser() === $user) {
                     return true;
                 }

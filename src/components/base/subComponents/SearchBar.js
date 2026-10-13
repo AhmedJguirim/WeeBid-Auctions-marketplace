@@ -99,6 +99,7 @@ export default function SearchBar({ className = "", onNavigate }) {
           onFocus={() => setOpen(true)}
           placeholder={t("search.placeholder")}
           aria-label={t("search.placeholder")}
+          maxLength={60}
           className="min-w-0 flex-1 border-0 bg-transparent px-3 py-2.5 text-sm text-slate-800 outline-none placeholder:text-slate-400"
         />
         <button type="submit" aria-label={t("search.submit")} className="px-3 text-slate-400 hover:text-brand-600">

@@ -11,6 +11,8 @@ import PageHeader from "../ui/PageHeader";
 
 const stepFields = [["name", "state", "localisation", "brand", "codebar", "description", "date"], ["quantity", "initPrice", "category", "startDate", "endDate"]];
 
+const MAX_IMAGE_BYTES = 5 * 1024 * 1024; // same limit as the server
+
 const toLocal = (date) => {
   const d = new Date(date);
   d.setMinutes(d.getMinutes() - d.getTimezoneOffset());
@@ -137,7 +139,10 @@ export default function CreateArticle() {
   };
 
   const addFiles = (list) => {
-    const incoming = Array.from(list).filter((f) => f.type.startsWith("image/"));
+    const all = Array.from(list);
+    if (all.some((f) => !["image/jpeg", "image/png", "image/webp", "image/gif"].includes(f.type))) alert(t("create.fileType"));
+    if (all.some((f) => f.size > MAX_IMAGE_BYTES)) alert(t("create.fileTooBig"));
+    const incoming = all.filter((f) => ["image/jpeg", "image/png", "image/webp", "image/gif"].includes(f.type) && f.size <= MAX_IMAGE_BYTES);
     const room = 4 - files.length;
     if (incoming.length > room) alert(t("create.max4"));
     setFiles([...files, ...incoming.slice(0, room).map((file) => ({ file, url: URL.createObjectURL(file) }))]);
@@ -191,17 +196,17 @@ export default function CreateArticle() {
           {step === 0 && (
             <>
               <div className="grid gap-5 sm:grid-cols-2">
-                <Field label={t("create.name")} placeholder={t("create.namePlaceholder")} {...fieldProps("name")} />
+                <Field label={t("create.name")} placeholder={t("create.namePlaceholder")} maxLength={15} {...fieldProps("name")} />
                 <Field label={t("detail.state")} as="select" {...fieldProps("state")}>
                   <option value="utilisé">{t("state.utilisé")}</option>
                   <option value="neuf">{t("state.neuf")}</option>
                 </Field>
-                <Field label={t("detail.location")} placeholder={t("create.locationPlaceholder")} {...fieldProps("localisation")} />
-                <Field label={`${t("detail.brand")} ${t("create.optional")}`} {...fieldProps("brand")} />
-                <Field label={`${t("detail.barcode")} ${t("create.optional")}`} {...fieldProps("codebar")} />
+                <Field label={t("detail.location")} placeholder={t("create.locationPlaceholder")} maxLength={100} {...fieldProps("localisation")} />
+                <Field label={`${t("detail.brand")} ${t("create.optional")}`} maxLength={15} {...fieldProps("brand")} />
+                <Field label={`${t("detail.barcode")} ${t("create.optional")}`} maxLength={50} {...fieldProps("codebar")} />
                 <Field label={`${t("detail.manufactured")} ${t("create.optional")}`} type="date" {...fieldProps("date")} />
               </div>
-              <Field label={t("detail.description")} as="textarea" rows={5} placeholder={t("create.descriptionPlaceholder")} hint={`${formik.values.description.length}/255`} {...fieldProps("description")} />
+              <Field label={t("detail.description")} as="textarea" rows={5} maxLength={255} placeholder={t("create.descriptionPlaceholder")} hint={`${formik.values.description.length}/255`} {...fieldProps("description")} />
 
               <div>
                 <p className="mb-1.5 text-sm font-semibold text-slate-700">{t("create.photos")} <span className="font-normal text-slate-400">{t("create.photosMax")}</span></p>
@@ -218,7 +223,7 @@ export default function CreateArticle() {
                     <label className="flex aspect-square cursor-pointer flex-col items-center justify-center gap-1 rounded-xl border-2 border-dashed border-slate-300 text-slate-400 transition hover:border-brand-400 hover:bg-brand-50 hover:text-brand-600">
                       <ImagePlus size={22} />
                       <span className="text-xs font-semibold">{t("create.add")}</span>
-                      <input type="file" accept="image/*" multiple className="sr-only" onChange={(e) => { addFiles(e.target.files); e.target.value = ""; }} />
+                      <input type="file" accept="image/jpeg,image/png,image/webp,image/gif" multiple className="sr-only" onChange={(e) => { addFiles(e.target.files); e.target.value = ""; }} />
                     </label>
                   )}
                 </div>
@@ -239,7 +244,7 @@ export default function CreateArticle() {
                     <option key={c.id} value={c.id}>{c.name}</option>
                   ))}
                 </Field>
-                <Field label={t("detail.quantity")} type="number" min="1" {...fieldProps("quantity")} />
+                <Field label={t("detail.quantity")} type="number" min="1" max="100000" {...fieldProps("quantity")} />
                 <Field label={inverse ? t("create.budget") : t("create.startPriceTnd")} type="number" min="0" step="0.1" {...fieldProps("initPrice")} />
                 <span className="hidden sm:block" />
                 <Field label={t("detail.start")} type="datetime-local" {...fieldProps("startDate")} />

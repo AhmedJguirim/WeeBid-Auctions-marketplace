@@ -46,11 +46,14 @@ class DemandeDevis
 
     #[ORM\Column(type: 'string', length: 255)]
     #[Groups(['write:demandeDevis', 'read:demandeDevis:collection'])]
+    #[Assert\NotBlank]
+    #[Assert\Length(max: 1000)]
     private $descriptionArticle;
 
     #[ORM\Column(type: 'integer')]
     #[Groups(['write:demandeDevis', 'read:demandeDevis:collection'])]
     #[Assert\Positive]
+    #[Assert\LessThanOrEqual(100000)]
     private $quantity;
 
     #[ORM\ManyToOne(targetEntity: User::class, inversedBy: 'demandeDevisTransmis')]

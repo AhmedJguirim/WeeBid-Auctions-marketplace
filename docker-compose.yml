@@ -1,10 +1,24 @@
-name: weebid
 # WeeBid demo stack:  docker compose up -d --build
 # Public entrypoint: http://<host>:${WEB_PORT:-18080}   Admin: http://<host>:${ADMIN_PORT:-18000}/admin
+name: weebid
+
+# every container: rotate logs (a chatty or attacked container must not fill the disk)
+x-logging: &default-logging
+  driver: json-file
+  options:
+    max-size: "10m"
+    max-file: "3"
+
 services:
   db:
     image: mariadb:10.11
     restart: unless-stopped
+    # connection / memory caps so a flood of requests cannot starve the machine
+    command: ["--max-connections=60", "--innodb-buffer-pool-size=128M", "--max-allowed-packet=8M"]
+    mem_limit: 512m
+    cpus: 1.0
+    pids_limit: 200
+    logging: *default-logging
     environment:
       MARIADB_DATABASE: auctionHouse
       MARIADB_USER: weebid
@@ -21,6 +35,10 @@ services:
   backend:
     build: ./backend
     restart: unless-stopped
+    mem_limit: 640m
+    cpus: 1.5
+    pids_limit: 200
+    logging: *default-logging
     depends_on:
       db:
         condition: service_healthy
@@ -35,6 +53,9 @@ services:
       # demo users/categories/auctions (accounts amine@weebid.local ... / demo1234)
       SEED_DEMO: ${SEED_DEMO:-true}
       SEED_LOCALE: ${SEED_LOCALE:-fr}   # language of the demo content: fr or en
+      # service account of the socket server
+      SOCKET_USER: socket@weebid.internal
+      SOCKET_PASSWORD: ${SOCKET_PASSWORD:-change-me-socket-password}
     volumes:
       - jwt-keys:/var/www/html/config/jwt
       - uploads-media:/var/www/html/public/media
@@ -48,16 +69,27 @@ services:
   socket:
     build: ./socket
     restart: unless-stopped
+    mem_limit: 192m
+    cpus: 0.5
+    pids_limit: 100
+    logging: *default-logging
     depends_on:
       - backend
     environment:
       PORT: 8081
       API_URL: http://backend
       CORS_ORIGIN: ${PUBLIC_URL:-http://localhost:18080}
+      SOCKET_USER: socket@weebid.internal
+      SOCKET_PASSWORD: ${SOCKET_PASSWORD:-change-me-socket-password}
+      NOTIFICATION_LANG: ${SEED_LOCALE:-fr}
 
   web:
     build: .
     restart: unless-stopped
+    mem_limit: 128m
+    cpus: 0.5
+    pids_limit: 100
+    logging: *default-logging
     depends_on:
       - backend
       - socket

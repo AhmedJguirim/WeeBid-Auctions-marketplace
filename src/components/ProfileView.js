@@ -257,8 +257,8 @@ const ProfileView = ({ id: publicId, own = false }) => {
         }
       >
         <form id="devis-form" onSubmit={sendDevis} className="space-y-4">
-          <Field id="quantity" label={t("detail.quantity")} type="number" min="1" required value={quantity} onChange={(e) => setQuantity(e.target.value)} />
-          <Field id="description" label={t("profile.quoteItem")} as="textarea" rows={5} required placeholder={t("profile.quotePlaceholder")} value={description} onChange={(e) => setDescription(e.target.value)} />
+          <Field id="quantity" label={t("detail.quantity")} type="number" min="1" max="100000" required value={quantity} onChange={(e) => setQuantity(e.target.value)} />
+          <Field id="description" label={t("profile.quoteItem")} as="textarea" rows={5} required maxLength={1000} placeholder={t("profile.quotePlaceholder")} value={description} onChange={(e) => setDescription(e.target.value)} />
         </form>
       </Modal>
     </div>

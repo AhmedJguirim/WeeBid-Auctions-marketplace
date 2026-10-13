@@ -2,6 +2,7 @@ import axios from "axios";
 import { StatusCodes } from "http-status-codes";
 import { navRoutes } from "./config/routes";
 import { apiRoutes } from "./config/routes";
+import { reportHttpError } from "./utils/httpErrors";
 
 const Api = () => {
   const api = axios.create({
@@ -28,7 +29,8 @@ const Api = () => {
     (response) => response,
 
     (error) => {
-      console.log("Error Interceptor");
+      reportHttpError(error);
+      if (!error.response) return Promise.reject(error);
       const { status } = error.response;
       if (status === StatusCodes.INTERNAL_SERVER_ERROR) {
         // configureStore.dispatch({

@@ -338,7 +338,9 @@
     "choose": "Choose…",
     "budget": "Maximum budget (TND)",
     "startPriceTnd": "Starting price (TND)",
-    "publish": "Publish listing"
+    "publish": "Publish listing",
+    "fileType": "Only JPEG, PNG, WebP and GIF images are accepted.",
+    "fileTooBig": "Each image must be 5 MB or less."
   },
   "profile": {
     "editFailed": "The update failed, check the value you entered.",
@@ -381,5 +383,10 @@
     "proposalsSubtitle": "Auctions other members offer you following your quote requests.",
     "proposalsEmpty": "You have not received any proposal.",
     "proposedAuction": "Proposed auction"
+  },
+  "errors": {
+    "tooMany": "Too many requests in a short time. Wait a few seconds and try again.",
+    "tooLarge": "The data you sent is too large.",
+    "network": "Cannot reach the server. Check your connection."
   }
 }

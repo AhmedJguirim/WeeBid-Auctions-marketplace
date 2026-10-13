@@ -338,7 +338,9 @@
     "choose": "Choisir…",
     "budget": "Budget maximum (TND)",
     "startPriceTnd": "Prix de départ (TND)",
-    "publish": "Publier l'annonce"
+    "publish": "Publier l'annonce",
+    "fileType": "Seules les images JPEG, PNG, WebP et GIF sont acceptées.",
+    "fileTooBig": "Chaque image doit faire 5 Mo au maximum."
   },
   "profile": {
     "editFailed": "La modification a échoué, vérifiez la valeur saisie.",
@@ -381,5 +383,10 @@
     "proposalsSubtitle": "Les enchères que d'autres membres vous proposent suite à vos demandes de devis.",
     "proposalsEmpty": "Vous n'avez reçu aucune proposition.",
     "proposedAuction": "Enchère proposée"
+  },
+  "errors": {
+    "tooMany": "Trop de requêtes en peu de temps. Patientez quelques secondes puis réessayez.",
+    "tooLarge": "Les données envoyées sont trop volumineuses.",
+    "network": "Impossible de joindre le serveur. Vérifiez votre connexion."
   }
 }

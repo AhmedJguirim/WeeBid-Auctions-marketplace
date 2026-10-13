@@ -35,6 +35,7 @@ import UserSearchPage from '../productsPage/search/UserSearchPage'
 import NotificationListing from '../tableListings/NotificationListing'
 import PropositionsListing from '../tableListings/propositionsListing'
 import Footer from './subComponents/Footer'
+import Toaster from '../ui/Toaster'
 // import image from "../../media/images/backgroundimg.gif"
 
 
@@ -122,6 +123,7 @@ const Base = () => {
         </Routes>
         </main>
         <Footer />
+        <Toaster />
       </div>
     </Router>
   )

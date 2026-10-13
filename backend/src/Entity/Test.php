@@ -13,8 +13,7 @@ use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\SearchFilter;
 
 
 #[ORM\Entity(repositoryClass: TestRepository::class)]
-#[ApiResource()
-,ApiFilter(SearchFilter::class, properties: ['name'=>'partial'])]
+// no #[ApiResource]: this was a development leftover and must not be writable by anyone
 
 class Test
 {

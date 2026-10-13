@@ -62,6 +62,10 @@ security:
     # Note: Only the *first* access control that matches will be used
     access_control:
         - { path: ^/admin, roles: ROLE_ADMIN }
+        # public endpoints that must work without a token
+        - { path: '^/api/(register|login|login_check|logout|token/refresh)$', roles: PUBLIC_ACCESS }
+        # reading is public; every write needs a logged-in user (anonymous visitors cannot create or delete anything)
+        - { path: ^/api, methods: [POST, PUT, PATCH, DELETE], roles: ROLE_USER }
         # - { path: ^/profile, roles: ROLE_USER }
 
 when@test:

@@ -77,6 +77,7 @@ class Enchere
     #[ORM\Column(type: 'integer')]
     #[Groups(['read:surveille:collection','read:enchere:collection', "read:enchere:item",'read:enchere:search'])]
     #[Assert\Positive]
+    #[Assert\LessThanOrEqual(100000)]
     private $quantity;
 
     #[ORM\Column(type: 'float')]

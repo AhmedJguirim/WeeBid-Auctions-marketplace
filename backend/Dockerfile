@@ -13,6 +13,8 @@ ENV APACHE_DOCUMENT_ROOT=/var/www/html/public \
     COMPOSER_ALLOW_SUPERUSER=1
 RUN sed -ri 's!/var/www/html!${APACHE_DOCUMENT_ROOT}!g' /etc/apache2/sites-available/*.conf /etc/apache2/apache2.conf /etc/apache2/conf-available/*.conf
 COPY docker/apache-symfony.conf /etc/apache2/conf-enabled/symfony.conf
+COPY docker/apache-mpm.conf /etc/apache2/conf-enabled/zz-mpm-limits.conf
+COPY docker/php-limits.ini /usr/local/etc/php/conf.d/zz-limits.ini
 
 WORKDIR /var/www/html
 
