@@ -1,102 +1,135 @@
-# Auctions marketplace web application
-Welcome to project of end of studies that covered the topic of an auctions marketplace achieved using mainly ReactJS/Symfony/NodeJS. i worked on this project for about 3 to 4 months including a full 40 pages report in french about it. This project was a big step for me in my journey of Web development but i am aware that i'm still at the beginnings and i still have a lot to learn.
+<div align="center">
 
-## The idea of the project
-the initial idea was to create a digital marketplace where people compete over a product regardless of its nature by bidding for the best price. We also implemented reversed auctions which are people listen a need for a specific product and people could promote their products that answer the need.
+# WeeBid — online auction marketplace
 
-## What's special about our app compared to a traditional auction marketplace
+**Buy, sell and negotiate through live auctions, reverse auctions and quote requests.**
+My first full-stack web project: React · Symfony · Node.js (Socket.io) · MariaDB
 
-- the standard services are free : we remove most boundaries like the price of publishing a product in the auction , the initial amount that you need to pay in order to be able to bid for a certain product and more.
+<img src="docs/screenshots/home.jpg" alt="WeeBid homepage" width="860">
 
-- Time flexibility : We made the time in which the auction will take place and its duration flexible and for the announcer to freely choose
+</div>
 
-- Reversed auctions : A user can publish the need of a certain item and people could promote the products they have which they believe that they answer the need (this feature needs to be tested to verify its success)
+## The idea
 
-## features
+WeeBid is a marketplace where people compete over a product by bidding for the best price, whatever the product is.
+I wanted to remove what makes classic auction sites annoying:
 
-- Registration and authentication: users can create an account and sign to be able to use the features of the application.
+- **Free to use**: no listing fee and no deposit to bid.
+- **Flexible timing**: the seller freely chooses when the auction starts and how long it lasts.
+- **Reverse auctions**: a buyer posts a need and sellers compete by *lowering* their price. The lowest offer wins.
 
-- Listing creation: users can list the items that they want to sell in the application.
+It started as my end-of-studies project: about 3–4 months of work, plus a 40-page report (in French). It was my first real step into web development.
 
-- Bidding system : the application proves bidding functionality to place bids on items. also a Real-time bidding updates with bid history is implemented.
+## Main features
 
-- Auction timer : Countdown timers to display the time remaining for each auction to start and for it to end.
+- **Auctions** with live countdown, bid history and a seller dashboard (close, edit dates, manage bids).
+- **Reverse auctions** and **quote requests / proposals** between members.
+- **Real-time prices and notifications** pushed to every open browser with Socket.io.
+- **Watch list**: follow an auction and get notified on every new bid.
+- **Accounts**: sign up, JWT authentication, editable profile, public member pages.
+- **Search and browsing** by category, member or keyword, with pagination.
+- **Photo uploads** for listings and an **admin dashboard** (EasyAdmin) to manage all the data.
+- **Responsive**, available in **French and English**.
 
-- Watchlist : users can watch an auction and receive notifications about any updates that concern it.
+<table>
+  <tr>
+    <td><img src="docs/screenshots/auctions.jpg" alt="Auction list"></td>
+    <td><img src="docs/screenshots/auction.jpg" alt="Auction page with live countdown and bidding"></td>
+  </tr>
+  <tr>
+    <td align="center"><img src="docs/screenshots/mobile-home.jpg" alt="Mobile homepage" width="230"></td>
+    <td align="center"><img src="docs/screenshots/mobile-auction.jpg" alt="Mobile auction page" width="230"></td>
+  </tr>
+</table>
 
-- Administrative Tools : the app provides an admin dashboard that allows him to manage most of the app's data
+## Tech stack
 
-- Real time features : prices are being updated on real time.
+| | |
+|---|---|
+| **Frontend** | React 17, Redux, React Router, Formik, Axios, Tailwind CSS, i18next |
+| **Backend** | Symfony 5.4, API Platform, Doctrine ORM, JWT (Lexik), EasyAdmin |
+| **Real-time** | Node.js + Socket.io |
+| **Database** | MariaDB / MySQL |
 
-## technologies used:
-
-- ReactJS + Tailwind CSS (+ i18next for the French/English UI): the frontend of the application which provides interfaces to interact with the end User
-  
-- Symfony: the backend of the application. Used to create the APIs and the Admin dashboard
-  
-- NodeJS: used to implement the real time features to the application via Socket.io
-
-- MySql: this application uses a MySql database server to store data
-
-## Run it with Docker
-
-See [DOCKER.md](DOCKER.md): `docker compose up -d --build`, then open http://localhost:18080 (demo data included).
-
-## how to use (manual setup)
-
-you need to have symfony, composer , a mysql server and nodeJS installed in your machine to run this project
-
-symfony: https://symfony.com/download
-
-composer: https://getcomposer.org/download/
-
-xampp for the mysql server (you can use an alternative): https://www.apachefriends.org/
-
-nodeJS : https://nodejs.org/en
-
-once you have these two you should clone the project:
-
-```console
-git clone https://github.com/sorrow112/Auctions-Marketplace-frontend.git
+```
+ Browser (React) ──► Symfony REST API ──► MariaDB
+        │                    ▲
+        └── Socket.io ──► Node server (verifies bids, creates notifications)
 ```
 
-then you move into the folder where you have the project on your console and install the dependecies then run the project
+## What was updated with Claude
 
-```console
-npm install
-npm start
+The application itself (concept, data model, API, real-time features) is my original work. I recently used [Claude](https://claude.ai/code) to modernise how it looks and who can use it:
+
+- **A complete UI redesign with Tailwind CSS**: new design system (colours, typography, components), a responsive layout from phone to desktop, a new homepage, auction cards, auction page, forms, profile and tables, plus loading and empty states.
+- **Cleaner frontend code**: one shared component for all auction listings and one for auction pages, instead of many near-identical copies.
+- **French / English translation** with i18next: language switcher in the navbar, remembered choice, and numbers and dates formatted for the selected language.
+
+## Installation
+
+### Quick start with Docker (recommended)
+
+You need [Docker](https://docs.docker.com/get-docker/) with the Compose plugin.
+
+```bash
+git clone https://github.com/AhmedJguirim/WeeBid-Auctions-marketplace.git
+cd WeeBid-Auctions-marketplace
+cp .env.example .env
+docker compose up -d --build
 ```
 
-then you have to clone the backend  into another seperate folder:
+The first start takes a few minutes. Then open:
 
-```console
-git clone https://github.com/sorrow112/Auction-Marketplace-backend.git
-```
+- **The app:** http://localhost:18080
+- **Admin dashboard:** http://localhost:18000/admin (`admin@weebid.local` / `admin1234`)
+- **Demo members** (the database is filled with sample auctions): `amine@weebid.local`, `sarra@weebid.local`… with password `demo1234`
 
-make sure to run the database server and configure the connection to it in your .env file (see symfony documentation if you need help with that https://symfony.com/doc/current/doctrine.html#configuring-the-database)
-After that install dependencies and run the backend 
+Putting it on a server, updates and backups: see [DOCKER.md](DOCKER.md).
 
-```console
+### Manual setup (for development)
+
+Requirements: PHP 8.1, Composer, Node 18+, MariaDB or MySQL.
+
+```bash
+# 1. Backend (http://127.0.0.1:8000)
+cd backend
 composer install
-symfony server:start
+#   set DATABASE_URL in backend/.env.local, then:
+php bin/console doctrine:database:create
+php bin/console doctrine:schema:update --force
+php bin/console lexik:jwt:generate-keypair
+php bin/console app:create-admin you@example.com a-strong-password
+php bin/console app:seed-demo                # optional sample data
+php -S 127.0.0.1:8000 -t public              # or: symfony server:start
+
+# 2. Real-time server (port 8081)
+cd ../socket && npm install
+#   notifications are created through a plain member account:
+#   (backend) php bin/console app:create-admin socket@weebid.internal <password> --role=ROLE_USER --display-name=weebidsocket
+SOCKET_PASSWORD=<password> npm start
+
+# 3. Frontend (http://localhost:3000)
+cd .. && npm install --legacy-peer-deps && npm start
 ```
-if something didn't work properly you can consult the symfony documentation for a step by step guide : https://symfony.com/doc/5.4/index.html
 
-(i promise this will be the last step :D)
-you need to clone the last part of the application into a seperate folder. this is the websocket part of the code.
+## Project structure
 
-```console
-git clone https://github.com/sorrow112/socket.io_pfe.git
+```
+src/        React app (components, redux, i18n/locales)
+backend/    Symfony API, entities, admin dashboard
+socket/     Socket.io server
+docker/     nginx config      scripts/   deployment helpers
 ```
 
-then you install dependencies for this too and run it
-```console
-npm install
-npm run devStart
-```
+## Contributing
 
-the app should be up and running if you followed the steps , if you run into problems please make sure to contact me on my email address below and i'd gladly do my best to help
+Contributions, bug reports and ideas are welcome.
 
-## Contact me
+1. Fork the repo and create a branch: `git checkout -b feature/my-idea`.
+2. Run the app locally (see above) and keep the style of the surrounding code.
+3. Make sure `npm run build` passes. Add every new UI text to **both** `src/i18n/locales/fr.json` and `en.json`.
+4. Commit with a short, clear message and open a pull request describing what changed and why.
 
-via email: jguirimahmed112@gmail.com
+## Contact
+
+**Ahmed Jguirim** · jguirimahmed112@gmail.com · [GitHub](https://github.com/AhmedJguirim)
