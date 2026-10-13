@@ -38,7 +38,11 @@ the initial idea was to create a digital marketplace where people compete over a
 
 - MySql: this application uses a MySql database server to store data
 
-##how to use
+## Run it with Docker
+
+See [DOCKER.md](DOCKER.md): `docker compose up -d --build`.
+
+## how to use (manual setup)
 
 you need to have symfony, composer , a mysql server and nodeJS installed in your machine to run this project
 

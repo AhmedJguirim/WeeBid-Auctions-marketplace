@@ -1,0 +1,9 @@
+.git
+.idea
+var
+vendor
+node_modules
+public/build
+config/jwt/*.pem
+.env.local
+*.rar

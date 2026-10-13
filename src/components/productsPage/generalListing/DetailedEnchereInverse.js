@@ -1,3 +1,4 @@
+import { BACKEND_URL } from "../../../config/env";
 import DateAdapter from "@mui/lab/AdapterDateFns";
 import DeleteIcon from '@mui/icons-material/Delete';
 import {
@@ -367,7 +368,7 @@ handleCloseDeleting()
   //MAKES IMAGES READY FOR USE
 const getImages = (rawImages)=>{
   let tempImages = []
-  let path = "http://127.0.0.1:8000"
+  let path = BACKEND_URL
   rawImages.map((image)=>{
     const myImg = path.concat(image.contentUrl);
     tempImages.push(myImg)

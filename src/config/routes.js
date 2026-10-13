@@ -1,3 +1,4 @@
+import { BACKEND_URL } from "./env";
 export const navRoutes = {
     //user account related
     LOGIN:'/login',
@@ -32,5 +33,5 @@ export const navRoutes = {
     INPROGRESS : "/prog"
 }
 export const apiRoutes = {
-    API:'http://127.0.0.1:8000/api'
+    API: `${BACKEND_URL}/api`
 }

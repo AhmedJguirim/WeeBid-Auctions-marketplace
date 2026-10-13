@@ -1,3 +1,5 @@
-import io from "socket.io-client";
+import { io } from "socket.io-client";
+import { SOCKET_URL } from "../../../config/env";
 
-export default io("http://127.0.0.1:8081");
+// SOCKET_URL undefined => same origin (socket.io is proxied by nginx)
+export default io(SOCKET_URL);

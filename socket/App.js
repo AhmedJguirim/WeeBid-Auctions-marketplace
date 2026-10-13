@@ -1,8 +1,14 @@
 
 const axios = require('axios').default;
-const  io = require("socket.io")(8081,{
+// Configurable through environment variables (defaults = local dev setup)
+const PORT = process.env.PORT || 8081
+const API_URL = process.env.API_URL || "http://127.0.0.1:8000"
+const CORS_ORIGIN = process.env.CORS_ORIGIN
+    ? process.env.CORS_ORIGIN.split(",")
+    : ['http://localhost:3000']
+const  io = require("socket.io")(PORT,{
     cors:{
-        origin: ['http://localhost:3000']
+        origin: CORS_ORIGIN
     }
 })
 io.on("connection", socket =>{
@@ -14,7 +20,7 @@ io.on("connection", socket =>{
     })
     socket.on("disconnect", ()=>console.log(socket.id + " got disconnected"))
     socket.on("DEMANDE",(demande,user)=>{
-        axios.post("http://127.0.0.1:8000/api/notifications",{
+        axios.post(`${API_URL}/api/notifications`,{
                     user: `/api/users/${user}`,
                     title:`demande ${demande["@id"]}`,
                     description: `${demande.transmitter.displayName} vous a envoyé une demande de devis`,
@@ -30,7 +36,7 @@ io.on("connection", socket =>{
                 ).catch(err=>console.log(err))
     })
     socket.on("PROPOSITION",(proposition)=>{
-        axios.post("http://127.0.0.1:8000/api/notifications",{
+        axios.post(`${API_URL}/api/notifications`,{
                     user: proposition.transmittedTo["@id"],
                     title:`proposition ${proposition["@id"]}`,
                     description: `${proposition.transmitter.displayName} vous a envoyé une proposition de devis`,
@@ -56,14 +62,14 @@ io.on("connection", socket =>{
             type="enchere"
             
         }
-        axios.get(`http://127.0.0.1:8000/api/surveilles`,{
+        axios.get(`${API_URL}/api/surveilles`,{
             params:{
                 [type]: enchere
             }
         }).then(response=>response["data"]["hydra:member"].map(surveille=>{
             console.log("hey")
             if(type==="enchereInverse"){
-                axios.post("http://127.0.0.1:8000/api/notifications",{
+                axios.post(`${API_URL}/api/notifications`,{
                     user: surveille["user"]["@id"],
                     title:`reduction ${enchere}`,
                     description: `${user} a réduit le prix de ${surveille.enchereInverse.article.name} jusqu'a ${newPrice}`,
@@ -80,7 +86,7 @@ io.on("connection", socket =>{
                 ).catch(err=>console.log(err))
             }
             else{
-                axios.post("http://127.0.0.1:8000/api/notifications",{
+                axios.post(`${API_URL}/api/notifications`,{
                     user: surveille["user"]["@id"],
                     description: `${user} a augmenté le prix de ${surveille.enchere.article.name} jusqu'a ${newPrice}`,
                     title:`augmentation ${enchere}`,

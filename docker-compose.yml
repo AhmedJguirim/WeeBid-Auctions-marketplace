@@ -1,0 +1,68 @@
+# WeeBid demo stack:  docker compose up -d --build
+# Public entrypoint: http://<host>:${WEB_PORT:-80}
+services:
+  db:
+    image: mariadb:10.11
+    restart: unless-stopped
+    environment:
+      MARIADB_DATABASE: auctionHouse
+      MARIADB_USER: weebid
+      MARIADB_PASSWORD: ${DB_PASSWORD:-weebid_db_pass}
+      MARIADB_ROOT_PASSWORD: ${DB_ROOT_PASSWORD:-weebid_root_pass}
+    volumes:
+      - db-data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "healthcheck.sh", "--connect", "--innodb_initialized"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+
+  backend:
+    build: ./backend
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      APP_ENV: prod
+      APP_SECRET: ${APP_SECRET:-change-me-to-a-long-random-string}
+      DATABASE_URL: mysql://weebid:${DB_PASSWORD:-weebid_db_pass}@db:3306/auctionHouse?serverVersion=mariadb-10.11.0
+      JWT_PASSPHRASE: ${JWT_PASSPHRASE:-change-me-jwt-passphrase}
+      CORS_ALLOW_ORIGIN: '^https?://.*$'
+      ADMIN_EMAIL: ${ADMIN_EMAIL:-admin@weebid.local}
+      ADMIN_PASSWORD: ${ADMIN_PASSWORD:-admin1234}
+    volumes:
+      - jwt-keys:/var/www/html/config/jwt
+      - uploads-media:/var/www/html/public/media
+      - uploads-user:/var/www/html/public/user
+      - uploads-category:/var/www/html/public/category
+    ports:
+      # Symfony directly: EasyAdmin dashboard at http://<host>:8000/admin
+      # (its /login would clash with the React /login route behind nginx)
+      - "${ADMIN_PORT:-8000}:80"
+
+  socket:
+    build: ./socket
+    restart: unless-stopped
+    depends_on:
+      - backend
+    environment:
+      PORT: 8081
+      API_URL: http://backend
+      CORS_ORIGIN: ${PUBLIC_URL:-http://localhost}
+
+  web:
+    build: .
+    restart: unless-stopped
+    depends_on:
+      - backend
+      - socket
+    ports:
+      - "${WEB_PORT:-80}:80"
+
+volumes:
+  db-data:
+  jwt-keys:
+  uploads-media:
+  uploads-user:
+  uploads-category:

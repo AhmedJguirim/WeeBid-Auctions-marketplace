@@ -1,3 +1,4 @@
+import { BACKEND_URL } from "../../config/env";
 import React from "react";
 import TextField from "@mui/material/TextField";
 import Autocomplete from "@mui/material/Autocomplete";
@@ -41,7 +42,7 @@ const Demande = () => {
       const response = await axios.get(`${apiRoutes.API}/demande_devis/${id}`);
       console.log(response["data"]);
       setDemande(response["data"]);
-      let path = "http://127.0.0.1:8000/user/";
+      let path = BACKEND_URL + "/user/";
       const myImg = path.concat(response["data"].transmitter.image);
       console.log(response["data"])
       setTransmitter({

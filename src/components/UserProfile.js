@@ -1,3 +1,4 @@
+import { BACKEND_URL } from "../config/env";
 import {
   Avatar,
   IconButton,
@@ -134,15 +135,15 @@ const UserProfile = () => {
       });
       let myImg = "";
         if(data.avatar){
-          let path = "http://127.0.0.1:8000/media/";
+          let path = BACKEND_URL + "/media/";
           myImg = path.concat(data.avatar.filePath);
         }else{
-          let path = "http://127.0.0.1:8000/user/";
+          let path = BACKEND_URL + "/user/";
           myImg = path.concat(data.image);
         }
         
       setAvatar(myImg);
-      console.log(`http://127.0.0.1:8000/${data.image}`);
+      console.log(`${BACKEND_URL}/${data.image}`);
     } catch (error) {
       console.error(error);
     }

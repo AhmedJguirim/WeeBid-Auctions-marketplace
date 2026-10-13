@@ -1,3 +1,4 @@
+import { BACKEND_URL } from "../../config/env";
 import DateAdapter from "@mui/lab/AdapterDateFns";
 import Api from "../../AxiosInstance";
 import { ButtonStyles, formBox , formContainer, FormTextField, lightContainer} from "../base/customComponents/general";
@@ -222,7 +223,7 @@ const handleType = (event) => {
   //categories GET request
   async function getCategories() {
     try {
-      const response = await Api.get("http://127.0.0.1:8000/api/categories");
+      const response = await Api.get(BACKEND_URL + "/api/categories");
 
       setCategories(response["data"]["hydra:member"]);
     } catch (error) {

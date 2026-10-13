@@ -1,3 +1,4 @@
+import { BACKEND_URL } from "../../../config/env";
 import { Card, CardContent, Divider, Grid, Typography } from "@mui/material";
 import React from "react";
 import axios from "axios";
@@ -9,7 +10,7 @@ const CategoriesList = () => {
   //#region getting categories
   //TODO: this code is duplicated from productslisting.js , declare it somewhere else then import it
   const [categories, setCategories] = React.useState({});
-  const imageLinkPrefix = "http://127.0.0.1:8000/category/"
+  const imageLinkPrefix = BACKEND_URL + "/category/"
   async function getCategories() {
     try {
       const response = await axios.get(`${apiRoutes.API}/categories`);

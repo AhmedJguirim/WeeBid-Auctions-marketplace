@@ -1,3 +1,4 @@
+import { BACKEND_URL } from "../../../config/env";
 import { Avatar, Card, CardContent, Checkbox, Grid, Pagination, Typography } from '@mui/material';
 import React from 'react'
 import ProductsListing from '../../generalComponents/ProductsListing';
@@ -78,7 +79,7 @@ const UserSearchPage = () => {
         <Card >
               <CardContent>
                 <Box >
-              <Avatar sx={{ width: "100%", height: "100%" }} alt="avatar" src={`http://127.0.0.1:8000/user/${users[key].image}`}/>
+              <Avatar sx={{ width: "100%", height: "100%" }} alt="avatar" src={`${BACKEND_URL}/user/${users[key].image}`}/>
               </Box>
                <Box sx={{ textAlign: "center"}}><CategoryLink to={`${navRoutes.CONSULTUSER}/${users[key].id}`}>{users[key].displayName}</CategoryLink>{" "}</Box>
                 
