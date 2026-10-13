@@ -25,7 +25,7 @@ for name in APP_SECRET JWT_PASSPHRASE SOCKET_PASSWORD ADMIN_PASSWORD; do
 done
 
 # values that were once published in the repository or in the documentation
-for pair in "ADMIN_PASSWORD:admin1234" "ADMIN_PASSWORD:demo1234" \
+for pair in "ADMIN_PASSWORD:admin1234" "ADMIN_PASSWORD:demo1234" "ADMIN_PASSWORD:choose-a-strong-password" \
             "APP_SECRET:f662a8df782e7578fa747765d882aac5" "JWT_PASSPHRASE:54ecd6dc23aa09ca2d708242a8b8bf10"; do
     name="${pair%%:*}"; known="${pair#*:}"
     eval "val=\${$name:-}"

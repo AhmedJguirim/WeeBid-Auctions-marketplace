@@ -42,7 +42,7 @@ check_env() {
   for key in APP_SECRET JWT_PASSPHRASE DB_NAME DB_USER DB_PASSWORD DB_ROOT_PASSWORD SOCKET_PASSWORD ADMIN_EMAIL ADMIN_PASSWORD; do
     val="$(env_value "$key" "")"
     if [[ -z "$val" ]]; then missing+=("$key (missing)")
-    elif [[ "$val" == *CHANGE_ME* || "$val" == *change-me* ]]; then missing+=("$key (still a placeholder)"); fi
+    elif [[ "$val" == *CHANGE_ME* || "$val" == *change-me* || "$val" == "choose-a-strong-password" || "$val" == "admin1234" ]]; then missing+=("$key (still a placeholder or a public example value)"); fi
   done
   if [[ ${#missing[@]} -gt 0 ]]; then
     printf '%s! .env is not ready: %s%s\n' "$YELLOW" "${missing[*]}" "$RESET" >&2
