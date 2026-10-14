@@ -19,10 +19,10 @@ const Toaster = () => {
   return (
     <div className="pointer-events-none fixed bottom-5 left-1/2 z-[80] flex w-[calc(100%-2rem)] max-w-sm -translate-x-1/2 flex-col gap-2" role="status" aria-live="polite">
       {toasts.map((t) => (
-        <div key={t.id} className="pointer-events-auto flex animate-fade-up items-start gap-3 rounded-2xl bg-slate-900 px-4 py-3 text-sm text-white shadow-lift">
-          <AlertTriangle size={17} className="mt-0.5 shrink-0 text-amber-300" />
+        <div key={t.id} className="pointer-events-auto flex items-start gap-3 bg-gray-900 px-4 py-3 text-sm text-white shadow-lg">
+          <AlertTriangle size={17} className="mt-0.5 shrink-0 text-white" />
           <span className="flex-1">{t.message}</span>
-          <button onClick={() => setToasts((list) => list.filter((x) => x.id !== t.id))} aria-label="×"><X size={16} className="text-slate-400" /></button>
+          <button onClick={() => setToasts((list) => list.filter((x) => x.id !== t.id))} aria-label="×"><X size={16} className="text-gray-400" /></button>
         </div>
       ))}
     </div>

@@ -21,16 +21,16 @@ const Modal = ({ open, onClose, title, children, footer, size = "md" }) => {
   const width = { md: "max-w-md", lg: "max-w-2xl" }[size];
   return (
     <div className="fixed inset-0 z-[70] flex items-end justify-center sm:items-center sm:p-4" role="dialog" aria-modal="true">
-      <div className="absolute inset-0 animate-[fade-up_.2s_ease-out_both] bg-slate-950/50 backdrop-blur-sm" onClick={onClose} />
-      <div className={`relative flex max-h-[90vh] w-full ${width} animate-fade-up flex-col rounded-t-3xl bg-white shadow-2xl sm:rounded-3xl`}>
-        <div className="flex items-center justify-between border-b border-slate-100 px-6 py-4">
-          <h3 className="text-lg font-bold text-slate-900">{title}</h3>
-          <button onClick={onClose} aria-label={t("common.close")} className="rounded-lg p-1.5 text-slate-400 hover:bg-slate-100 hover:text-slate-700">
+      <div className="absolute inset-0 bg-gray-900/50" onClick={onClose} />
+      <div className={`relative flex max-h-[90vh] w-full ${width} flex-col bg-white shadow-xl`}>
+        <div className="flex items-center justify-between border-b border-gray-300 px-6 py-4">
+          <h3 className="font-serif text-lg font-bold text-gray-900">{title}</h3>
+          <button onClick={onClose} aria-label={t("common.close")} className="rounded-sm p-1.5 text-gray-400 hover:bg-gray-100 hover:text-gray-700">
             <X size={20} />
           </button>
         </div>
         <div className="overflow-auto px-6 py-5">{children}</div>
-        {footer && <div className="flex justify-end gap-2 border-t border-slate-100 px-6 py-4">{footer}</div>}
+        {footer && <div className="flex justify-end gap-2 border-t border-gray-300 px-6 py-4">{footer}</div>}
       </div>
     </div>
   );

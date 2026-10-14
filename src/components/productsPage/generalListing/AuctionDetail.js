@@ -11,11 +11,12 @@ import { apiRoutes, navRoutes } from "../../../config/routes";
 import Api from "../../../AxiosInstance";
 import Socket from "../../base/customComponents/Socket";
 import { fetchWatchList } from "../../../redux/actions";
-import placeHolder from "../../../media/images/imagelessAuction.png";
 import Countdown, { useAuctionClock } from "../../ui/Countdown";
 import Modal from "../../ui/Modal";
 import Avatar from "../../ui/Avatar";
 import { formatDate, formatDateTime, formatNumber } from "../../../i18n";
+
+const placeHolder = "/assets/placeholders/product.jpg"; // not committed yet, see public/assets/README.md
 
 /**
  * One detail page for both kinds of auctions. Everything that differs between an
@@ -59,8 +60,8 @@ const toInput = (d) => {
 const DetailRow = ({ label, value }) =>
   value ? (
     <div className="flex justify-between gap-4 py-3 text-sm">
-      <dt className="text-slate-500">{label}</dt>
-      <dd className="text-right font-semibold text-slate-800 first-letter:uppercase">{value}</dd>
+      <dt className="font-bold text-gray-900">{label}</dt>
+      <dd className="text-right text-gray-900 first-letter:uppercase">{value}</dd>
     </div>
   ) : null;
 
@@ -257,11 +258,11 @@ const AuctionDetail = ({ kind }) => {
   if (loading) {
     return (
       <div className="container-page grid gap-8 py-10 lg:grid-cols-5">
-        <div className="aspect-[4/3] animate-pulse rounded-3xl bg-slate-200 lg:col-span-3" />
+        <div className="aspect-[4/3] animate-pulse rounded-sm bg-gray-200 lg:col-span-3" />
         <div className="space-y-4 lg:col-span-2">
-          <div className="h-10 w-2/3 animate-pulse rounded-xl bg-slate-200" />
-          <div className="h-40 animate-pulse rounded-2xl bg-slate-200" />
-          <div className="h-56 animate-pulse rounded-2xl bg-slate-200" />
+          <div className="h-10 w-2/3 animate-pulse rounded-sm bg-gray-200" />
+          <div className="h-40 animate-pulse rounded-sm bg-gray-200" />
+          <div className="h-56 animate-pulse rounded-sm bg-gray-200" />
         </div>
       </div>
     );
@@ -269,7 +270,7 @@ const AuctionDetail = ({ kind }) => {
   if (notFound || !enchere) {
     return (
       <div className="container-page flex min-h-[50vh] flex-col items-center justify-center text-center">
-        <h1 className="text-2xl font-extrabold text-slate-900">{k("notFound")}</h1>
+        <h1 className="text-2xl font-bold text-gray-900">{k("notFound")}</h1>
         <Link to={cfg.path} className="btn-primary mt-6">{k("backTo")}</Link>
       </div>
     );
@@ -279,102 +280,106 @@ const AuctionDetail = ({ kind }) => {
   const city = seller.adresse && seller.adresse[0] && seller.adresse[0].ville;
   const statusBadge =
     status === "live" ? (
-      <span className="badge bg-emerald-50 text-emerald-700"><span className="h-2 w-2 animate-pulse-dot rounded-full bg-emerald-500" /> {t("status.live")}</span>
+      <span className="inline-flex items-center gap-1.5 text-xs font-bold uppercase tracking-wide text-green-700"><span className="h-2 w-2 animate-pulse-dot rounded-full bg-green-600" /> {t("status.live")}</span>
     ) : status === "upcoming" ? (
-      <span className="badge bg-amber-50 text-amber-700">{t("status.upcoming")}</span>
+      <span className="text-xs font-bold uppercase tracking-wide text-gray-600">{t("status.upcoming")}</span>
     ) : (
-      <span className="badge bg-slate-100 text-slate-600">{t("status.ended")}</span>
+      <span className="text-xs font-bold uppercase tracking-wide text-red-700">{t("status.ended")}</span>
     );
 
   return (
-    <div className="container-page py-8">
-      <nav className="mb-6 text-sm text-slate-500">
-        <Link to="/" className="hover:text-brand-600">{t("footer.home")}</Link> <span className="mx-1.5">/</span>
-        <Link to={cfg.path} className="hover:text-brand-600">{kind === "inverse" ? t("nav.reverseAuctions") : t("nav.auctions")}</Link> <span className="mx-1.5">/</span>
-        <span className="text-slate-800">{article.name}</span>
+    <div className="container-page py-6">
+      <nav className="mb-8 text-xs text-gray-900">
+        <Link to="/" className="underline underline-offset-2 hover:text-brand-600">{t("footer.home")}</Link> <span className="mx-2">/</span>
+        <Link to={cfg.path} className="underline underline-offset-2 hover:text-brand-600">{kind === "inverse" ? t("nav.reverseAuctions") : t("nav.auctions")}</Link> <span className="mx-1.5">/</span>
+        <span>{article.name}</span>
       </nav>
 
       <div className="grid items-start gap-8 lg:grid-cols-5 lg:grid-rows-[auto_1fr]">
         {/* gallery */}
         <div className="lg:col-span-3 lg:row-start-1">
-          <div className="card overflow-hidden p-2">
-            <div className="aspect-[4/3] overflow-hidden rounded-2xl bg-slate-100">
-              <img src={images[activeImage] || placeHolder} alt={article.name} className="h-full w-full object-cover" />
-            </div>
+          <div className="flex flex-col-reverse gap-4 sm:flex-row">
             {images.length > 1 && (
-              <div className="mt-2 grid grid-cols-5 gap-2">
+              <div className="flex gap-3 sm:w-24 sm:shrink-0 sm:flex-col">
                 {images.map((src, i) => (
-                  <button key={src} onClick={() => setActiveImage(i)} className={`aspect-square overflow-hidden rounded-xl ring-2 transition ${i === activeImage ? "ring-brand-500" : "ring-transparent opacity-70 hover:opacity-100"}`}>
-                    <img src={src} alt="" className="h-full w-full object-cover" />
+                  <button key={src} onClick={() => setActiveImage(i)} className={`aspect-[4/5] w-20 shrink-0 overflow-hidden border bg-gray-100 transition sm:w-full ${i === activeImage ? "border-brand-600 ring-2 ring-brand-100" : "border-gray-300 hover:border-gray-900"}`}>
+                    <img src={src} alt={`${article.name}, view ${i + 1}`} className="h-full w-full object-cover" />
                   </button>
                 ))}
               </div>
             )}
+            <div className="aspect-[4/5] flex-1 overflow-hidden border border-gray-300 bg-gray-100 sm:max-w-xl">
+              <img
+                src={images[activeImage] || placeHolder}
+                alt={images[activeImage] ? article.name : `${article.name}: main product photo on a plain light background, item centred`}
+                className="h-full w-full object-cover"
+              />
+            </div>
           </div>
         </div>
 
         {/* sticky bid panel */}
-        <aside className="space-y-5 lg:col-span-2 lg:col-start-4 lg:row-span-2 lg:row-start-1">
-          <div className="lg:sticky lg:top-24 space-y-5">
+        <aside className="lg:col-span-2 lg:col-start-4 lg:row-span-2 lg:row-start-1">
+          <div className="space-y-6 lg:sticky lg:top-32">
             <div>
               <div className="flex items-center gap-2">{statusBadge}</div>
-              <h1 className="mt-3 text-3xl font-extrabold tracking-tight text-slate-900">{article.name}</h1>
+              <h1 className="mt-2 font-sans text-2xl font-normal text-gray-900">{article.name}</h1>
             </div>
 
-            <div className="card space-y-5 p-6">
+            <div className="space-y-5 border-t border-gray-300 pt-6">
               <Countdown variant="blocks" startDate={enchere.startDate} endDate={enchere.endDate} />
-              {closed && <p className="text-sm font-semibold text-slate-500">{t("detail.closedBySeller")}</p>}
+              {closed && <p className="text-sm font-semibold text-gray-500">{t("detail.closedBySeller")}</p>}
 
-              <div className="flex items-end justify-between border-t border-slate-100 pt-5">
+              <div className="flex items-end justify-between border-t border-gray-300 pt-5">
                 <div>
-                  <p className="text-xs font-semibold uppercase tracking-wide text-slate-400">{k("price")}</p>
-                  <p className="text-4xl font-black tabular-nums text-slate-900">
-                    {fmt(price)} <span className="text-lg font-bold text-slate-400">TND</span>
+                  <p className="text-sm font-bold text-gray-900">{k("price")}</p>
+                  <p className="text-3xl tabular-nums text-gray-900">
+                    {fmt(price)} <span className="text-base text-gray-600">TND</span>
                   </p>
                 </div>
                 <div className="text-right">
-                  <p className="text-xs text-slate-400">{t("detail.startPrice")}</p>
-                  <p className="font-semibold tabular-nums text-slate-600">{fmt(enchere.initPrice)} TND</p>
+                  <p className="text-xs text-gray-600">{t("detail.startPrice")}</p>
+                  <p className="font-semibold tabular-nums text-gray-600">{fmt(enchere.initPrice)} TND</p>
                 </div>
               </div>
 
               {status === "live" && !isOwner && (
                 loggedIn ? (
-                  <div className="space-y-3 border-t border-slate-100 pt-5">
-                    <label htmlFor="delta" className="text-sm font-semibold text-slate-700">
+                  <div className="space-y-3 border-t border-gray-300 pt-5">
+                    <label htmlFor="delta" className="text-sm font-bold text-gray-900">
                       {k("amountLabel")}
                     </label>
                     <div className="flex flex-wrap gap-2">
                       {cfg.steps.map((s) => (
-                        <button key={s} onClick={() => setDelta(s)} className={`rounded-lg border px-3 py-1.5 text-sm font-semibold transition ${delta === s ? "border-brand-600 bg-brand-50 text-brand-700" : "border-slate-200 text-slate-600 hover:border-slate-300"}`}>
+                        <button key={s} onClick={() => setDelta(s)} className={`min-w-[3rem] border px-3 py-2 text-sm transition ${delta === s ? "border-brand-600 text-brand-600 ring-1 ring-brand-600" : "border-gray-900 text-gray-900 hover:border-brand-600"}`}>
                           {cfg.sign > 0 ? "+" : "−"}{s}
                         </button>
                       ))}
                     </div>
                     <input id="delta" type="number" min="0.1" step="0.1" value={delta} onChange={(e) => setDelta(parseFloat(e.target.value) || 0)} className="input" />
-                    <p className="text-sm text-slate-500">
-                      {t("detail.newPrice")} <span className="font-bold text-slate-900">{fmt(newPrice)} TND</span>
+                    <p className="text-sm text-gray-600">
+                      {t("detail.newPrice")} <span className="font-bold text-gray-900">{fmt(newPrice)} TND</span>
                     </p>
-                    <button disabled={!validBid || busy} onClick={() => setModal("confirm")} className="btn-primary w-full !py-3">
-                      <Gavel size={17} /> {k("verb")}
+                    <button disabled={!validBid || busy} onClick={() => setModal("confirm")} className="btn-primary w-full !py-3.5">
+                      <Gavel size={16} /> {k("verb")}
                     </button>
                   </div>
                 ) : (
-                  <div className="border-t border-slate-100 pt-5">
-                    <Link to={navRoutes.LOGIN} className="btn-primary w-full !py-3">{t("detail.loginToJoin")}</Link>
+                  <div className="border-t border-gray-300 pt-5">
+                    <Link to={navRoutes.LOGIN} className="btn-primary w-full !py-3.5">{t("detail.loginToJoin")}</Link>
                   </div>
                 )
               )}
 
               {isOwner && (
-                <div className="space-y-2 border-t border-slate-100 pt-5">
-                  <p className="text-xs font-semibold uppercase tracking-wide text-slate-400">{t("detail.youAreSeller")}</p>
+                <div className="space-y-2 border-t border-gray-300 pt-5">
+                  <p className="text-sm font-bold text-gray-900">{t("detail.youAreSeller")}</p>
                   <button onClick={() => { loadBids(1); setBidPages(1); setModal("bids"); }} className="btn-secondary w-full">{k("manage")}</button>
                   <div className="grid grid-cols-2 gap-2">
                     <button onClick={() => { setError(""); setModal("dates"); }} className="btn-secondary"><CalendarClock size={16} /> {t("detail.dates")}</button>
                     {status !== "ended" && <button onClick={closeAuction} className="btn-secondary"><CheckCircle2 size={16} /> {t("detail.closeAuction")}</button>}
                   </div>
-                  <button onClick={() => setModal("delete")} className="btn w-full text-rose-600 hover:bg-rose-50"><Trash2 size={16} /> {t("common.delete")}</button>
+                  <button onClick={() => setModal("delete")} className="btn w-full text-red-700 hover:text-red-900"><Trash2 size={16} /> {t("common.delete")}</button>
                 </div>
               )}
 
@@ -389,28 +394,28 @@ const AuctionDetail = ({ kind }) => {
             <div className="card flex items-center gap-4 p-5">
               <Avatar name={seller.displayName} size={52} />
               <div className="min-w-0 flex-1">
-                <p className="text-xs text-slate-400">{t("detail.seller")}</p>
-                <Link to={`${navRoutes.CONSULTUSER}/${seller.id}`} className="block truncate font-bold text-slate-900 hover:text-brand-700">{seller.displayName}</Link>
-                {city && <p className="mt-0.5 flex items-center gap-1 text-xs text-slate-500"><MapPin size={12} /> {city}</p>}
+                <p className="text-xs text-gray-600">{t("detail.seller")}</p>
+                <Link to={`${navRoutes.CONSULTUSER}/${seller.id}`} className="block truncate font-bold text-gray-900 hover:text-brand-600">{seller.displayName}</Link>
+                {city && <p className="mt-0.5 flex items-center gap-1 text-xs text-gray-500"><MapPin size={12} /> {city}</p>}
               </div>
               <Link to={`${navRoutes.CONSULTUSER}/${seller.id}`} className="btn-secondary !px-3 !py-2 text-xs">{t("detail.profile")}</Link>
             </div>
 
             {/* bid history */}
             <div className="card p-5">
-              <h2 className="flex items-center gap-2 text-sm font-bold text-slate-900"><Icon size={16} className="text-brand-600" /> {k("history")}</h2>
+              <h2 className="flex items-center gap-2 font-sans text-sm font-bold text-gray-900"><Icon size={16} strokeWidth={1.75} /> {k("history")}</h2>
               {bids.length === 0 ? (
-                <p className="mt-3 text-sm text-slate-500">{k("noBidsYet")}</p>
+                <p className="mt-3 text-sm text-gray-500">{k("noBidsYet")}</p>
               ) : (
-                <ul className="mt-3 divide-y divide-slate-100">
+                <ul className="mt-3 divide-y divide-gray-100">
                   {bids.slice(0, 6).map((b, i) => (
                     <li key={b.id} className="flex items-center gap-3 py-2.5 text-sm">
                       <Avatar name={b.user.displayName} size={28} />
                       <div className="min-w-0 flex-1">
-                        <p className="truncate font-semibold text-slate-800">{b.user.displayName}</p>
-                        <p className="text-xs text-slate-400">{dateTime(b.date)}</p>
+                        <p className="truncate font-bold text-gray-900">{b.user.displayName}</p>
+                        <p className="text-xs text-gray-600">{dateTime(b.date)}</p>
                       </div>
-                      <span className={`font-bold tabular-nums ${i === 0 ? "text-emerald-600" : "text-slate-600"}`}>{fmt(b.value)} TND</span>
+                      <span className={`font-bold tabular-nums ${i === 0 ? "text-green-700" : "text-gray-600"}`}>{fmt(b.value)} TND</span>
                     </li>
                   ))}
                 </ul>
@@ -419,15 +424,15 @@ const AuctionDetail = ({ kind }) => {
           </div>
         </aside>
         {/* description + details (below the bid panel on mobile) */}
-        <div className="space-y-6 lg:col-span-3 lg:row-start-2">
-          <section className="card p-6">
-            <h2 className="text-lg font-bold text-slate-900">{t("detail.description")}</h2>
-            <p className="mt-3 whitespace-pre-line leading-relaxed text-slate-600">{article.description || t("detail.noDescription")}</p>
+        <div className="space-y-8 lg:col-span-3 lg:row-start-2">
+          <section className="border-t border-gray-300 pt-6">
+            <h2 className="font-sans text-sm font-bold text-gray-900">{t("detail.description")}</h2>
+            <p className="mt-3 whitespace-pre-line leading-relaxed text-gray-900">{article.description || t("detail.noDescription")}</p>
           </section>
 
-          <section className="card p-6">
-            <h2 className="text-lg font-bold text-slate-900">{t("detail.articleDetails")}</h2>
-            <dl className="mt-2 divide-y divide-slate-100">
+          <section className="border-t border-gray-300 pt-6">
+            <h2 className="font-sans text-sm font-bold text-gray-900">{t("detail.articleDetails")}</h2>
+            <dl className="mt-2 divide-y divide-gray-100">
               <DetailRow label={t("detail.state")} value={article.state && t(`state.${article.state}`, { defaultValue: article.state })} />
               <DetailRow label={t("detail.location")} value={article.localisation} />
               <DetailRow label={t("detail.brand")} value={article.brand} />
@@ -454,33 +459,33 @@ const AuctionDetail = ({ kind }) => {
           </>
         }
       >
-        <p className="text-slate-600">
-          <Trans i18nKey={`detail.${kind}.confirmText`} values={{ price: `${fmt(newPrice)} TND`, name: article.name }} components={{ b: <span className="font-bold text-slate-900" /> }} />
+        <p className="text-gray-600">
+          <Trans i18nKey={`detail.${kind}.confirmText`} values={{ price: `${fmt(newPrice)} TND`, name: article.name }} components={{ b: <span className="font-bold text-gray-900" /> }} />
         </p>
-        <div className="mt-4 flex items-start gap-2 rounded-xl bg-amber-50 p-3 text-sm text-amber-800">
+        <div className="mt-4 flex items-start gap-2 border border-gray-300 bg-gray-100 p-3 text-sm text-gray-900">
           <ShieldAlert size={18} className="mt-0.5 shrink-0" />
           {k("definitive")}
         </div>
-        {error && <p className="mt-3 text-sm text-rose-600">{error}</p>}
+        {error && <p className="mt-3 text-sm text-red-600">{error}</p>}
       </Modal>
 
       {/* owner: manage bids */}
       <Modal open={modal === "bids"} onClose={() => setModal(null)} title={k("manage")} size="lg" footer={<button className="btn-secondary" onClick={() => setModal(null)}>{t("common.close")}</button>}>
         {bids.length === 0 ? (
-          <p className="text-slate-500">{k("noBids")}</p>
+          <p className="text-gray-500">{k("noBids")}</p>
         ) : (
           <table className="w-full text-left text-sm">
-            <thead className="text-xs uppercase tracking-wide text-slate-400">
+            <thead className="text-xs uppercase tracking-wide text-gray-400">
               <tr><th className="pb-2">{t("detail.member")}</th><th className="pb-2">{t("detail.phone")}</th><th className="pb-2 text-right">{t("detail.amount")}</th><th className="pb-2 text-right">{t("detail.date")}</th><th /></tr>
             </thead>
-            <tbody className="divide-y divide-slate-100">
+            <tbody className="divide-y divide-gray-100">
               {bids.map((b) => (
                 <tr key={b.id}>
                   <td className="py-2.5"><Link to={`${navRoutes.CONSULTUSER}/${b.user.id}`} className="font-semibold text-brand-700 hover:underline">{b.user.displayName}</Link></td>
-                  <td className="py-2.5 text-slate-500">{b.user.telephone}</td>
+                  <td className="py-2.5 text-gray-500">{b.user.telephone}</td>
                   <td className="py-2.5 text-right font-bold tabular-nums">{fmt(b.value)}</td>
-                  <td className="py-2.5 text-right text-slate-500">{dateTime(b.date)}</td>
-                  <td className="py-2.5 text-right"><button onClick={() => deleteBid(b.id)} aria-label={t("common.delete")} className="rounded-lg p-1.5 text-slate-400 hover:bg-rose-50 hover:text-rose-600"><Trash2 size={16} /></button></td>
+                  <td className="py-2.5 text-right text-gray-500">{dateTime(b.date)}</td>
+                  <td className="py-2.5 text-right"><button onClick={() => deleteBid(b.id)} aria-label={t("common.delete")} className="rounded-sm p-1.5 text-gray-400 hover:bg-red-50 hover:text-red-600"><Trash2 size={16} /></button></td>
                 </tr>
               ))}
             </tbody>
@@ -499,11 +504,11 @@ const AuctionDetail = ({ kind }) => {
         footer={
           <>
             <button className="btn-secondary" onClick={() => setModal(null)}>{t("common.cancel")}</button>
-            <button className="btn !bg-rose-600 text-white hover:!bg-rose-700" disabled={busy} onClick={deleteAuction}>{t("common.delete")}</button>
+            <button className="btn !border-red-700 !bg-red-700 text-white hover:!bg-red-800" disabled={busy} onClick={deleteAuction}>{t("common.delete")}</button>
           </>
         }
       >
-        <p className="text-slate-600">{k("deleteText")}</p>
+        <p className="text-gray-600">{k("deleteText")}</p>
       </Modal>
 
       {/* owner: dates */}
@@ -520,14 +525,14 @@ const AuctionDetail = ({ kind }) => {
       >
         <div className="space-y-4">
           <div>
-            <label className="mb-1.5 block text-sm font-semibold text-slate-700">{t("detail.start")}</label>
+            <label className="mb-1.5 block text-sm font-bold text-gray-900">{t("detail.start")}</label>
             <input type="datetime-local" className="input" value={dates.start} onChange={(e) => setDates({ ...dates, start: e.target.value })} />
           </div>
           <div>
-            <label className="mb-1.5 block text-sm font-semibold text-slate-700">{t("detail.end")}</label>
+            <label className="mb-1.5 block text-sm font-bold text-gray-900">{t("detail.end")}</label>
             <input type="datetime-local" className="input" value={dates.end} onChange={(e) => setDates({ ...dates, end: e.target.value })} />
           </div>
-          {error && <p className="text-sm text-rose-600">{error}</p>}
+          {error && <p className="text-sm text-red-600">{error}</p>}
         </div>
       </Modal>
     </div>

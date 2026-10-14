@@ -71,7 +71,9 @@
     "sell": "Sell",
     "sellItem": "Sell an item",
     "login": "Log in",
-    "register": "Sign up"
+    "register": "Sign up",
+    "tagline": "Auctions, reverse auctions and quotes",
+    "search": "Search"
   },
   "userMenu": {
     "profile": "My profile",
@@ -104,7 +106,8 @@
     "about": "The marketplace where everyone sets the price. Classic auctions, reverse auctions and quote requests, with no listing fees.",
     "explore": "Explore",
     "account": "Account",
-    "project": "end-of-studies project."
+    "project": "end-of-studies project.",
+    "followUs": "Follow us"
   },
   "status": {
     "live": "Live",
@@ -156,7 +159,10 @@
     "service_quotes_text": "Ask a supplier directly for a proposal on a specific product.",
     "learnMore": "Learn more",
     "ctaTitle": "Ready to launch your first auction?",
-    "ctaText": "List an item in a few minutes and let the community drive the price up."
+    "ctaText": "List an item in a few minutes and let the community drive the price up.",
+    "tileAuctions": "Bid on items",
+    "tileReverse": "Let sellers compete",
+    "tileCategories": "Find what you need"
   },
   "list": {
     "showEnded": "Show ended auctions",
@@ -178,7 +184,8 @@
     "membersTitle": "Members: “{{search}}”",
     "membersSubtitle": "Search results among members.",
     "noMember": "No member found",
-    "noMemberText": "Try another name."
+    "noMemberText": "Try another name.",
+    "results": "{{count}} results"
   },
   "categories": {
     "reverseShort": "Reverse",

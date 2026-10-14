@@ -18,7 +18,7 @@ const DemandesListing = () => {
       emptyText={t("tables.quotesEmpty")}
       columns={[
         { header: t("tables.from"), cell: (d) => <Link to={`${navRoutes.DEMANDE}/${d.id}`} className="font-semibold text-brand-700 hover:underline">{d.transmitter.displayName}</Link> },
-        { header: t("detail.date"), align: "right", cell: (d) => <span className="text-slate-500">{dateLabel(d.date)}</span> },
+        { header: t("detail.date"), align: "right", cell: (d) => <span className="text-gray-500">{dateLabel(d.date)}</span> },
         { header: "", align: "right", cell: (d) => <Link to={`${navRoutes.DEMANDE}/${d.id}`} className="btn-secondary !px-3 !py-1.5 text-xs">{t("tables.reply")}</Link> },
       ]}
     />

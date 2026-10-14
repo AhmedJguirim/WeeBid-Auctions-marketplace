@@ -15,11 +15,11 @@ import Field from "./ui/Field";
 import { formatDate } from "../i18n";
 
 const Stat = ({ icon: Icon, value, label }) => (
-  <div className="flex items-center gap-3 rounded-2xl bg-slate-50 px-4 py-3">
-    <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-white text-brand-600 shadow-card"><Icon size={18} /></span>
+  <div className="flex items-center gap-3 rounded-sm bg-gray-50 px-4 py-3">
+    <span className="flex h-10 w-10 items-center justify-center rounded-sm bg-white text-brand-600 border border-gray-300"><Icon size={18} /></span>
     <div>
-      <p className="text-2xl font-extrabold leading-none tabular-nums text-slate-900">{value}</p>
-      <p className="mt-1 text-xs text-slate-500">{label}</p>
+      <p className="text-2xl font-bold leading-none tabular-nums text-gray-900">{value}</p>
+      <p className="mt-1 text-xs text-gray-500">{label}</p>
     </div>
   </div>
 );
@@ -28,7 +28,7 @@ const SectionHeader = ({ title, to }) => {
   const { t } = useTranslation();
   return (
   <div className="mb-4 flex items-end justify-between">
-    <h2 className="text-xl font-bold text-slate-900">{title}</h2>
+    <h2 className="text-xl font-bold text-gray-900">{title}</h2>
     <Link to={to} className="text-sm font-semibold text-brand-600 hover:underline">{t("common.viewAll")}</Link>
   </div>
   );
@@ -116,7 +116,7 @@ const ProfileView = ({ id: publicId, own = false }) => {
   };
 
   if (!data) {
-    return <div className="container-page py-10"><div className="h-64 animate-pulse rounded-3xl bg-slate-200" /></div>;
+    return <div className="container-page py-10"><div className="h-64 animate-pulse rounded-sm bg-gray-200" /></div>;
   }
 
   const avatarSrc = data.avatar ? `${BACKEND_URL}/media/${data.avatar.filePath}` : `${BACKEND_URL}/user/${data.image}`;
@@ -134,7 +134,7 @@ const ProfileView = ({ id: publicId, own = false }) => {
   return (
     <div className="container-page py-8">
       {feedback && (
-        <div className="mb-6 flex items-center justify-between rounded-xl bg-brand-50 px-4 py-3 text-sm font-medium text-brand-800">
+        <div className="mb-6 flex items-center justify-between rounded-sm bg-brand-50 px-4 py-3 text-sm font-medium text-brand-800">
           {feedback}
           <button onClick={() => setFeedback("")} className="text-brand-500 hover:text-brand-800">{t("common.close")}</button>
         </div>
@@ -142,14 +142,14 @@ const ProfileView = ({ id: publicId, own = false }) => {
 
       {/* header card */}
       <section className="card overflow-hidden">
-        <div className="h-28 bg-gradient-to-r from-brand-600 via-brand-700 to-brand-900 sm:h-36" />
+        <div className="h-28 bg-gray-100 sm:h-36" role="img" aria-label="Profile banner: wide, subtle, abstract light-gray pattern or a soft landscape photo" />
         <div className="px-6 pb-6 sm:px-8">
           <div className="-mt-12 flex flex-col gap-4 sm:-mt-14 sm:flex-row sm:items-end sm:justify-between">
             <div className="flex items-end gap-4">
-              <Avatar name={data.displayName} src={avatarSrc} size={104} className="!ring-4" />
+              <Avatar name={data.displayName} src={avatarSrc} size={104} className="!ring-2" />
               <div className="pb-2 pt-3">
-                <h1 className="text-2xl font-extrabold tracking-tight text-slate-900">{data.displayName}</h1>
-                <p className="flex items-center gap-3 text-sm text-slate-500">
+                <h1 className="text-2xl font-bold text-gray-900">{data.displayName}</h1>
+                <p className="flex items-center gap-3 text-sm text-gray-500">
                   {data.name}
                   {city && <span className="inline-flex items-center gap-1"><MapPin size={13} />{city}</span>}
                 </p>
@@ -180,26 +180,26 @@ const ProfileView = ({ id: publicId, own = false }) => {
       {/* own account settings */}
       {own && (
         <section className="card mt-6 p-6 sm:p-8">
-          <h2 className="text-lg font-bold text-slate-900">{t("profile.accountInfo")}</h2>
-          <dl className="mt-2 divide-y divide-slate-100">
+          <h2 className="text-lg font-bold text-gray-900">{t("profile.accountInfo")}</h2>
+          <dl className="mt-2 divide-y divide-gray-100">
             {rows.map(([label, val, Icon]) => (
               <div key={label} className="flex items-center gap-4 py-3.5">
-                <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-slate-100 text-slate-500"><Icon size={16} /></span>
+                <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-sm bg-gray-100 text-gray-500"><Icon size={16} /></span>
                 <div className="min-w-0 flex-1">
-                  <dt className="text-xs text-slate-400 first-letter:uppercase">{t(editable[label].label)}</dt>
-                  <dd className="truncate font-semibold text-slate-800">{val}</dd>
+                  <dt className="text-xs text-gray-400 first-letter:uppercase">{t(editable[label].label)}</dt>
+                  <dd className="truncate font-semibold text-gray-800">{val}</dd>
                 </div>
-                <button onClick={() => { setEditing(label); setValue(label === "password" ? "" : val); setFeedback(""); }} aria-label={t("profile.edit", { field: t(editable[label].label) })} className="rounded-lg p-2 text-slate-400 hover:bg-brand-50 hover:text-brand-600">
+                <button onClick={() => { setEditing(label); setValue(label === "password" ? "" : val); setFeedback(""); }} aria-label={t("profile.edit", { field: t(editable[label].label) })} className="rounded-sm p-2 text-gray-400 hover:bg-brand-50 hover:text-brand-600">
                   <Pencil size={16} />
                 </button>
               </div>
             ))}
             {data.birthDate && (
               <div className="flex items-center gap-4 py-3.5">
-                <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-slate-100 text-slate-500"><Cake size={16} /></span>
+                <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-sm bg-gray-100 text-gray-500"><Cake size={16} /></span>
                 <div>
-                  <dt className="text-xs text-slate-400">{t("form.birthDate")}</dt>
-                  <dd className="font-semibold text-slate-800">{formatDate(data.birthDate)}</dd>
+                  <dt className="text-xs text-gray-400">{t("form.birthDate")}</dt>
+                  <dd className="font-semibold text-gray-800">{formatDate(data.birthDate)}</dd>
                 </div>
               </div>
             )}
@@ -229,7 +229,7 @@ const ProfileView = ({ id: publicId, own = false }) => {
         }
       >
         <form id="edit-form" onSubmit={saveEdit} className="space-y-3">
-          {editing === "email" && <p className="text-xs text-slate-500">{t("profile.emailRelogin")}</p>}
+          {editing === "email" && <p className="text-xs text-gray-500">{t("profile.emailRelogin")}</p>}
           {editing && (
             <Field
               id="edit"

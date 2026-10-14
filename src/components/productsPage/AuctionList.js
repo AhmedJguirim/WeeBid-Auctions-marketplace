@@ -11,12 +11,8 @@ const endpoints = { enchere: "/encheres", inverse: "/enchere_inverses" };
 const routes = { enchere: navRoutes.ENCHERE, inverse: navRoutes.ENCHEREINVERSE };
 
 const Switch = ({ checked, onChange, label }) => (
-  <label className="inline-flex cursor-pointer select-none items-center gap-3 text-sm font-medium text-slate-600">
-    <span className="relative">
-      <input type="checkbox" className="peer sr-only" checked={checked} onChange={(e) => onChange(e.target.checked)} />
-      <span className="block h-6 w-11 rounded-full bg-slate-300 transition peer-checked:bg-brand-600 peer-focus-visible:ring-4 peer-focus-visible:ring-brand-100" />
-      <span className="absolute left-0.5 top-0.5 h-5 w-5 rounded-full bg-white shadow transition peer-checked:translate-x-5" />
-    </span>
+  <label className="inline-flex cursor-pointer select-none items-center gap-2 text-sm text-gray-900">
+    <input type="checkbox" className="h-4 w-4 cursor-pointer rounded-sm border-gray-900 accent-brand-600" checked={checked} onChange={(e) => onChange(e.target.checked)} />
     {label}
   </label>
 );
@@ -24,20 +20,20 @@ const Switch = ({ checked, onChange, label }) => (
 const Tabs = ({ kind }) => {
   const { t } = useTranslation();
   return (
-  <div className="inline-flex rounded-xl bg-slate-100 p-1 text-sm font-semibold">
-    {[
-      ["enchere", "nav.auctions", navRoutes.ENCHERES],
-      ["inverse", "nav.reverseAuctions", navRoutes.ENCHERESINVERSES],
-    ].map(([k, key, path]) => (
-      <Link
-        key={k}
-        to={path}
-        className={`rounded-lg px-4 py-1.5 transition ${kind === k ? "bg-white text-brand-700 shadow-sm" : "text-slate-500 hover:text-slate-800"}`}
-      >
-        {t(key)}
-      </Link>
-    ))}
-  </div>
+    <div className="inline-flex gap-6 text-sm">
+      {[
+        ["enchere", "nav.auctions", navRoutes.ENCHERES],
+        ["inverse", "nav.reverseAuctions", navRoutes.ENCHERESINVERSES],
+      ].map(([k, key, path]) => (
+        <Link
+          key={k}
+          to={path}
+          className={`border-b-2 pb-1 transition ${kind === k ? "border-gray-900 font-bold text-gray-900" : "border-transparent text-gray-600 hover:text-gray-900"}`}
+        >
+          {t(key)}
+        </Link>
+      ))}
+    </div>
   );
 };
 
@@ -86,7 +82,8 @@ const AuctionList = ({ kind = "enchere", filters = {}, title, subtitle, tabs = f
     <>
       <PageHeader title={title} subtitle={subtitle} actions={tabs && <Tabs kind={kind} />} />
       <div className="container-page py-8">
-        <div className="mb-6 flex justify-end">
+        <div className="mb-8 flex items-center justify-between border-b border-gray-300 pb-4">
+          <p className="text-sm text-gray-900">{t("list.results", { count: items.length })}</p>
           <Switch checked={showExpired} onChange={setShowExpired} label={t("list.showEnded")} />
         </div>
         <div className={loading ? "opacity-60 transition" : "transition"}>

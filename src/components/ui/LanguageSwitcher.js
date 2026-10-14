@@ -7,7 +7,7 @@ const LanguageSwitcher = ({ className = "" }) => {
   const { i18n, t } = useTranslation();
   const current = (i18n.resolvedLanguage || "fr").slice(0, 2);
   return (
-    <div role="group" aria-label={t("lang.label")} className={`inline-flex rounded-lg bg-slate-100 p-0.5 text-xs font-bold ${className}`}>
+    <div role="group" aria-label={t("lang.label")} className={`inline-flex gap-1 text-xs font-bold ${className}`}>
       {languages.map((l) => (
         <button
           key={l.code}
@@ -15,7 +15,7 @@ const LanguageSwitcher = ({ className = "" }) => {
           title={l.label}
           aria-pressed={current === l.code}
           onClick={() => i18n.changeLanguage(l.code)}
-          className={`rounded-md px-2.5 py-1.5 transition ${current === l.code ? "bg-white text-brand-700 shadow-sm" : "text-slate-500 hover:text-slate-800"}`}
+          className={`px-1.5 py-0.5 transition ${current === l.code ? "text-gray-900 underline underline-offset-4" : "text-gray-500 hover:text-gray-900"}`}
         >
           {l.short}
         </button>

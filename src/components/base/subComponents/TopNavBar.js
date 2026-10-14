@@ -2,10 +2,9 @@ import * as React from "react";
 import { useSelector } from "react-redux";
 import { useTranslation } from "react-i18next";
 import { Link, NavLink, useLocation } from "react-router-dom";
-import { ChevronDown, Eye, Gavel, Inbox, LogOut, Menu, Package, PlusCircle, Send, User as UserIcon, X } from "lucide-react";
+import { ChevronDown, Eye, Gavel, Inbox, LogOut, Menu, Package, Search, Send, User as UserIcon, X } from "lucide-react";
 import { navRoutes } from "../../../config/routes";
 import Logo from "../../ui/Logo";
-import Avatar from "../../ui/Avatar";
 import useClickOutside from "../../ui/useClickOutside";
 import SearchBar from "./SearchBar";
 import LanguageSwitcher from "../../ui/LanguageSwitcher";
@@ -18,7 +17,7 @@ const mainLinks = [
 ];
 
 const navClass = ({ isActive }) =>
-  `whitespace-nowrap rounded-lg px-3 py-2 text-sm font-semibold transition ${isActive ? "bg-brand-50 text-brand-700" : "text-slate-600 hover:bg-slate-100 hover:text-slate-900"}`;
+  `whitespace-nowrap px-3 py-2 text-base transition hover:text-brand-600 ${isActive ? "font-bold text-gray-900" : "text-gray-900"}`;
 
 const UserMenu = ({ user }) => {
   const { t } = useTranslation();
@@ -35,26 +34,26 @@ const UserMenu = ({ user }) => {
   ];
   return (
     <div ref={ref} className="relative">
-      <button onClick={() => setOpen((o) => !o)} className="flex items-center gap-2 rounded-xl py-1 pl-1 pr-2 transition hover:bg-slate-100">
-        <Avatar name={user.displayName || "?"} size={32} />
-        <span className="hidden text-sm font-semibold text-slate-700 xl:block">{user.displayName}</span>
-        <ChevronDown size={16} className="text-slate-400" />
+      <button onClick={() => setOpen((o) => !o)} className="flex items-center gap-2 text-base text-gray-900 hover:text-brand-600">
+        <UserIcon size={22} strokeWidth={1.75} />
+        <span className="hidden max-w-[10rem] truncate lg:block">{user.displayName}</span>
+        <ChevronDown size={14} />
       </button>
       {open && (
-        <div className="absolute right-0 z-50 mt-2 w-64 overflow-hidden rounded-2xl border border-slate-200 bg-white p-1.5 shadow-lift">
-          <div className="px-3 py-2">
-            <p className="text-xs text-slate-400">{t("userMenu.signedInAs")}</p>
-            <p className="truncate text-sm font-bold text-slate-900">{user.displayName}</p>
+        <div className="absolute right-0 z-50 mt-3 w-64 border border-gray-300 bg-white py-1 shadow-lg">
+          <div className="px-4 py-3">
+            <p className="text-xs text-gray-500">{t("userMenu.signedInAs")}</p>
+            <p className="truncate text-sm font-bold text-gray-900">{user.displayName}</p>
           </div>
-          <div className="my-1 h-px bg-slate-100" />
+          <div className="h-px bg-gray-300" />
           {items.map(({ icon: Icon, text, path }) => (
-            <Link key={path} to={path} onClick={() => setOpen(false)} className="flex items-center gap-3 rounded-lg px-3 py-2 text-sm text-slate-700 hover:bg-slate-50">
-              <Icon size={16} className="text-slate-400" /> {text}
+            <Link key={path} to={path} onClick={() => setOpen(false)} className="flex items-center gap-3 px-4 py-2 text-sm text-gray-900 hover:bg-gray-100">
+              <Icon size={16} strokeWidth={1.75} /> {text}
             </Link>
           ))}
-          <div className="my-1 h-px bg-slate-100" />
-          <Link to={navRoutes.LOGOUT} className="flex items-center gap-3 rounded-lg px-3 py-2 text-sm text-rose-600 hover:bg-rose-50">
-            <LogOut size={16} /> {t("userMenu.logout")}
+          <div className="h-px bg-gray-300" />
+          <Link to={navRoutes.LOGOUT} className="flex items-center gap-3 px-4 py-2 text-sm text-red-700 hover:bg-gray-100">
+            <LogOut size={16} strokeWidth={1.75} /> {t("userMenu.logout")}
           </Link>
         </div>
       )}
@@ -67,60 +66,84 @@ const TopNavBar = () => {
   const user = useSelector((state) => state.user);
   const loggedIn = user.id !== undefined;
   const [mobileOpen, setMobileOpen] = React.useState(false);
+  const [searchOpen, setSearchOpen] = React.useState(false);
   const location = useLocation();
 
-  // close the mobile menu on navigation
-  React.useEffect(() => setMobileOpen(false), [location.pathname]);
+  // close the menus on navigation
+  React.useEffect(() => {
+    setMobileOpen(false);
+    setSearchOpen(false);
+  }, [location.pathname]);
 
   return (
-    <header className="sticky top-0 z-40 border-b border-slate-200/80 bg-white/85 backdrop-blur-lg">
-      <div className="container-page flex h-16 items-center gap-3">
-        <button className="-ml-2 flex h-10 w-10 items-center justify-center rounded-xl text-slate-600 hover:bg-slate-100 xl:hidden" onClick={() => setMobileOpen((o) => !o)} aria-label={t("nav.menu")}>
-          {mobileOpen ? <X size={22} /> : <Menu size={22} />}
-        </button>
-        <Logo />
-
-        <nav className="ml-4 hidden items-center gap-1 xl:flex">
-          {mainLinks.map((l) => (
-            <NavLink key={l.path} to={l.path} className={navClass}>{t(l.key)}</NavLink>
-          ))}
-        </nav>
-
-        <div className="mx-auto hidden min-w-0 max-w-md flex-1 md:block"><SearchBar /></div>
-
-        <div className="ml-auto flex items-center gap-1.5 md:ml-0">
-          <LanguageSwitcher className="mr-1 hidden sm:inline-flex" />
-          {loggedIn ? (
-            <>
-              <Link to={navRoutes.MAKE_ARTICLE} className="btn-primary hidden !py-2 sm:inline-flex">
-                <PlusCircle size={16} /> {t("nav.sell")}
-              </Link>
-              <NotificationsMenu />
-              <UserMenu user={user} />
-            </>
-          ) : (
-            <>
-              <Link to={navRoutes.LOGIN} className="btn-ghost hidden !py-2 sm:inline-flex">{t("nav.login")}</Link>
-              <Link to={navRoutes.REGISTER} className="btn-primary !py-2">{t("nav.register")}</Link>
-            </>
-          )}
+    <header className="sticky top-0 z-40 bg-white">
+      {/* utility bar */}
+      <div className="hidden bg-gray-100 sm:block">
+        <div className="container-page flex h-10 items-center justify-end gap-4 text-sm text-gray-900">
+          <span>{t("nav.tagline")}</span>
+          <span className="h-4 w-px bg-gray-400" />
+          <LanguageSwitcher />
         </div>
       </div>
 
+      {/* main bar */}
+      <div className="border-b border-gray-300">
+        <div className="container-page grid h-16 grid-cols-[1fr_auto_1fr] items-center gap-3 lg:h-20">
+          <div className="flex items-center gap-3">
+            <button className="-ml-2 flex h-10 w-10 items-center justify-center text-gray-900 lg:hidden" onClick={() => setMobileOpen((o) => !o)} aria-label={t("nav.menu")}>
+              {mobileOpen ? <X size={24} /> : <Menu size={24} />}
+            </button>
+            <Logo />
+          </div>
+
+          <nav className="hidden items-center gap-3 lg:flex">
+            {mainLinks.map((l) => (
+              <NavLink key={l.path} to={l.path} className={navClass}>{t(l.key)}</NavLink>
+            ))}
+            {loggedIn && <NavLink to={navRoutes.MAKE_ARTICLE} className={navClass}>{t("nav.sellItem")}</NavLink>}
+          </nav>
+          <span className="lg:hidden" />
+
+          <div className="flex items-center justify-end gap-5">
+            <button onClick={() => setSearchOpen((o) => !o)} className="flex items-center gap-2 text-base text-gray-900 hover:text-brand-600" aria-expanded={searchOpen}>
+              <Search size={22} strokeWidth={1.75} /> <span className="hidden md:inline">{t("nav.search")}</span>
+            </button>
+            {loggedIn ? (
+              <>
+                <NotificationsMenu />
+                <UserMenu user={user} />
+              </>
+            ) : (
+              <Link to={navRoutes.LOGIN} className="flex items-center gap-2 text-base text-gray-900 hover:text-brand-600">
+                <UserIcon size={22} strokeWidth={1.75} /> <span className="hidden md:inline">{t("nav.login")}</span>
+              </Link>
+            )}
+          </div>
+        </div>
+      </div>
+
+      {searchOpen && (
+        <div className="border-b border-gray-300 bg-white py-4">
+          <div className="container-page"><SearchBar onNavigate={() => setSearchOpen(false)} /></div>
+        </div>
+      )}
+
       {mobileOpen && (
-        <div className="border-t border-slate-100 bg-white px-4 pb-5 pt-3 xl:hidden">
-          <SearchBar className="md:hidden" onNavigate={() => setMobileOpen(false)} />
-          <LanguageSwitcher className="mt-3 sm:hidden" />
-          <nav className="mt-3 flex flex-col gap-1">
+        <div className="border-b border-gray-300 bg-white px-4 pb-5 pt-2 lg:hidden">
+          <nav className="flex flex-col">
             {mainLinks.map((l) => (
               <NavLink key={l.path} to={l.path} className={navClass}>{t(l.key)}</NavLink>
             ))}
             {loggedIn ? (
               <NavLink to={navRoutes.MAKE_ARTICLE} className={navClass}>{t("nav.sellItem")}</NavLink>
             ) : (
-              <NavLink to={navRoutes.LOGIN} className={navClass}>{t("nav.login")}</NavLink>
+              <>
+                <NavLink to={navRoutes.LOGIN} className={navClass}>{t("nav.login")}</NavLink>
+                <NavLink to={navRoutes.REGISTER} className={navClass}>{t("nav.register")}</NavLink>
+              </>
             )}
           </nav>
+          <LanguageSwitcher className="mt-3 sm:hidden" />
         </div>
       )}
     </header>

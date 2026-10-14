@@ -1,16 +1,25 @@
 import React from "react";
+import { Link } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 
-const PageHeader = ({ title, subtitle, actions, children }) => (
-  <div className="border-b border-slate-200 bg-white">
-    <div className="container-page flex flex-col gap-4 py-8 sm:flex-row sm:items-end sm:justify-between">
-      <div>
-        <h1 className="text-2xl font-extrabold tracking-tight text-slate-900 sm:text-3xl">{title}</h1>
-        {subtitle && <p className="mt-1 max-w-2xl text-slate-500">{subtitle}</p>}
+// Venia-style page head: breadcrumb on the left, centred title underneath.
+const PageHeader = ({ title, subtitle, actions, children }) => {
+  const { t } = useTranslation();
+  return (
+    <div className="container-page pt-6">
+      <nav aria-label="breadcrumb" className="text-xs text-gray-900">
+        <Link to="/" className="underline underline-offset-2 hover:text-brand-600">{t("footer.home")}</Link>
+        <span className="mx-2">/</span>
+        <span>{title}</span>
+      </nav>
+      <div className="mt-6 text-center">
+        <h1 className="font-sans text-2xl font-normal text-gray-900">{title}</h1>
+        {subtitle && <p className="mx-auto mt-2 max-w-2xl text-sm text-gray-600">{subtitle}</p>}
       </div>
-      {actions && <div className="flex flex-wrap gap-2">{actions}</div>}
+      {actions && <div className="mt-5 flex flex-wrap justify-center gap-2">{actions}</div>}
+      {children && <div className="pt-4">{children}</div>}
     </div>
-    {children && <div className="container-page pb-4">{children}</div>}
-  </div>
-);
+  );
+};
 
 export default PageHeader;

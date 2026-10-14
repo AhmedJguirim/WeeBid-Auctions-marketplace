@@ -1,7 +1,7 @@
 import React from "react";
 import { BACKEND_URL } from "../../config/env";
 
-const colors = ["bg-brand-500", "bg-emerald-500", "bg-amber-500", "bg-rose-500", "bg-sky-500"];
+const colors = ["bg-gray-900", "bg-gray-700", "bg-brand-700", "bg-brand-900"];
 
 // Round avatar: user image when it loads, coloured initial otherwise.
 const Avatar = ({ name = "?", image, src, size = 36, className = "" }) => {

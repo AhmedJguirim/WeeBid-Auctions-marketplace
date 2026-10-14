@@ -49,19 +49,19 @@ const Login = () => {
     >
       <form onSubmit={onSubmit} className="space-y-5">
         {error && (
-          <div role="alert" className="flex items-start gap-2 rounded-xl border border-rose-200 bg-rose-50 px-4 py-3 text-sm text-rose-700">
+          <div role="alert" className="flex items-start gap-2 rounded-sm border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
             <AlertCircle size={18} className="mt-0.5 shrink-0" /> {error}
           </div>
         )}
         <div>
-          <label htmlFor="email" className="mb-1.5 block text-sm font-semibold text-slate-700">{t("form.email")}</label>
+          <label htmlFor="email" className="mb-1.5 block text-sm font-bold text-gray-900">{t("form.email")}</label>
           <input id="email" type="email" required autoComplete="email" className="input" placeholder={t("login.emailPlaceholder")} value={email} onChange={(e) => setEmail(e.target.value)} />
         </div>
         <div>
-          <label htmlFor="password" className="mb-1.5 block text-sm font-semibold text-slate-700">{t("form.password")}</label>
+          <label htmlFor="password" className="mb-1.5 block text-sm font-bold text-gray-900">{t("form.password")}</label>
           <div className="relative">
             <input id="password" type={show ? "text" : "password"} required autoComplete="current-password" className="input pr-11" placeholder="••••••••" value={password} onChange={(e) => setPassword(e.target.value)} />
-            <button type="button" onClick={() => setShow((s) => !s)} aria-label={t("login.showPassword")} className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600">
+            <button type="button" onClick={() => setShow((s) => !s)} aria-label={t("login.showPassword")} className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600">
               {show ? <EyeOff size={18} /> : <Eye size={18} />}
             </button>
           </div>

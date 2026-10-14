@@ -42,14 +42,14 @@ const TypeCard = ({ active, onClick, icon: Icon, title, text }) => (
   <button
     type="button"
     onClick={onClick}
-    className={`flex items-start gap-3 rounded-2xl border-2 p-4 text-left transition ${active ? "border-brand-600 bg-brand-50" : "border-slate-200 bg-white hover:border-slate-300"}`}
+    className={`flex items-start gap-3 rounded-sm border-2 p-4 text-left transition ${active ? "border-brand-600 bg-brand-50" : "border-gray-200 bg-white hover:border-gray-300"}`}
   >
-    <span className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-xl ${active ? "bg-brand-600 text-white" : "bg-slate-100 text-slate-500"}`}>
+    <span className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-sm ${active ? "bg-brand-600 text-white" : "bg-gray-100 text-gray-500"}`}>
       <Icon size={20} />
     </span>
     <span>
-      <span className="block font-bold text-slate-900">{title}</span>
-      <span className="mt-0.5 block text-sm text-slate-500">{text}</span>
+      <span className="block font-bold text-gray-900">{title}</span>
+      <span className="mt-0.5 block text-sm text-gray-500">{text}</span>
     </span>
   </button>
 );
@@ -151,8 +151,8 @@ export default function CreateArticle() {
   if (user.id === undefined && !localStorage.getItem("token")) {
     return (
       <div className="container-page flex min-h-[50vh] flex-col items-center justify-center text-center">
-        <h1 className="text-2xl font-extrabold text-slate-900">{t("create.loginTitle")}</h1>
-        <p className="mt-2 text-slate-500">{t("create.loginText")}</p>
+        <h1 className="text-2xl font-bold text-gray-900">{t("create.loginTitle")}</h1>
+        <p className="mt-2 text-gray-500">{t("create.loginText")}</p>
         <a href={navRoutes.LOGIN} className="btn-primary mt-6">{t("footer.login")}</a>
       </div>
     );
@@ -168,12 +168,12 @@ export default function CreateArticle() {
           {steps.map((label, i) => (
             <React.Fragment key={label}>
               <li className="flex items-center gap-2.5">
-                <span className={`flex h-8 w-8 items-center justify-center rounded-full text-sm font-bold ${i < step ? "bg-brand-600 text-white" : i === step ? "bg-brand-600 text-white ring-4 ring-brand-100" : "bg-slate-200 text-slate-500"}`}>
+                <span className={`flex h-8 w-8 items-center justify-center rounded-full text-sm font-bold ${i < step ? "bg-brand-600 text-white" : i === step ? "bg-brand-600 text-white ring-2 ring-brand-100" : "bg-gray-200 text-gray-500"}`}>
                   {i < step ? <Check size={16} /> : i + 1}
                 </span>
-                <span className={`text-sm font-semibold ${i <= step ? "text-slate-900" : "text-slate-400"}`}>{label}</span>
+                <span className={`text-sm font-semibold ${i <= step ? "text-gray-900" : "text-gray-400"}`}>{label}</span>
               </li>
-              {i < steps.length - 1 && <span className={`h-px flex-1 ${i < step ? "bg-brand-600" : "bg-slate-200"}`} />}
+              {i < steps.length - 1 && <span className={`h-px flex-1 ${i < step ? "bg-brand-600" : "bg-gray-200"}`} />}
             </React.Fragment>
           ))}
         </ol>
@@ -188,7 +188,7 @@ export default function CreateArticle() {
           }}
         >
           {error && (
-            <div role="alert" className="flex items-start gap-2 rounded-xl border border-rose-200 bg-rose-50 px-4 py-3 text-sm text-rose-700">
+            <div role="alert" className="flex items-start gap-2 rounded-sm border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
               <AlertCircle size={18} className="mt-0.5 shrink-0" /> <span className="whitespace-pre-line">{error}</span>
             </div>
           )}
@@ -209,18 +209,18 @@ export default function CreateArticle() {
               <Field label={t("detail.description")} as="textarea" rows={5} maxLength={255} placeholder={t("create.descriptionPlaceholder")} hint={`${formik.values.description.length}/255`} {...fieldProps("description")} />
 
               <div>
-                <p className="mb-1.5 text-sm font-semibold text-slate-700">{t("create.photos")} <span className="font-normal text-slate-400">{t("create.photosMax")}</span></p>
+                <p className="mb-1.5 text-sm font-bold text-gray-900">{t("create.photos")} <span className="font-normal text-gray-400">{t("create.photosMax")}</span></p>
                 <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
                   {files.map(({ url }, i) => (
-                    <div key={url} className="group relative aspect-square overflow-hidden rounded-xl bg-slate-100">
+                    <div key={url} className="group relative aspect-square overflow-hidden rounded-sm bg-gray-100">
                       <img src={url} alt="" className="h-full w-full object-cover" />
-                      <button type="button" onClick={() => setFiles(files.filter((_, j) => j !== i))} aria-label={t("create.remove")} className="absolute right-1.5 top-1.5 rounded-full bg-slate-900/70 p-1 text-white opacity-0 transition group-hover:opacity-100">
+                      <button type="button" onClick={() => setFiles(files.filter((_, j) => j !== i))} aria-label={t("create.remove")} className="absolute right-1.5 top-1.5 rounded-full bg-gray-900/70 p-1 text-white opacity-0 transition group-hover:opacity-100">
                         <X size={14} />
                       </button>
                     </div>
                   ))}
                   {files.length < 4 && (
-                    <label className="flex aspect-square cursor-pointer flex-col items-center justify-center gap-1 rounded-xl border-2 border-dashed border-slate-300 text-slate-400 transition hover:border-brand-400 hover:bg-brand-50 hover:text-brand-600">
+                    <label className="flex aspect-square cursor-pointer flex-col items-center justify-center gap-1 rounded-sm border-2 border-dashed border-gray-300 text-gray-400 transition hover:border-brand-400 hover:bg-brand-50 hover:text-brand-600">
                       <ImagePlus size={22} />
                       <span className="text-xs font-semibold">{t("create.add")}</span>
                       <input type="file" accept="image/jpeg,image/png,image/webp,image/gif" multiple className="sr-only" onChange={(e) => { addFiles(e.target.files); e.target.value = ""; }} />
@@ -253,7 +253,7 @@ export default function CreateArticle() {
             </>
           )}
 
-          <div className="flex items-center justify-between gap-3 border-t border-slate-100 pt-6">
+          <div className="flex items-center justify-between gap-3 border-t border-gray-100 pt-6">
             {step === 1 ? (
               <button type="button" onClick={() => setStep(0)} className="btn-secondary"><ArrowLeft size={16} /> {t("common.back")}</button>
             ) : <span />}

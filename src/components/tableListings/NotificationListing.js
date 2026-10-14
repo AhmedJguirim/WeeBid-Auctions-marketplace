@@ -16,8 +16,8 @@ const NotificationListing = () => {
       emptyText={t("notifications.empty")}
       columns={[
         { header: t("tables.title"), cell: (n) => <a href={n.route} className="font-semibold text-brand-700 hover:underline">{n.title}</a> },
-        { header: t("detail.description"), cell: (n) => <span className="text-slate-600">{n.description}</span> },
-        { header: t("detail.date"), align: "right", cell: (n) => <span className="whitespace-nowrap text-slate-500">{dateLabel(n.date)}</span> },
+        { header: t("detail.description"), cell: (n) => <span className="text-gray-600">{n.description}</span> },
+        { header: t("detail.date"), align: "right", cell: (n) => <span className="whitespace-nowrap text-gray-500">{dateLabel(n.date)}</span> },
       ]}
     />
   );

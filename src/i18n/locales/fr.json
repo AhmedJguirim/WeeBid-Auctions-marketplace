@@ -71,7 +71,9 @@
     "sell": "Vendre",
     "sellItem": "Vendre un article",
     "login": "Connexion",
-    "register": "Inscription"
+    "register": "Inscription",
+    "tagline": "Enchères, enchères inversées et devis",
+    "search": "Recherche"
   },
   "userMenu": {
     "profile": "Mon profil",
@@ -104,7 +106,8 @@
     "about": "La place de marché où chacun fixe le prix. Enchères classiques, enchères inversées et demandes de devis, sans frais de mise en vente.",
     "explore": "Explorer",
     "account": "Compte",
-    "project": "projet de fin d'études."
+    "project": "projet de fin d'études.",
+    "followUs": "Suivez-nous"
   },
   "status": {
     "live": "En direct",
@@ -156,7 +159,10 @@
     "service_quotes_text": "Demandez directement à un fournisseur une proposition sur un produit spécifique.",
     "learnMore": "En savoir plus",
     "ctaTitle": "Prêt à lancer votre première enchère ?",
-    "ctaText": "Publiez un article en quelques minutes et laissez la communauté faire monter les prix."
+    "ctaText": "Publiez un article en quelques minutes et laissez la communauté faire monter les prix.",
+    "tileAuctions": "Enchérissez sur des articles",
+    "tileReverse": "Faites jouer la concurrence",
+    "tileCategories": "Trouvez ce qu'il vous faut"
   },
   "list": {
     "showEnded": "Afficher les enchères terminées",
@@ -178,7 +184,8 @@
     "membersTitle": "Membres : « {{search}} »",
     "membersSubtitle": "Résultats de recherche parmi les membres.",
     "noMember": "Aucun membre trouvé",
-    "noMemberText": "Essayez avec un autre nom."
+    "noMemberText": "Essayez avec un autre nom.",
+    "results": "{{count}} résultats"
   },
   "categories": {
     "reverseShort": "Inversées",

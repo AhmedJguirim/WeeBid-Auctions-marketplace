@@ -51,28 +51,28 @@ export default function NotificationsMenu() {
       <button
         onClick={() => setOpen((o) => !o)}
         aria-label={t("notifications.title")}
-        className="relative flex h-10 w-10 items-center justify-center rounded-xl text-slate-600 transition hover:bg-slate-100"
+        className="relative flex h-10 w-10 items-center justify-center text-gray-900 transition hover:text-brand-600"
       >
-        <Bell size={20} />
-        {list.length > 0 && <span className="absolute right-2 top-2 h-2.5 w-2.5 rounded-full bg-rose-500 ring-2 ring-white" />}
+        <Bell size={22} strokeWidth={1.75} />
+        {list.length > 0 && <span className="absolute right-2 top-2 h-2.5 w-2.5 rounded-full bg-brand-600" />}
       </button>
 
       {open && (
-        <div className="absolute right-0 z-50 mt-2 w-80 overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-lift">
-          <div className="flex items-center justify-between border-b border-slate-100 px-4 py-3">
-            <h3 className="text-sm font-bold text-slate-900">{t("notifications.title")}</h3>
-            <Link to={navRoutes.NOTIFICATIONS} onClick={() => setOpen(false)} className="text-xs font-semibold text-brand-600 hover:underline">
+        <div className="absolute right-0 z-50 mt-2 w-80 overflow-hidden border border-gray-300 bg-white shadow-lg">
+          <div className="flex items-center justify-between border-b border-gray-300 px-4 py-3">
+            <h3 className="text-sm font-bold text-gray-900">{t("notifications.title")}</h3>
+            <Link to={navRoutes.NOTIFICATIONS} onClick={() => setOpen(false)} className="text-xs text-gray-900 underline hover:text-brand-600">
               {t("common.seeAll")}
             </Link>
           </div>
-          <ul className="max-h-80 divide-y divide-slate-100 overflow-auto">
-            {list.length === 0 && <li className="px-4 py-8 text-center text-sm text-slate-500">{t("notifications.empty")}</li>}
+          <ul className="max-h-80 divide-y divide-gray-100 overflow-auto">
+            {list.length === 0 && <li className="px-4 py-8 text-center text-sm text-gray-500">{t("notifications.empty")}</li>}
             {list.map((n, i) => (
               <li key={n.id || i}>
-                <a href={n.route} className="block px-4 py-3 transition hover:bg-slate-50">
-                  <p className="text-sm font-semibold text-slate-900">{n.title}</p>
-                  <p className="mt-0.5 line-clamp-2 text-xs text-slate-500">{n.description}</p>
-                  <p className="mt-1 text-[11px] text-slate-400">{timeAgo(n.date, t)}</p>
+                <a href={n.route} className="block px-4 py-3 transition hover:bg-gray-50">
+                  <p className="text-sm font-semibold text-gray-900">{n.title}</p>
+                  <p className="mt-0.5 line-clamp-2 text-xs text-gray-500">{n.description}</p>
+                  <p className="mt-1 text-[11px] text-gray-400">{timeAgo(n.date, t)}</p>
                 </a>
               </li>
             ))}
@@ -81,10 +81,10 @@ export default function NotificationsMenu() {
       )}
 
       {toast && (
-        <div className="fixed bottom-5 right-5 z-[60] flex max-w-xs animate-fade-up items-start gap-3 rounded-2xl bg-slate-900 px-4 py-3 text-sm text-white shadow-lift">
-          <Bell size={16} className="mt-0.5 shrink-0 text-brand-300" />
+        <div className="fixed bottom-5 right-5 z-[60] flex max-w-xs items-start gap-3 bg-gray-900 px-4 py-3 text-sm text-white shadow-lg">
+          <Bell size={16} className="mt-0.5 shrink-0 text-white" />
           <span>{toast}</span>
-          <button onClick={() => setToast("")} aria-label={t("common.close")}><X size={16} className="text-slate-400" /></button>
+          <button onClick={() => setToast("")} aria-label={t("common.close")}><X size={16} className="text-gray-400" /></button>
         </div>
       )}
     </div>

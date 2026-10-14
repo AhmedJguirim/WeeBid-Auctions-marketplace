@@ -5,12 +5,10 @@ import { PackageOpen } from "lucide-react";
 const EmptyState = ({ title, text, action }) => {
   const { t } = useTranslation();
   return (
-  <div className="card col-span-full flex flex-col items-center px-6 py-16 text-center">
-    <span className="flex h-14 w-14 items-center justify-center rounded-2xl bg-brand-50 text-brand-600">
-      <PackageOpen size={26} />
-    </span>
-    <h3 className="mt-4 text-lg font-bold text-slate-900">{title || t("empty.title")}</h3>
-    {text && <p className="mt-1 max-w-md text-sm text-slate-500">{text}</p>}
+  <div className="col-span-full flex flex-col items-center border border-gray-300 px-6 py-16 text-center">
+    <PackageOpen size={28} className="text-gray-400" strokeWidth={1.5} />
+    <h3 className="mt-4 font-serif text-lg font-bold text-gray-900">{title || t("empty.title")}</h3>
+    {text && <p className="mt-1 max-w-md text-sm text-gray-500">{text}</p>}
     {action && <div className="mt-5">{action}</div>}
   </div>
   );

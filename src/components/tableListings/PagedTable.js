@@ -41,16 +41,16 @@ const PagedTable = ({ title, subtitle, endpoint, params, enabled = true, columns
           <div className="card overflow-hidden">
             <div className="overflow-x-auto">
               <table className="w-full text-left text-sm">
-                <thead className="border-b border-slate-100 bg-slate-50 text-xs uppercase tracking-wide text-slate-500">
+                <thead className="border-b border-gray-100 bg-gray-50 text-xs uppercase tracking-wide text-gray-500">
                   <tr>
                     {columns.map((c) => (
                       <th key={c.header} className={`px-5 py-3 font-semibold ${c.align === "right" ? "text-right" : ""}`}>{c.header}</th>
                     ))}
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-slate-100">
+                <tbody className="divide-y divide-gray-100">
                   {rows.map((row) => (
-                    <tr key={row.id} className="transition hover:bg-slate-50/70">
+                    <tr key={row.id} className="transition hover:bg-gray-50/70">
                       {columns.map((c) => (
                         <td key={c.header} className={`px-5 py-3.5 ${c.align === "right" ? "text-right" : ""}`}>{c.cell(row)}</td>
                       ))}
@@ -60,7 +60,7 @@ const PagedTable = ({ title, subtitle, endpoint, params, enabled = true, columns
               </table>
             </div>
             {hasMore && (
-              <button onClick={() => setPage(page + 1)} className="w-full border-t border-slate-100 py-3.5 text-sm font-semibold text-brand-600 transition hover:bg-brand-50">
+              <button onClick={() => setPage(page + 1)} className="w-full border-t border-gray-100 py-3.5 text-sm font-semibold text-brand-600 transition hover:bg-brand-50">
                 {t("common.showMore")}
               </button>
             )}

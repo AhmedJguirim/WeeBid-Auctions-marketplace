@@ -29,11 +29,11 @@ const WatchList = () => {
       <PageHeader title={t("userMenu.watchlist")} subtitle={t("watch.subtitle")} />
       <div className="container-page space-y-12 py-8">
         <section>
-          <h2 className="mb-4 text-xl font-bold text-slate-900">{t("watch.auctions")}</h2>
+          <h2 className="mb-4 text-xl font-bold text-gray-900">{t("watch.auctions")}</h2>
           <ProductsListing type={navRoutes.ENCHERE} ventes={encheres} />
         </section>
         <section>
-          <h2 className="mb-4 text-xl font-bold text-slate-900">{t("watch.reverse")}</h2>
+          <h2 className="mb-4 text-xl font-bold text-gray-900">{t("watch.reverse")}</h2>
           <ProductsListing type={navRoutes.ENCHEREINVERSE} ventes={encheresInverses} />
         </section>
       </div>

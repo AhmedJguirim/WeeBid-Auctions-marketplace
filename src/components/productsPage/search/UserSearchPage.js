@@ -34,9 +34,9 @@ const UserSearchPage = () => {
       <div className="container-page py-8">
         <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-5">
           {users.map((u) => (
-            <Link key={u.id} to={`${navRoutes.CONSULTUSER}/${u.id}`} className="card flex flex-col items-center p-6 text-center transition hover:-translate-y-1 hover:shadow-lift">
+            <Link key={u.id} to={`${navRoutes.CONSULTUSER}/${u.id}`} className="card flex flex-col items-center p-6 text-center transition">
               <Avatar name={u.displayName} image={u.image} size={72} />
-              <p className="mt-3 truncate font-bold text-slate-900">{u.displayName}</p>
+              <p className="mt-3 truncate font-bold text-gray-900">{u.displayName}</p>
             </Link>
           ))}
           {users.length === 0 && <EmptyState title={t("list.noMember")} text={t("list.noMemberText")} />}

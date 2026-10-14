@@ -112,12 +112,12 @@ export default function MultiStepRegister() {
         {steps.map((label, i) => (
           <React.Fragment key={label}>
             <li className="flex items-center gap-2.5">
-              <span className={`flex h-8 w-8 items-center justify-center rounded-full text-sm font-bold transition ${i < step ? "bg-brand-600 text-white" : i === step ? "bg-brand-600 text-white ring-4 ring-brand-100" : "bg-slate-200 text-slate-500"}`}>
+              <span className={`flex h-8 w-8 items-center justify-center rounded-full text-sm font-bold transition ${i < step ? "bg-brand-600 text-white" : i === step ? "bg-brand-600 text-white ring-2 ring-brand-100" : "bg-gray-200 text-gray-500"}`}>
                 {i < step ? <Check size={16} /> : i + 1}
               </span>
-              <span className={`text-sm font-semibold ${i <= step ? "text-slate-900" : "text-slate-400"}`}>{label}</span>
+              <span className={`text-sm font-semibold ${i <= step ? "text-gray-900" : "text-gray-400"}`}>{label}</span>
             </li>
-            {i < steps.length - 1 && <span className={`h-px flex-1 ${i < step ? "bg-brand-600" : "bg-slate-200"}`} />}
+            {i < steps.length - 1 && <span className={`h-px flex-1 ${i < step ? "bg-brand-600" : "bg-gray-200"}`} />}
           </React.Fragment>
         ))}
       </ol>
@@ -131,7 +131,7 @@ export default function MultiStepRegister() {
         noValidate
       >
         {error && (
-          <div role="alert" className="mb-5 flex items-start gap-2 rounded-xl border border-rose-200 bg-rose-50 px-4 py-3 text-sm text-rose-700">
+          <div role="alert" className="mb-5 flex items-start gap-2 rounded-sm border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
             <AlertCircle size={18} className="mt-0.5 shrink-0" /> <span className="whitespace-pre-line">{error}</span>
           </div>
         )}

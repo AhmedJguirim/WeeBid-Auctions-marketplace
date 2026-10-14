@@ -78,18 +78,18 @@ export default function SearchBar({ className = "", onNavigate }) {
 
   return (
     <div ref={ref} className={`relative ${className}`}>
-      <form onSubmit={submit} className="flex items-center rounded-xl border border-slate-200 bg-slate-50 transition focus-within:border-brand-500 focus-within:bg-white focus-within:ring-4 focus-within:ring-brand-100">
+      <form onSubmit={submit} className="flex items-center rounded-sm border border-gray-900 bg-white transition focus-within:ring-2 focus-within:ring-brand-100">
         <select
           value={type}
           onChange={(e) => setType(e.target.value)}
           aria-label={t("search.type")}
-          className="cursor-pointer rounded-l-xl border-0 bg-transparent py-2.5 pl-3 pr-1 text-sm font-medium text-slate-600 outline-none"
+          className="cursor-pointer border-0 bg-transparent py-2.5 pl-3 pr-1 text-sm text-gray-700 outline-none"
         >
           {types.map((o) => (
             <option key={o.value} value={o.value}>{t(o.key)}</option>
           ))}
         </select>
-        <span className="h-5 w-px bg-slate-200" />
+        <span className="h-5 w-px bg-gray-200" />
         <input
           value={input}
           onChange={(e) => {
@@ -100,18 +100,18 @@ export default function SearchBar({ className = "", onNavigate }) {
           placeholder={t("search.placeholder")}
           aria-label={t("search.placeholder")}
           maxLength={60}
-          className="min-w-0 flex-1 border-0 bg-transparent px-3 py-2.5 text-sm text-slate-800 outline-none placeholder:text-slate-400"
+          className="min-w-0 flex-1 border-0 bg-transparent px-3 py-2.5 text-sm text-gray-800 outline-none placeholder:text-gray-500"
         />
-        <button type="submit" aria-label={t("search.submit")} className="px-3 text-slate-400 hover:text-brand-600">
+        <button type="submit" aria-label={t("search.submit")} className="px-3 text-gray-900 hover:text-brand-600">
           {loading ? <Loader2 size={18} className="animate-spin" /> : <Search size={18} />}
         </button>
       </form>
       {open && input.trim() && (
-        <ul className="absolute left-0 right-0 top-full z-50 mt-2 max-h-72 overflow-auto rounded-xl border border-slate-200 bg-white p-1.5 shadow-lift">
-          {options.length === 0 && !loading && <li className="px-3 py-2 text-sm text-slate-500">{t("search.noResult")}</li>}
+        <ul className="absolute left-0 right-0 top-full z-50 mt-2 max-h-72 overflow-auto border border-gray-300 bg-white py-1 shadow-lg">
+          {options.length === 0 && !loading && <li className="px-3 py-2 text-sm text-gray-500">{t("search.noResult")}</li>}
           {options.map((o) => (
             <li key={o.id}>
-              <button onClick={() => go(o.link)} className="w-full rounded-lg px-3 py-2 text-left text-sm text-slate-700 hover:bg-brand-50 hover:text-brand-700">
+              <button onClick={() => go(o.link)} className="w-full rounded-sm px-3 py-2 text-left text-sm text-gray-700 hover:bg-brand-50 hover:text-brand-700">
                 {o.name}
               </button>
             </li>

@@ -52,17 +52,17 @@ const Countdown = ({ startDate, endDate, variant = "pill" }) => {
     ];
     return (
       <div>
-        <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-slate-500">
+        <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-gray-500">
           {labels[status]}
         </p>
         {status === "ended" ? (
-          <p className="text-2xl font-bold text-slate-400">{t("countdown.auctionEnded")}</p>
+          <p className="text-2xl font-bold text-gray-400">{t("countdown.auctionEnded")}</p>
         ) : (
           <div className="grid grid-cols-4 gap-2">
             {cells.map(([label, value]) => (
-              <div key={label} className="rounded-xl bg-slate-900 px-2 py-3 text-center text-white">
+              <div key={label} className="border border-gray-900 px-2 py-3 text-center text-gray-900">
                 <div className="text-2xl font-bold tabular-nums sm:text-3xl">{pad(value)}</div>
-                <div className="text-[10px] uppercase tracking-wider text-slate-400">{label}</div>
+                <div className="text-[10px] uppercase tracking-wider text-gray-500">{label}</div>
               </div>
             ))}
           </div>
@@ -73,12 +73,12 @@ const Countdown = ({ startDate, endDate, variant = "pill" }) => {
 
   const tone =
     status === "ended"
-      ? "bg-slate-100 text-slate-500"
+      ? "bg-gray-100 text-gray-500"
       : status === "upcoming"
-      ? "bg-amber-50 text-amber-700"
+      ? "bg-gray-100 text-gray-700"
       : remaining < 3600 * 1000 * 6
-      ? "bg-rose-50 text-rose-600"
-      : "bg-slate-100 text-slate-700";
+      ? "bg-red-700 text-white"
+      : "bg-gray-100 text-gray-700";
 
   return (
     <span className={`badge tabular-nums ${tone}`}>

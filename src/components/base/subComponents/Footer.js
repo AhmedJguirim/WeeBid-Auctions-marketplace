@@ -9,16 +9,16 @@ import Logo from "../../ui/Logo";
 const FooterColumn = ({ title, links }) => {
   const { t } = useTranslation();
   return (
-  <div>
-    <h4 className="text-sm font-bold uppercase tracking-wider text-white">{title}</h4>
-    <ul className="mt-4 space-y-2.5">
-      {links.map(([key, path]) => (
-        <li key={path}>
-          <Link to={path} className="text-sm text-slate-400 transition hover:text-white">{t(key)}</Link>
-        </li>
-      ))}
-    </ul>
-  </div>
+    <div>
+      <h4 className="text-sm font-bold text-gray-900">{title}</h4>
+      <ul className="mt-5 space-y-3">
+        {links.map(([key, path]) => (
+          <li key={path}>
+            <Link to={path} className="text-sm text-gray-600 transition hover:text-brand-600">{t(key)}</Link>
+          </li>
+        ))}
+      </ul>
+    </div>
   );
 };
 
@@ -45,29 +45,28 @@ const Footer = () => {
       ];
 
   return (
-    <footer className="mt-20 bg-slate-950">
-      <div className="container-page grid gap-10 py-14 md:grid-cols-4">
-        <div className="md:col-span-2">
-          <Logo light />
-          <p className="mt-4 max-w-sm text-sm leading-relaxed text-slate-400">
-            {t("footer.about")}
-          </p>
-          <div className="mt-5 flex gap-2">
-            <a href="https://github.com/AhmedJguirim/WeeBid-Auctions-marketplace" target="_blank" rel="noreferrer" aria-label="GitHub" className="flex h-9 w-9 items-center justify-center rounded-lg bg-slate-800 text-slate-300 transition hover:bg-brand-600 hover:text-white">
-              <Github size={17} />
+    <footer className="mt-20 border-t border-gray-300 bg-white">
+      <div className="container-page grid gap-10 py-14 sm:grid-cols-2 lg:grid-cols-4">
+        <FooterColumn title={t("footer.explore")} links={explore} />
+        <FooterColumn title={t("footer.account")} links={account} />
+        <div className="lg:col-span-2">
+          <h4 className="text-sm font-bold text-gray-900">{t("footer.followUs")}</h4>
+          <p className="mt-5 max-w-md text-sm leading-relaxed text-gray-600">{t("footer.about")}</p>
+          <div className="mt-4 flex gap-4 text-gray-900">
+            <a href="https://github.com/AhmedJguirim/WeeBid-Auctions-marketplace" target="_blank" rel="noreferrer" aria-label="GitHub" className="hover:text-brand-600">
+              <Github size={20} strokeWidth={1.75} />
             </a>
-            <a href="mailto:jguirimahmed112@gmail.com" aria-label="Email" className="flex h-9 w-9 items-center justify-center rounded-lg bg-slate-800 text-slate-300 transition hover:bg-brand-600 hover:text-white">
-              <Mail size={17} />
+            <a href="mailto:jguirimahmed112@gmail.com" aria-label="Email" className="hover:text-brand-600">
+              <Mail size={20} strokeWidth={1.75} />
             </a>
           </div>
         </div>
-        <FooterColumn title={t("footer.explore")} links={explore} />
-        <FooterColumn title={t("footer.account")} links={account} />
       </div>
-      <div className="border-t border-slate-800">
-        <div className="container-page flex flex-col items-center justify-between gap-2 py-5 text-xs text-slate-500 sm:flex-row">
+      <div className="border-t border-gray-300">
+        <div className="container-page flex flex-col items-center justify-between gap-3 py-5 text-sm text-gray-600 sm:flex-row">
+          <Logo />
           <p>© {new Date().getFullYear()} WeeBid — {t("footer.project")}</p>
-          <p>React · Symfony · Socket.io · MariaDB</p>
+          <p className="text-gray-500">React · Symfony · Socket.io · MariaDB</p>
         </div>
       </div>
     </footer>

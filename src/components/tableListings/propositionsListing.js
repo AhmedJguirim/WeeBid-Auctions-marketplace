@@ -18,8 +18,8 @@ const PropositionsListing = () => {
       emptyText={t("tables.proposalsEmpty")}
       columns={[
         { header: t("tables.from"), cell: (p) => <Link to={`${navRoutes.CONSULTUSER}/${p.transmitter.id}`} className="font-semibold text-brand-700 hover:underline">{p.transmitter.displayName}</Link> },
-        { header: t("tables.proposedAuction"), cell: (p) => <Link to={`${navRoutes.ENCHERE}/${p.enchere.id}`} className="font-semibold text-slate-800 hover:text-brand-700 hover:underline">{p.enchere.article.name}</Link> },
-        { header: t("detail.date"), align: "right", cell: (p) => <span className="text-slate-500">{dateLabel(p.date)}</span> },
+        { header: t("tables.proposedAuction"), cell: (p) => <Link to={`${navRoutes.ENCHERE}/${p.enchere.id}`} className="font-semibold text-gray-800 hover:text-brand-700 hover:underline">{p.enchere.article.name}</Link> },
+        { header: t("detail.date"), align: "right", cell: (p) => <span className="text-gray-500">{dateLabel(p.date)}</span> },
       ]}
     />
   );
