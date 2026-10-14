@@ -54,7 +54,7 @@ class Article
     ])]
     #[Assert\Length(
         min: 3,
-        max: 15,
+        max: 40,
         maxMessage: 'le nom  est trop long',
         minMessage: 'le nom  est trop court'
     )]
