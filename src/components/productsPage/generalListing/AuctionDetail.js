@@ -303,7 +303,7 @@ const AuctionDetail = ({ kind }) => {
               <div className="flex gap-3 sm:w-24 sm:shrink-0 sm:flex-col">
                 {images.map((src, i) => (
                   <button key={src} onClick={() => setActiveImage(i)} className={`aspect-[4/5] w-20 shrink-0 overflow-hidden border bg-gray-100 transition sm:w-full ${i === activeImage ? "border-brand-600 ring-2 ring-brand-100" : "border-gray-300 hover:border-gray-900"}`}>
-                    <img src={src} alt={`${article.name}, view ${i + 1}`} className="h-full w-full object-cover" />
+                    <img src={src} alt={`${article.name}, view ${i + 1}`} className="h-full w-full object-contain" />
                   </button>
                 ))}
               </div>
@@ -312,7 +312,7 @@ const AuctionDetail = ({ kind }) => {
               <img
                 src={images[activeImage] || placeHolder}
                 alt={images[activeImage] ? article.name : `${article.name}: main product photo on a plain light background, item centred`}
-                className="h-full w-full object-cover"
+                className="h-full w-full object-contain"
               />
             </div>
           </div>

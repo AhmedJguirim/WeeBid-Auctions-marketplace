@@ -32,7 +32,7 @@ export const AuctionCard = ({ vente, type }) => {
   return (
     <article>
       <Link to={`${type}/${vente.id}`} className="block aspect-[4/5] overflow-hidden border border-gray-300 bg-gray-100">
-        <img src={image} alt={alt} loading="lazy" className="h-full w-full object-cover" />
+        <img src={image} alt={alt} loading="lazy" className="h-full w-full object-contain" />
       </Link>
       <div className="mt-3 flex items-center justify-between gap-2">
         <StatusLine startDate={vente.startDate} endDate={vente.endDate} />

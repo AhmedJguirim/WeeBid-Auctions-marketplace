@@ -213,7 +213,7 @@ export default function CreateArticle() {
                 <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
                   {files.map(({ url }, i) => (
                     <div key={url} className="group relative aspect-square overflow-hidden rounded-sm bg-gray-100">
-                      <img src={url} alt="" className="h-full w-full object-cover" />
+                      <img src={url} alt="" className="h-full w-full object-contain" />
                       <button type="button" onClick={() => setFiles(files.filter((_, j) => j !== i))} aria-label={t("create.remove")} className="absolute right-1.5 top-1.5 rounded-full bg-gray-900/70 p-1 text-white opacity-0 transition group-hover:opacity-100">
                         <X size={14} />
                       </button>
