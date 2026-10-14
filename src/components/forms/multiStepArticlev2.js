@@ -196,7 +196,7 @@ export default function CreateArticle() {
           {step === 0 && (
             <>
               <div className="grid gap-5 sm:grid-cols-2">
-                <Field label={t("create.name")} placeholder={t("create.namePlaceholder")} maxLength={15} {...fieldProps("name")} />
+                <Field label={t("create.name")} placeholder={t("create.namePlaceholder")} maxLength={40} {...fieldProps("name")} />
                 <Field label={t("detail.state")} as="select" {...fieldProps("state")}>
                   <option value="utilisé">{t("state.utilisé")}</option>
                   <option value="neuf">{t("state.neuf")}</option>
