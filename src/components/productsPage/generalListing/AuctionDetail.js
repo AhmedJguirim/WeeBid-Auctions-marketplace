@@ -16,7 +16,7 @@ import Modal from "../../ui/Modal";
 import Avatar from "../../ui/Avatar";
 import { formatDate, formatDateTime, formatNumber } from "../../../i18n";
 
-const placeHolder = "/assets/placeholders/product.jpg"; // not committed yet, see public/assets/README.md
+const placeHolder = "/assets/placeholders/product.svg"; // not committed yet, see public/assets/README.md
 
 /**
  * One detail page for both kinds of auctions. Everything that differs between an

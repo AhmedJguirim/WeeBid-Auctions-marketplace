@@ -56,12 +56,12 @@ const Homepage = () => {
       {/* hero */}
       <section className="relative isolate overflow-hidden bg-gray-100">
         <img
-          src={`${ASSETS}/hero.jpg`}
+          src={`${ASSETS}/hero.jpeg`}
           alt="Wide banner photo, light and airy: a person smiling while holding a freshly won vintage camera, auction items blurred in the background. Subject on the right, left third kept empty for the headline."
           className="absolute inset-0 -z-10 h-full w-full object-cover"
         />
         <div className="container-page flex min-h-[26rem] items-center py-16 lg:min-h-[34rem]">
-          <div className="max-w-xl">
+          <div className="max-w-xl rounded-2xl bg-white/40 p-6">
             <h1 className="text-4xl font-bold leading-tight text-gray-900 lg:text-5xl">
               {t("home.title1")}
               <br />
@@ -77,21 +77,21 @@ const Homepage = () => {
       <section className="container-page -mt-4 grid gap-6 pb-4 pt-10 md:grid-cols-3">
         <Tile
           to={navRoutes.ENCHERES}
-          image={`${ASSETS}/tile-auctions.jpg`}
+          image={`${ASSETS}/tile-auctions.jpeg`}
           alt="Close-up of a wooden auction gavel resting on a stack of vintage books, soft daylight"
           title={t("home.service_auctions_title")}
           text={t("home.tileAuctions")}
         />
         <Tile
           to={navRoutes.ENCHERESINVERSES}
-          image={`${ASSETS}/tile-reverse.jpg`}
+          image={`${ASSETS}/tile-reverse.jpeg`}
           alt="Two people at a workshop table comparing quotes on a laptop, one pointing at the screen"
           title={t("home.service_reverse_title")}
           text={t("home.tileReverse")}
         />
         <Tile
           to={navRoutes.CATEGORIES}
-          image={`${ASSETS}/tile-categories.jpg`}
+          image={`${ASSETS}/tile-categories.jpeg`}
           alt="Flat-lay of assorted marketplace goods: a sneaker, a watch, a ceramic mug, a plant, a small speaker"
           title={t("home.browseCategories")}
           text={t("home.tileCategories")}
@@ -117,7 +117,7 @@ const Homepage = () => {
         </div>
         <div className="aspect-[4/3] bg-gray-100">
           <img
-            src={`${ASSETS}/how-it-works.jpg`}
+            src={`${ASSETS}/how-it-works.jpeg`}
             alt="Person at a desk looking at a phone showing a live bid countdown, a parcel and packing tape beside them"
             loading="lazy"
             className="h-full w-full object-cover"
@@ -134,7 +134,7 @@ const Homepage = () => {
       {/* dark call-out */}
       <section className="relative isolate mt-16 overflow-hidden bg-gray-100">
         <img
-          src={`${ASSETS}/cta.jpg`}
+          src={`${ASSETS}/cta.jpeg`}
           alt="Wide photo of a tidy home workspace with boxed items ready to ship, warm light, empty space on the left"
           loading="lazy"
           className="absolute inset-0 -z-10 h-full w-full object-cover"

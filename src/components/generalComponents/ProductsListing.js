@@ -20,7 +20,7 @@ const StatusLine = ({ startDate, endDate }) => {
 };
 
 // Missing seed pictures fall back to this path; the alt text says what belongs there.
-const FALLBACK_IMAGE = "/assets/placeholders/product.jpg";
+const FALLBACK_IMAGE = "/assets/placeholders/product.svg";
 
 export const AuctionCard = ({ vente, type }) => {
   const { t } = useTranslation();
