@@ -312,7 +312,7 @@
     "submit": "Créer mon compte"
   },
   "create": {
-    "name3_15": "Entre 3 et 15 caractères",
+    "name3_40": "Entre 3 et 40 caractères",
     "max15": "15 caractères maximum",
     "max255": "255 caractères maximum",
     "atLeast1": "Au moins 1",

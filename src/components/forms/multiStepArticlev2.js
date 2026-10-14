@@ -23,7 +23,7 @@ const toLocal = (date) => {
 const makeValidate = (t) => (v) => {
   const e = {};
   if (!v.name) e.name = t("form.required");
-  else if (v.name.length < 3 || v.name.length > 15) e.name = t("create.name3_15");
+  else if (v.name.length < 3 || v.name.length > 40) e.name = t("create.name3_40");
   if (!v.localisation) e.localisation = t("form.required");
   if (v.brand && v.brand.length > 15) e.brand = t("create.max15");
   if (v.description && v.description.length > 255) e.description = t("create.max255");
