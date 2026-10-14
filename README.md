@@ -5,20 +5,12 @@
 **Buy, sell and negotiate through live auctions, reverse auctions and quote requests.**
 My first full-stack web project: React · Symfony · Node.js (Socket.io) · MariaDB
 
-<img src="docs/screenshots/home.jpg" alt="WeeBid homepage" width="860">
+<img src="docs/screenshots/home.png" alt="WeeBid homepage" width="860">
 
 </div>
 
-## The idea
-
-WeeBid is a marketplace where people compete over a product by bidding for the best price, whatever the product is.
-I wanted to remove what makes classic auction sites annoying:
-
-- **Free to use**: no listing fee and no deposit to bid.
-- **Flexible timing**: the seller freely chooses when the auction starts and how long it lasts.
-- **Reverse auctions**: a buyer posts a need and sellers compete by *lowering* their price. The lowest offer wins.
-
-It started as my end-of-studies project: about 3–4 months of work, plus a 40-page report (in French). It was my first real step into web development.
+## Developer Note
+This version of the application was sort of an MVP/Proof of concept for an idea that the company hosting my internship had. It was one of my first steps into web development and i learned a lot making this app. Due to internal issues in the company, the work on the project didn't continue and the idea was abandoned. So i am using it as a portfolio project. The app is by no means ready for production usage in its current condition, but it can make a good, opensource starting point if you're going to build a bidding application.
 
 ## Main features
 
@@ -33,12 +25,12 @@ It started as my end-of-studies project: about 3–4 months of work, plus a 40-p
 
 <table>
   <tr>
-    <td><img src="docs/screenshots/auctions.jpg" alt="Auction list"></td>
-    <td><img src="docs/screenshots/auction.jpg" alt="Auction page with live countdown and bidding"></td>
+    <td><img src="docs/screenshots/auctions.png" alt="Auction list"></td>
+    <td><img src="docs/screenshots/auction.png" alt="Auction page with live countdown and bidding"></td>
   </tr>
   <tr>
-    <td align="center"><img src="docs/screenshots/mobile-home.jpg" alt="Mobile homepage" width="230"></td>
-    <td align="center"><img src="docs/screenshots/mobile-auction.jpg" alt="Mobile auction page" width="230"></td>
+    <td align="center"><img src="docs/screenshots/auctions-mobile.png" alt="Mobile homepage" width="230"></td>
+    <td align="center"><img src="docs/screenshots/auction-mobile.png" alt="Mobile auction page" width="230"></td>
   </tr>
 </table>
 
@@ -56,14 +48,6 @@ It started as my end-of-studies project: about 3–4 months of work, plus a 40-p
         │                    ▲
         └── Socket.io ──► Node server (verifies bids, creates notifications)
 ```
-
-## What was updated with Claude
-
-The application itself (concept, data model, API, real-time features) is my original work. I recently used [Claude](https://claude.ai/code) to modernise how it looks and who can use it:
-
-- **A complete UI redesign with Tailwind CSS**: new design system (colours, typography, components), a responsive layout from phone to desktop, a new homepage, auction cards, auction page, forms, profile and tables, plus loading and empty states.
-- **Cleaner frontend code**: one shared component for all auction listings and one for auction pages, instead of many near-identical copies.
-- **French / English translation** with i18next: language switcher in the navbar, remembered choice, and numbers and dates formatted for the selected language.
 
 ## Installation
 
