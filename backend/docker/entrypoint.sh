@@ -41,10 +41,6 @@ if [ -n "$SOCKET_PASSWORD" ]; then
     php bin/console app:create-admin "${SOCKET_USER:-socket@weebid.internal}" "$SOCKET_PASSWORD" --role=ROLE_USER --display-name=weebidsocket --sync-password
 fi
 
-if [ "$SEED_DEMO" = "true" ]; then
-    php bin/console app:seed-demo --locale="${SEED_LOCALE:-fr}"
-fi
-
 chown -R www-data:www-data var public/media public/user public/category config/jwt
 chmod 640 config/jwt/*.pem
 

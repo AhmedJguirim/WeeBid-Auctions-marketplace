@@ -4,6 +4,7 @@
 #
 #   scripts/init-env.sh                                  # asks for the admin e-mail and the public URL
 #   scripts/init-env.sh --email me@example.com --url http://203.0.113.10:18080
+#   scripts/init-env.sh --private-admin ...              # admin dashboard reachable from the server only (SSH tunnel)
 #   scripts/init-env.sh --upgrade --email me@example.com # existing server: ADD the missing keys, never touch the others
 #   scripts/init-env.sh --force                          # overwrite an existing .env (a new database/secrets!)
 #
@@ -12,14 +13,15 @@
 set -euo pipefail
 cd "$(dirname "${BASH_SOURCE[0]}")/.."
 
-EMAIL=""; URL=""; UPGRADE=0; FORCE=0
+EMAIL=""; URL=""; UPGRADE=0; FORCE=0; PRIVATE_ADMIN=0
 while [[ $# -gt 0 ]]; do
   case "$1" in
     --email) EMAIL="${2:?--email needs a value}"; shift ;;
     --url) URL="${2:?--url needs a value}"; shift ;;
     --upgrade) UPGRADE=1 ;;
     --force) FORCE=1 ;;
-    -h|--help) sed -n '2,11p' "$0" | sed 's/^# \{0,1\}//'; exit 0 ;;
+    --private-admin) PRIVATE_ADMIN=1 ;;
+    -h|--help) sed -n '2,12p' "$0" | sed 's/^# \{0,1\}//'; exit 0 ;;
     *) echo "unknown option: $1" >&2; exit 1 ;;
   esac
   shift
@@ -89,6 +91,7 @@ tmp="$(mktemp)"
 while IFS= read -r line; do
   case "$line" in
     PUBLIC_URL=*)       echo "PUBLIC_URL=$URL" ;;
+    ADMIN_PORT=*)       if [[ "$PRIVATE_ADMIN" == 1 ]]; then echo "ADMIN_PORT=127.0.0.1:18000"; else echo "ADMIN_PORT=18000"; fi ;;
     APP_SECRET=*)       echo "APP_SECRET=$(rand 32)" ;;
     JWT_PASSPHRASE=*)   echo "JWT_PASSPHRASE=$(rand 16)" ;;
     DB_NAME=*)          echo "DB_NAME=weebid_$(rand 3)" ;;
@@ -108,5 +111,12 @@ echo "✔ .env created (readable by you only)."
 echo
 echo "  Admin login:  $EMAIL"
 echo "  Admin password (also stored in .env): $ADMIN_PASSWORD"
+echo
+HOST="$(printf '%s' "$URL" | sed -E 's#^[a-zA-Z]+://##; s#[:/].*$##')"
+if [[ "$PRIVATE_ADMIN" == 1 ]]; then
+  echo "  Admin dashboard: private. Open an SSH tunnel (-L 28000:127.0.0.1:18000) then http://localhost:28000/admin"
+else
+  echo "  Admin dashboard: http://$HOST:18000/admin"
+fi
 echo
 echo "Next:  docker compose up -d --build"

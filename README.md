@@ -82,7 +82,8 @@ The first start takes a few minutes. Then open:
 
 - **The app:** http://localhost:18080
 - **Admin dashboard:** http://localhost:18000/admin (the admin e-mail and password printed by `init-env.sh`)
-- **Demo members** (the database is filled with sample auctions): `amine@weebid.local`, `sarra@weebid.local`… with password `demo1234`
+
+The app starts empty (only the admin account exists): add categories and auctions from the dashboard. Optional sample data: `docker compose exec backend php bin/console app:seed-demo --locale=en`.
 
 No secret is ever stored in the repository or in an image: they all live in your private `.env`.
 
@@ -102,7 +103,7 @@ php bin/console doctrine:database:create
 php bin/console doctrine:schema:update --force
 php bin/console lexik:jwt:generate-keypair
 php bin/console app:create-admin you@example.com a-strong-password
-php bin/console app:seed-demo                # optional sample data
+php bin/console app:seed-demo                # optional sample data (manual)
 php -S 127.0.0.1:8000 -t public              # or: symfony server:start
 
 # 2. Real-time server (port 8081)

@@ -10,8 +10,9 @@ docker compose up -d --build
 | What | URL |
 |------|-----|
 | The app | `http://<host>:18080/` (`WEB_PORT`) |
-| Admin dashboard (EasyAdmin) | `http://localhost:18000/admin` (`ADMIN_PORT`); login = the e-mail and password printed by `init-env.sh` (`ADMIN_EMAIL` / `ADMIN_PASSWORD` in `.env`) |
-| Demo members | `amine@weebid.local`, `sarra@weebid.local`, `yassine@weebid.local`, … / `demo1234` (public on purpose, see `SEED_DEMO`) |
+| Admin dashboard (EasyAdmin) | `http://<host>:18000/admin` (`ADMIN_PORT`); login = the e-mail and password printed by `init-env.sh` (`ADMIN_EMAIL` / `ADMIN_PASSWORD` in `.env`) |
+
+The app starts **empty**: only the admin account exists (plus an internal service account). Categories, auctions, etc. are yours to add from the admin dashboard.
 
 ## Secrets and configuration
 
@@ -40,11 +41,11 @@ one of the values that used to be published in the repository.
 - The old `backend/.env` that used to be committed contained a development `APP_SECRET` and `JWT_PASSPHRASE`. They are still in the git history, so never use them anywhere (the backend rejects them).
 
 First start takes a few minutes (image builds). The backend waits for the DB, generates the JWT keys,
-creates the DB schema from the entities (the repo ships no migrations), creates the admin user and, unless `SEED_DEMO=false`, fills the database with demo data (5 members, 6 categories, 12 auctions with bid history, 6 reverse auctions). Restarting the stack refreshes the dates of expired demo auctions so the demo never looks dead. The demo content is seeded in French by default; set `SEED_LOCALE=en` for English (use `docker compose down -v` first if the database already exists).
+creates the DB schema from the entities (the repo ships no migrations), and creates the admin user. Nothing else is seeded. (Optional sample data exists as a manual command: `docker compose exec backend php bin/console app:seed-demo --locale=en`.)
 
 ## Languages
 
-The UI is available in French and English (i18next). It picks the language from the browser, remembers the choice in `localStorage` and can be switched with the FR | EN toggle in the navbar. Translations live in `src/i18n/locales/{fr,en}.json`; to add a language, create a JSON file, register it in `src/i18n/index.js` and add it to `languages`. Auction/category texts come from the database, so they stay in the language they were created in (see `SEED_LOCALE`), and validation messages returned by the API are still French.
+The UI is available in French and English (i18next). It picks the language from the browser, remembers the choice in `localStorage` and can be switched with the FR | EN toggle in the navbar. Translations live in `src/i18n/locales/{fr,en}.json`; to add a language, create a JSON file, register it in `src/i18n/index.js` and add it to `languages`. Auction/category texts come from the database, so they stay in the language they were created in, and validation messages returned by the API are still French.
 
 ## How it is wired
 
@@ -63,9 +64,9 @@ The socket server reads `PORT`, `API_URL`, `CORS_ORIGIN`.
 
 1. Install Docker + the compose plugin, clone the repo.
 2. `scripts/init-env.sh --email you@example.com --url http://203.0.113.10:18080` creates the private `.env` **on the server**
-   (the URL is what users type in the browser, port included). Note the admin password it prints. Set `SEED_DEMO=false` in `.env` for a private installation without demo members.
+   (the URL is what users type in the browser, port included). Note the admin password it prints.
 3. `docker compose up -d --build`
-4. Open port 18080 in the firewall. The admin dashboard is only bound to the server itself (`ADMIN_PORT=127.0.0.1:18000`): reach it through an SSH tunnel (`ssh -L 18000:127.0.0.1:18000 user@server`, then http://localhost:18000/admin).
+4. Open port 18080 in the firewall. The admin dashboard is public on port 18000 by default (`http://<server>:18000/admin`). It bypasses nginx, so its login is **not rate-limited**: keep the generated long password. To make it private instead, run `init-env.sh --private-admin` (binds `127.0.0.1:18000`) and use an SSH tunnel (`ssh -L 28000:127.0.0.1:18000 user@server`, then http://localhost:28000/admin). Note that Docker-published ports bypass `ufw`.
 
 HTTPS: put Caddy/Traefik/Cloudflare in front of port 18080 (shared reverse proxy for several apps) (nginx already forwards `X-Forwarded-Proto`).
 Update `PUBLIC_URL` to the `https://` address.
