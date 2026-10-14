@@ -87,6 +87,7 @@ It fetches the branch you are on, backs up the database, fast-forwards the code,
 | `scripts/deploy.sh --force` | rebuild and restart even if nothing changed (e.g. after editing `.env`) |
 | `scripts/deploy.sh --branch main` | switch the server to another branch |
 | `scripts/deploy.sh --resume` | lift the hold left by a rollback and deploy the latest code |
+| `scripts/redeploy.sh` | rebuild backend + frontend + socket from the code on disk and restart, database untouched (no git needed, local edits are fine). `--no-cache` for a from-scratch build |
 | `scripts/rollback.sh [commit]` | go back to the previous (or a given) version and hold deploys |
 | `scripts/backup.sh` | dump the database and archive the uploads into `./backups` (last 10 kept) |
 | `scripts/restore.sh <db.sql.gz> [files.tar.gz]` | restore a backup (asks for confirmation) |
